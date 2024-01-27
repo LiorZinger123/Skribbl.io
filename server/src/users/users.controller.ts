@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Res, UsePipes, ValidationPipe, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Response } from 'express';
-import { UserDto } from './dtos/user.dto';
+import { CreateUserDto } from './dtos/createUser.dot';
 import { AuthService } from 'src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
 
@@ -15,7 +15,7 @@ export class UsersController {
   
   @UsePipes(ValidationPipe)  
   @Post('add')
-  async addUser(@Res() res: Response, @Body() user: UserDto): Promise<void>{
+  async addUser(@Res() res: Response, @Body() user: CreateUserDto): Promise<void>{
     try{
       const result = await this.usersService.create(user)
       if(typeof result !== "number"){

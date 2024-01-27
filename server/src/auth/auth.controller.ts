@@ -16,6 +16,7 @@ import { ConfigService } from '@nestjs/config';
   
 @Controller('auth')
 export class AuthController {
+    
     constructor(
         private authService: AuthService, 
         private configService: ConfigService
@@ -28,10 +29,5 @@ export class AuthController {
         const token = this.authService.login(req.user)
         const maxAge = this.configService.get<number>('cookieExpirationTime')
         res.cookie('Login', token, { httpOnly: true, maxAge: maxAge })
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Get('profile')
-    getProfile(@Req() req) {
     }
 }

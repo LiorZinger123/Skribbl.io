@@ -1,6 +1,6 @@
-type UserLogin = {
+type User = {
     username: string,
     password: string
 }
 
-export default UserLogin
+export default User

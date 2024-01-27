@@ -1,39 +1,44 @@
-import React, { useState } from "react"
-import UserLogin from "../../types/userLogin"
-import { connect } from "../../Api/fetchFunctions"
+import { useNavigate } from 'react-router-dom'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { LoginFormFields, schema } from '../../types/loginFormFields'
+import { connect } from '../../Api/fetchFunctions'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 const Login = () => {
-    
-    const [data, setData] = useState<UserLogin>({ username: '', password: '' })
-    const [msg, setMsg] = useState<string>('')
 
-    const handleConnect = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    const nav = useNavigate()
+    const { 
+        register, 
+        handleSubmit, 
+        setError, 
+        formState: { errors, isSubmitting } 
+    } = useForm<LoginFormFields>({
+        resolver: zodResolver(schema)
+    })
+0
+    const onSubmit: SubmitHandler<LoginFormFields> = async (data): Promise<void> => {
         try{
-            e.preventDefault()
             const res = await connect('auth/login', data)
             if(res.ok)
-                console.log("Connect!")
-            if(res.status === 400)
-                setMsg("Username or password is incorrect")
+                nav('')
+            if(res.status === 401)
+                setError("root", { message: "Username or password is incorrect" })
         }
         catch{
-            setMsg("Something went wrong. Please try again later.")
+            setError("root", { message: "Something went wrong, please try again later."})
         }
     }
 
-    return (
-    <div>
-        <form onSubmit={handleConnect}>
-            <input type='text' name='username' value={data.username} onChange={(e) => setData({...data, username: e.target.value})}
-            placeholder="Username" required />
-
-            <input type='password' name='password' value={data.password} onChange={(e) => setData({...data, password: e.target.value})}
-            placeholder="Password" required />
-
-            <button>Login</button>
-        </form>
-        <p>{msg}</p>
-    </div>
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+        <input {...register("username")} type='text' placeholder='Username' />
+        <input {...register("password")} type='password' placeholder='Password' />
+        <button disabled={isSubmitting} type='submit'>
+            {isSubmitting ? "Loading..." : "Submit"}
+        </button>
+        <button type='button' onClick={() => nav('signup')}>Sign Up</button>
+        {errors.root && <div>{errors.root.message}</div>}
+    </form>
   )
 }
 
