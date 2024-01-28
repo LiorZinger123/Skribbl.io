@@ -20,7 +20,7 @@ const Login = () => {
         try{
             const res = await connect('auth/login', data)
             if(res.ok)
-                nav('')
+                nav('home')
             if(res.status === 401)
                 setError("root", { message: "Username or password is incorrect" })
         }

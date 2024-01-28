@@ -22,7 +22,7 @@ const SignUp = () => {
                 const {submitPassword, ...userInfo} = data
                 const res = await connect('users/add', userInfo)
                 if(res.status === 201)
-                    nav('')
+                    nav('home')
                 if(res.status === 403)
                     setError("root", { message: "Username already exists" })
             }
