@@ -12,7 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
         const cookie = request?.cookies['Login']
-        return cookie.accessToken
+        return cookie?.accessToken
       }]),
       ignoreExpiration: false, 
       secretOrKey: configService.get<string>('jwt')

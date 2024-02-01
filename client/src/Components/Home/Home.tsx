@@ -1,36 +1,31 @@
-import { useState, useEffect } from "react"
-import { Socket, io } from "socket.io-client"
+import { useState, useEffect, useContext } from "react"
+import Room from "../../types/room"
+import { getFromApi } from "../../Api/fetch"
+import RoomInList from "../RoomInList/RoomInList"
+import { StableNavigateContext } from "../../App"
 
 const Home = () => {
 
-    const [socket, setSocket] = useState<Socket>(null!)
-    const [room, setRoom] = useState<string>('')
+    const [rooms, setRooms] = useState<Room[]>([])
+    const nav = useContext(StableNavigateContext)
 
     useEffect(() => {
-        const newSocket = io('http://localhost:8080')
-        setSocket(newSocket)
-        newSocket.on('createRoom', (id: string) => {
-            setRoom(id)
-        })
-        return (): void => {
-            newSocket.off('createRoom')
-            newSocket.close()
+        const getRoomsFromApi = async (): Promise<void> => {
+            const res = await getFromApi('users/rooms')
+            if(res.ok)
+                setRooms(await res.json())
         }
+       getRoomsFromApi()
     }, [])
-
-    const joinRoon = (): void => {
-        socket.emit('join', room)
-    }
-
-    const createRoom = (): void => {
-        socket.emit('create')
-    }
 
   return (
     <div>
-        <input type="text" value={room} onChange={e => setRoom(e.target.value)} placeholder="Room ID" />
-        <button onClick={joinRoon}>Join Room</button>
-        <button onClick={createRoom}>Create Room</button>
+        <button onClick={() => nav('/createroom')}>Create Room</button>
+        <ul>
+            {rooms.map(room => (
+              <RoomInList key={room.id} room={room} />
+            ))}
+        </ul>
     </div>
   )
 }

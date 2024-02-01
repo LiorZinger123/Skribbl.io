@@ -1,12 +1,14 @@
+import { useContext } from 'react'
+import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SignUpFormFields, schema } from '../../types/signUpFormFields'
-import { connect } from '../../Api/fetchFunctions'
-import { useNavigate } from 'react-router-dom'
+import { fetchToApi } from '../../Api/fetch'
 
 const SignUp = () => {
 
-    const nav = useNavigate()
+    const nav = useContext(StableNavigateContext)
+
     const { 
         register, 
         handleSubmit, 
@@ -20,11 +22,11 @@ const SignUp = () => {
                 setError("submitPassword", { message: "Passwords do not match" })
             else{
                 const {submitPassword, ...userInfo} = data
-                const res = await connect('users/add', userInfo)
+                const res = await fetchToApi('users/add', userInfo)
                 if(res.status === 201)
-                    nav('home')
+                    nav('/home')
                 if(res.status === 403)
-                    setError("root", { message: "Username already exists" })
+                    setError("root", { message: await res.text() })
             }
         }
         catch{

@@ -1,12 +1,14 @@
-import { useNavigate } from 'react-router-dom'
+import { useContext } from 'react'
+import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { LoginFormFields, schema } from '../../types/loginFormFields'
-import { connect } from '../../Api/fetchFunctions'
+import { fetchToApi } from '../../Api/fetch'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 const Login = () => {
 
-    const nav = useNavigate()
+    const nav = useContext(StableNavigateContext)
+    
     const { 
         register, 
         handleSubmit, 
@@ -18,7 +20,7 @@ const Login = () => {
 0
     const onSubmit: SubmitHandler<LoginFormFields> = async (data): Promise<void> => {
         try{
-            const res = await connect('auth/login', data)
+            const res = await fetchToApi('auth/login', data)
             if(res.ok)
                 nav('home')
             if(res.status === 401)
