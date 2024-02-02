@@ -13,7 +13,7 @@ const Home = () => {
         const getRoomsFromApi = async (): Promise<void> => {
             const res = await getFromApi('users/rooms')
             if(res.ok)
-                setRooms(await res.json())
+              setRooms(await res.json())
         }
        getRoomsFromApi()
     }, [])

@@ -23,8 +23,10 @@ const SignUp = () => {
             else{
                 const {submitPassword, ...userInfo} = data
                 const res = await fetchToApi('users/add', userInfo)
-                if(res.status === 201)
+                if(res.status === 201){
+                    // username.current = await res.text()
                     nav('/home')
+                }
                 if(res.status === 403)
                     setError("root", { message: await res.text() })
             }

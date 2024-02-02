@@ -27,7 +27,7 @@ export class UsersService {
         return null
       }
       catch(e){
-        throw e
+        // throw e
       }
     }
 
@@ -45,7 +45,7 @@ export class UsersService {
         return newUser
       }
       catch(e){
-        throw e
+        // throw e
       }
     }
 

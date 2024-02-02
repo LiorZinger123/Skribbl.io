@@ -25,9 +25,10 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(LocalGuard)
     @Post('login')
-    login(@Req() req, @Res({ passthrough: true }) res: Response){
+    login(@Req() req, @Res({ passthrough: true }) res: Response): void{
         const token = this.authService.login(req.user)
         const maxAge = this.configService.get<number>('cookieExpirationTime')
         res.cookie('Login', token, { httpOnly: true, maxAge: maxAge })
+        res.status(HttpStatus.OK).send(req.user.username)
     }
 }

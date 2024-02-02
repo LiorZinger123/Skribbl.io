@@ -21,8 +21,10 @@ const Login = () => {
     const onSubmit: SubmitHandler<LoginFormFields> = async (data): Promise<void> => {
         try{
             const res = await fetchToApi('auth/login', data)
-            if(res.ok)
+            if(res.ok){
+                // username.current = await res.text()
                 nav('home')
+            }
             if(res.status === 401)
                 setError("root", { message: "Username or password is incorrect" })
         }

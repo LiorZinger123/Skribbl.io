@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, NavigateFunction } from "react-router-dom";
+import { Routes, Route, NavigateFunction } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useRef, createContext } from "react";
 import Login from './Components/Login/Login'

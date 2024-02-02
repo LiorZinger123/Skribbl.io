@@ -16,9 +16,10 @@ const RoomInList = (props: Props) => {
   const joinRoom = async (id: string): Promise<void> => {
     try{
         const res = await fetchToApi('users/join', { room: id, password: password })
-        if(res.ok)
-            //set id global val
-            nav('/room')
+        if(res.ok){
+          // room.current = id
+          nav('/room')
+        }
     }
     catch{
         //pass error
@@ -30,7 +31,7 @@ const RoomInList = (props: Props) => {
       id: {props.room.id} name: {props.room.name}
       {props.room.hasPassword &&
         <input type="text" value={password} onChange={e => setPassward(e.target.value)} placeholder="Enter Password" required/>}
-      <button disabled={props.room.hasPassword && password.length < 3} onClick={() => joinRoom(props.room.id)}>Join Room</button>
+      <button type='submit' disabled={props.room.hasPassword && password.length < 3} onClick={() => joinRoom(props.room.id)}>Join Room</button>
     </li>
   )
 }

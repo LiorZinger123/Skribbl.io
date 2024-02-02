@@ -26,7 +26,7 @@ export class UsersController {
         const token = this.authService.login(result)
         const maxAge = this.configService.get<number>('cookieExpirationTime')
         res.cookie('Login', token, { httpOnly: true, maxAge: maxAge })
-        res.sendStatus(HttpStatus.CREATED)
+        res.status(HttpStatus.CREATED).send(result.username)
       }
       else
         res.status(HttpStatus.FORBIDDEN).send(result)
