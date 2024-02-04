@@ -1,12 +1,15 @@
 import { useContext } from 'react'
+import { useAppDispatch } from '../../store/hooks'
 import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SignUpFormFields, schema } from '../../types/signUpFormFields'
 import { fetchToApi } from '../../Api/fetch'
+import { setUsername } from '../../store/counterSlice'
 
 const SignUp = () => {
 
+    const dispatch = useAppDispatch()
     const nav = useContext(StableNavigateContext)
 
     const { 
@@ -24,10 +27,10 @@ const SignUp = () => {
                 const {submitPassword, ...userInfo} = data
                 const res = await fetchToApi('users/add', userInfo)
                 if(res.status === 201){
-                    // username.current = await res.text()
+                    dispatch(setUsername(await res.text()))
                     nav('/home')
                 }
-                if(res.status === 403)
+                else
                     setError("root", { message: await res.text() })
             }
         }

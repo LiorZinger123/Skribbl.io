@@ -27,7 +27,7 @@ export class UsersService {
         return null
       }
       catch(e){
-        // throw e
+        return null
       }
     }
 
@@ -44,8 +44,8 @@ export class UsersService {
         await newUser.save()
         return newUser
       }
-      catch(e){
-        // throw e
+      catch{
+        return 'Something went wrong, please try again later.'
       }
     }
 
@@ -55,22 +55,24 @@ export class UsersService {
         {
           id: room.id,
           name: room.name,
-          hasPassword: room.password !== '' ? true : false 
+          hasPassword: room.password !== '' ? true : false,
+          connectedPlayers: room.connectedPlayers,
+          maxPlayers: room.players 
         }
       ))
     }
 
-    joinRoom(data: JoinRoomDto): boolean {
-      const existingRoom = this.rooms.find(roomObj => roomObj.id === data.room)
-      if(existingRoom){
-        if(data.password.length === 0)
-          return true
-        else{
-          if(data.password === existingRoom.password)
-            return true
-        }
+    joinRoom(data: JoinRoomDto): string {
+      const existingRoom = this.rooms.find(room => room.id === data.room)
+      if(data.password.length === 0 || data.password === existingRoom.password){
+        this.rooms = this.rooms.map(room => {
+          if(room.id === data.room)
+            return {...room, connectedPlayers: room.connectedPlayers + 1}
+          return room
+        })
+        return data.room
       }
-      return false
+      return null
     }
 
     createRoom(data: NewRoom): string {
@@ -92,5 +94,14 @@ export class UsersService {
       if(room)
         return true
       return false
+    }
+
+    leaveRoom(id: string): number{
+      this.rooms = this.rooms.map(room => {
+        if(room.id === id)
+          return {...room, connectedPlayers: room.connectedPlayers - 1}
+        return room
+      })
+      return HttpStatus.OK
     }
 }

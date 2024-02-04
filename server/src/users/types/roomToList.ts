@@ -1,7 +1,9 @@
 type RoomToList = {
     id: string, 
     name: string,
-    hasPassword: boolean
+    hasPassword: boolean,
+    connectedPlayers: number,
+    maxPlayers: number
 }
 
 export default RoomToList

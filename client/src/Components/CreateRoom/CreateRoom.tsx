@@ -1,16 +1,20 @@
-import { useContext } from 'react'
+import { Fragment, useContext } from 'react'
 import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CreateRoomFormFields, schema } from "../../types/createRoomFormFields"
 import { fetchToApi } from "../../Api/fetch"
+import { setRoomId } from '../../store/counterSlice'
+import { useAppDispatch } from '../../store/hooks'
 
 const CreateRoom = () => {
 
-  const players = Array.from({ length: 8 }, (_, k) => k + 3)
-  const times = Array.from({ length: 16 }, (_, k) => 10 * (k + 3))
-  const rounds = Array.from({ length: 10 }, (_, k) => k + 1)
+  const players = {id: 'players', label: 'Maximum Players', options: Array.from({ length: 8 }, (_, k) => k + 3)}
+  const times = {id: 'time',label: 'Drawing Time', options: Array.from({ length: 16 }, (_, k) => 10 * (k + 3))}
+  const rounds = {id: 'rounds', label: 'Rounds', options: Array.from({ length: 10 }, (_, k) => k + 1)}
+  const createSettings = [players, times, rounds]
 
+  const dispatch = useAppDispatch()
   const nav = useContext(StableNavigateContext)
 
   const { 
@@ -25,7 +29,7 @@ const CreateRoom = () => {
   const onSubmit: SubmitHandler<CreateRoomFormFields> = async (data): Promise<void> => {
     try{
       const res = await fetchToApi('users/createroom', data)
-      // room.current = await res.text()
+      dispatch(setRoomId(await res.text()))
       nav('/room')
     }
     catch{
@@ -41,26 +45,16 @@ const CreateRoom = () => {
       <label htmlFor="password">Password:</label>
       <input {...register('password')} id='password' placeholder="Enter Password"/>
 
-      <label htmlFor="players">Maximum Players:</label>
-      <select id='players'>
-        {players.map(player => (
-          <option key={player}>{player}</option>
-        ))}
-      </select>
-
-      <label htmlFor="time">Drawing Time:</label>
-      <select id='time'>
-        {times.map(time => (
-          <option key={time}>{time}</option>
-        ))}
-      </select>
-      
-      <label htmlFor="rounds">Rounds:</label>
-      <select id='rounds'>
-        {rounds.map(round => (
-          <option key={round}>{round}</option>
-        ))}
-      </select>
+      {createSettings.map(setting => (
+        <Fragment key={setting.id}>
+          <label htmlFor={setting.id}>{setting.label}:</label>
+          <select id={setting.id}>
+            {setting.options.map(item => (
+              <option key={item}>{item}</option>
+            ))}
+          </select>
+        </Fragment>
+      ))}
       
       <button type='submit' disabled={isSubmitting}>
         {isSubmitting ? "Creating..." : "Create Room"}

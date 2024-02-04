@@ -31,8 +31,8 @@ export class UsersController {
       else
         res.status(HttpStatus.FORBIDDEN).send(result)
     }
-    catch(e){
-      throw e
+    catch(msg){
+      res.status(500).send(msg)
     }
   }
 
@@ -45,9 +45,9 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Post('join')
   joinRoom(@Res() res: Response, @Body() data: JoinRoomDto): void {
-    const result = this.usersService.joinRoom(data)
-    if(result)
-      res.sendStatus(HttpStatus.OK)
+    const id = this.usersService.joinRoom(data)
+    if(id)
+      res.status(HttpStatus.OK).send(id)
     else
       res.sendStatus(HttpStatus.UNAUTHORIZED)
   }
@@ -57,5 +57,11 @@ export class UsersController {
   @Post('createroom')
   createRoom(@Res() res: Response, @Body() data: NewRoom): void {
     res.send(this.usersService.createRoom(data))
+  }
+
+  @Post('leaveroom')
+  leaveRoom(@Res() res: Response, @Body() data: string): void {
+    const result = this.usersService.leaveRoom(data)
+    res.sendStatus(result)
   }
 }

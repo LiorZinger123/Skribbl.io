@@ -4,9 +4,12 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { LoginFormFields, schema } from '../../types/loginFormFields'
 import { fetchToApi } from '../../Api/fetch'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { setUsername } from '../../store/counterSlice'
+import { useAppDispatch } from '../../store/hooks'
 
 const Login = () => {
 
+    const dispatch = useAppDispatch()
     const nav = useContext(StableNavigateContext)
     
     const { 
@@ -22,7 +25,7 @@ const Login = () => {
         try{
             const res = await fetchToApi('auth/login', data)
             if(res.ok){
-                // username.current = await res.text()
+                dispatch(setUsername(await res.text()))
                 nav('home')
             }
             if(res.status === 401)
