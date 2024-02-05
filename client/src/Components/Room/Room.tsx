@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { Socket, io } from "socket.io-client"
 import { useAppSelector } from "../../store/hooks"
 import { RootState } from "../../store/store"
@@ -6,14 +6,14 @@ import { StableNavigateContext } from "../../App"
 import { useContext } from "react"
 import ChatMessage from "../../types/chatMessage"
 import { fetchToApi } from "../../Api/fetch"
+import Chat from "./Chat"
+import Canvas from "./Canvas"
 
 const Room = () => {
  
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const nav = useContext(StableNavigateContext)
   const room = useAppSelector((state: RootState) => state.room)
   const username = useAppSelector((state: RootState) => state.username)
-  const [msg, setMsg] = useState<string>('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [socket, setSocket] = useState<Socket>(null!)
 
@@ -26,21 +26,18 @@ const Room = () => {
     setSocket(newSocket)
     newSocket.emit('join', {room: room, username: username})
     newSocket.on('message', handleMsg)
+    newSocket.on('leaveroom', handleMsg)
 
     return (): void => {
       newSocket.off('message', handleMsg)
+      newSocket.off('leaveroom', handleMsg)
       newSocket.disconnect()
     }
   }, [])
   
-  // useEffect(() => {
-
-  //   const context = canvasRef.current?.getContext('2d')
-  // }, [])
-
   const leaveRoom = async (): Promise<void> => {
     try{
-      await fetchToApi('users/leaveroom', room)
+      await fetchToApi('users/leaveroom', {id: room})
       socket.emit('leaveRoom', {username: username})
       nav('/home')
     }
@@ -49,26 +46,10 @@ const Room = () => {
     }
   }
 
-  const sendMsg = (e: FormEvent<HTMLFormElement>): void => {
-    e.preventDefault()
-    socket.send({room: room, msg: msg})
-    setMsg('')
-  }
-
   return (
     <div>
-      <canvas ref={canvasRef}>
-
-      </canvas>
-      <div className="chat">
-        {messages.map(msg => (
-          <p key={msg.id}>{msg.msg}</p>
-        ))}
-        <form onSubmit={sendMsg}>
-          <input type="text" value={msg} onChange={e => setMsg(e.target.value)} required />
-          <button>SEND</button>
-        </form>
-      </div>
+      <Canvas />
+      <Chat socket={socket} room={room} messages={messages} />
       <button onClick={leaveRoom}>leave</button>
     </div>
   )

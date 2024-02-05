@@ -5,9 +5,9 @@ import { CreateUserDto } from './dtos/createUser.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
 import { JoinRoomDto } from './dtos/joinRoom.dto';
-import Room from './types/room';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { NewRoom } from './dtos/newRoom.dto';
+import { LeaveRoomDto } from './dtos/leaveRoom.dto';
 
 @Controller('users')
 export class UsersController {
@@ -60,8 +60,8 @@ export class UsersController {
   }
 
   @Post('leaveroom')
-  leaveRoom(@Res() res: Response, @Body() data: string): void {
-    const result = this.usersService.leaveRoom(data)
-    res.sendStatus(result)
+  leaveRoom(@Res() res: Response, @Body() data: LeaveRoomDto): void {
+    this.usersService.leaveRoom(data.id)
+    res.sendStatus(200)
   }
 }

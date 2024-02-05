@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schemas/users.schema';
@@ -96,12 +96,12 @@ export class UsersService {
       return false
     }
 
-    leaveRoom(id: string): number{
+    leaveRoom(id: string): void{
       this.rooms = this.rooms.map(room => {
         if(room.id === id)
           return {...room, connectedPlayers: room.connectedPlayers - 1}
         return room
       })
-      return HttpStatus.OK
+      console.log(this.rooms)
     }
 }

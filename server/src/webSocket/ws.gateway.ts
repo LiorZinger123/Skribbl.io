@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io'
 
 @WebSocketGateway({ cors: true })
 export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
-    
+
     @WebSocketServer()
     server: Server
 
