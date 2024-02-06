@@ -36,4 +36,9 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         })
         socket.disconnect(true)
     }
+
+    @SubscribeMessage('drawing')
+    sendDrawing(@MessageBody() data: {drawing: string, room: string}): void{
+        this.server.to(data.room).emit('updatedrawing', data.drawing)    
+    }
 }   

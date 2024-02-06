@@ -17,7 +17,7 @@ export class UsersService {
     private readonly usersModel: Model<UserDocument>
   ) {}
 
-    private rooms: Room[] = [{ id: '111111', name: 'Lior', password: 'aaaa', players: 5, time: 60, rounds: 2, connectedPlayers: 0, currentDrawing: [] }]
+    private rooms: Room[] = [{ id: '111111', name: 'Lior', password: 'aaaa', players: 5, time: 60, rounds: 2, connectedPlayers: 0, currentDrawing: '' }]
 
     async findOne(username: string): Promise<UserDto> {
       try{
@@ -77,7 +77,7 @@ export class UsersService {
 
     createRoom(data: NewRoom): string {
       const newId = this.generateNewId()
-      this.rooms.push({...data, id: newId, connectedPlayers: 0, currentDrawing: []})
+      this.rooms.push({...data, id: newId, connectedPlayers: 0, currentDrawing: ''})
       return newId
     }
 

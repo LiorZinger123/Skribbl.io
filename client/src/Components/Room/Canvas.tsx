@@ -1,6 +1,13 @@
 import { useEffect, useRef } from "react"
+import { Socket } from "socket.io-client"
 
-const Canvas = () => {
+type Props = {
+    drawing: string,
+    socket: Socket,
+    room: string
+}
+
+const Canvas = (props: Props) => {
   
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const contextRef = useRef<CanvasRenderingContext2D | null>(null)
@@ -33,7 +40,8 @@ const Canvas = () => {
                     contextRef.current?.beginPath()
                     contextRef.current?.arc(mouseX, mouseY, 1, 1, 2 * Math.PI)
                     contextRef.current?.stroke()
-                    // contextRef.current?.fillRect(mouseX, mouseY, 1, 1)
+                    // contextRef.current?.fill()
+                    props.socket.emit('drawing', {drawing: canvasRef.current?.toDataURL(), room: props.room})
                 }
             }
         }
@@ -48,7 +56,15 @@ const Canvas = () => {
             canvasRef.current?.removeEventListener('mousemove', draw)
         }
 
-    }, [])
+    }, [props.socket])
+
+    useEffect(() => {
+        const img = new Image()
+        img.src = props.drawing
+        img.onload = () => {
+            contextRef.current?.drawImage(img, 0, 0)
+        }
+    }, [props.drawing])
 
     return (
         <canvas ref={canvasRef} />

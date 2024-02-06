@@ -16,19 +16,27 @@ const Room = () => {
   const username = useAppSelector((state: RootState) => state.username)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [socket, setSocket] = useState<Socket>(null!)
+  const [drawing, setDrawing] = useState<string>('')
 
   useEffect(() => {
     const handleMsg = (msg: string): void => {
       setMessages(messages => [...messages, { id: messages.length + 1, msg: msg}])
     }
 
+    const handleDrawing = (drawing: string): void => {
+      if(drawing.length > 0)
+        setDrawing(drawing)
+    }
+
     const newSocket = io('http://127.0.0.1:8080')
     setSocket(newSocket)
     newSocket.emit('join', {room: room, username: username})
+    newSocket.on('updatedrawing', handleDrawing)
     newSocket.on('message', handleMsg)
     newSocket.on('leaveroom', handleMsg)
 
     return (): void => {
+      newSocket.off('updatedrawing', handleDrawing)
       newSocket.off('message', handleMsg)
       newSocket.off('leaveroom', handleMsg)
       newSocket.disconnect()
@@ -48,7 +56,7 @@ const Room = () => {
 
   return (
     <div>
-      <Canvas />
+      <Canvas drawing={drawing} socket={socket} room={room} />
       <Chat socket={socket} room={room} messages={messages} />
       <button onClick={leaveRoom}>leave</button>
     </div>

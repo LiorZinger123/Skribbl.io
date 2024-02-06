@@ -6,7 +6,7 @@ interface Room {
     time: number,
     rounds: number,
     connectedPlayers: number,
-    currentDrawing: any[]
+    currentDrawing: string
 }
 
 export default Room
