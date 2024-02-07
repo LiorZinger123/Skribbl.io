@@ -5,6 +5,7 @@ import { Socket } from "socket.io-client"
 type Props = {
     socket: Socket,
     room: string,
+    username: string,
     messages: ChatMessage[]
 }
 
@@ -15,7 +16,7 @@ const Chat = (props: Props) => {
 
   const sendMsg = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
-    props.socket.send({room: props.room, msg: msg})
+    props.socket.send({room: props.room, msg: msg, username: props.username})
     setMsg('')
   }
 

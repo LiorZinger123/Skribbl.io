@@ -1,10 +1,13 @@
 import { useEffect, useRef } from "react"
 import { Socket } from "socket.io-client"
+import { Point } from "../../types/canvasFunctions"
+import { drawStarightLine } from "./CanvasFunctions"
 
 type Props = {
     drawing: string,
     socket: Socket,
-    room: string
+    room: string,
+    myTurn: boolean
 }
 
 const Canvas = (props: Props) => {
@@ -12,13 +15,16 @@ const Canvas = (props: Props) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const contextRef = useRef<CanvasRenderingContext2D | null>(null)
     const isDrawing  = useRef<boolean>(false)
+    const prevPoint = useRef<Point | null>(null)
+    const width = useRef<number>(5)
+    const color = useRef<string>('black')
 
     useEffect(() => {
 
         if(canvasRef.current){
             contextRef.current = canvasRef.current.getContext('2d')
             if(contextRef.current){
-                contextRef.current.fillStyle = 'blue'
+                contextRef.current.fillStyle = 'lightgreen'
                 contextRef.current.fillRect(0 , 0, canvasRef.current.width, canvasRef.current.height)
             }
         }
@@ -26,33 +32,30 @@ const Canvas = (props: Props) => {
         const mouseDown = (): void => {
             isDrawing.current = true
         }
-
+        
         const mouseUp = (): void => {
             isDrawing.current = false
         }
-
+        
         const draw = (e: MouseEvent): void => {
-            if(isDrawing.current){
+            if(contextRef.current && isDrawing.current){
                 const canvasRect = canvasRef.current?.getBoundingClientRect()
                 if(canvasRect){
-                    const mouseX = e.clientX - canvasRect.left
-                    const mouseY = e.clientY - canvasRect.top
-                    contextRef.current?.beginPath()
-                    contextRef.current?.arc(mouseX, mouseY, 1, 1, 2 * Math.PI)
-                    contextRef.current?.stroke()
-                    // contextRef.current?.fill()
+                    const data = {e: e, canvasRect: canvasRect, ctx: contextRef.current,
+                        prevPoint: prevPoint, width: width.current , color: color.current}
+                    drawStarightLine(data)
                     props.socket.emit('drawing', {drawing: canvasRef.current?.toDataURL(), room: props.room})
                 }
             }
         }
 
         canvasRef.current?.addEventListener('mousedown', mouseDown)
-        canvasRef.current?.addEventListener('mouseup', mouseUp)
+        window.addEventListener('mouseup', mouseUp)
         canvasRef.current?.addEventListener('mousemove', draw)
 
         return (): void => {
             canvasRef.current?.removeEventListener('mousedown', mouseDown)
-            canvasRef.current?.removeEventListener('mouseup', mouseUp)
+            window.removeEventListener('mouseup', mouseUp)
             canvasRef.current?.removeEventListener('mousemove', draw)
         }
 
@@ -67,7 +70,7 @@ const Canvas = (props: Props) => {
     }, [props.drawing])
 
     return (
-        <canvas ref={canvasRef} />
+        <canvas ref={canvasRef} width={500} height={500} />
     ) 
 }
 

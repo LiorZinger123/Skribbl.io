@@ -2,7 +2,6 @@ import {
     Req,
     Res,
     Controller,
-    Get,
     Post,
     UseGuards,
     HttpCode,
@@ -10,7 +9,6 @@ import {
   } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalGuard } from './guards/local-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
   

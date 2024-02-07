@@ -102,6 +102,13 @@ export class UsersService {
           return {...room, connectedPlayers: room.connectedPlayers - 1}
         return room
       })
-      console.log(this.rooms)
+    }
+
+    updateDrawing(id: string, drawing: string): void{
+      this.rooms = this.rooms.map(room => {
+        if(room.id === id)
+          return {...room, drawing: drawing}
+        return room
+      })
     }
 }

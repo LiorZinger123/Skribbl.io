@@ -7,7 +7,6 @@ import { ConfigService } from '@nestjs/config';
 import { JoinRoomDto } from './dtos/joinRoom.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { NewRoom } from './dtos/newRoom.dto';
-import { LeaveRoomDto } from './dtos/leaveRoom.dto';
 
 @Controller('users')
 export class UsersController {
@@ -57,11 +56,5 @@ export class UsersController {
   @Post('createroom')
   createRoom(@Res() res: Response, @Body() data: NewRoom): void {
     res.send(this.usersService.createRoom(data))
-  }
-
-  @Post('leaveroom')
-  leaveRoom(@Res() res: Response, @Body() data: LeaveRoomDto): void {
-    this.usersService.leaveRoom(data.id)
-    res.sendStatus(200)
   }
 }
