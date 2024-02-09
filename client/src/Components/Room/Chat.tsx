@@ -1,5 +1,5 @@
 import { useState } from "react"
-import ChatMessage from "../../types/chatMessage"
+import ChatMessage from "../../types/RoomTypes/chatMessage"
 import { Socket } from "socket.io-client"
 
 type Props = {
@@ -13,7 +13,6 @@ const Chat = (props: Props) => {
 
   const [msg, setMsg] = useState<string>('')
     
-
   const sendMsg = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
     props.socket.send({room: props.room, msg: msg, username: props.username})

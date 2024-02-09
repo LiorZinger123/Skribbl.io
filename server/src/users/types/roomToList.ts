@@ -1,8 +1,10 @@
+import { ConnectedPlayersType } from "./room"
+
 type RoomToList = {
     id: string, 
     name: string,
     hasPassword: boolean,
-    connectedPlayers: number,
+    connectedPlayers: ConnectedPlayersType[],
     maxPlayers: number
 }
 

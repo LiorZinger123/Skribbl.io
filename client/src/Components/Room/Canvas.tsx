@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 import { Socket } from "socket.io-client"
-import { Point } from "../../types/canvasFunctions"
+import { Point } from "../../types/RoomTypes/canvasFunctions"
 import { drawStarightLine } from "./CanvasFunctions"
 
 type Props = {

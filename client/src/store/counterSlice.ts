@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "./store";
 
 interface userInfoState {
     username: string,

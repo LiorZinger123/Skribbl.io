@@ -3,7 +3,7 @@ import { useAppDispatch } from '../../store/hooks'
 import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SignUpFormFields, schema } from '../../types/signUpFormFields'
+import { SignUpFormFields, schema } from '../../types/SignUpTypes/signUpFormFields'
 import { fetchToApi } from '../../Api/fetch'
 import { setUsername } from '../../store/counterSlice'
 

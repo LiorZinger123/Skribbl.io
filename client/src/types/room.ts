@@ -1,8 +1,10 @@
+import PlayerType from "./RoomTypes/playerType"
+
 type Room = {
     id: string,
     name: string
     hasPassword: boolean,
-    connectedPlayers: number,
+    connectedPlayers: PlayerType[],
     maxPlayers: number
 }
 

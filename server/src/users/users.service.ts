@@ -5,7 +5,7 @@ import { User, UserDocument } from 'src/schemas/users.schema';
 import { UserDto } from './dtos/user.dto';
 import { encode } from './utils/hash';
 import { CreateUserDto } from './dtos/createUser.dto';
-import Room from "./types/room";
+import Room, { ConnectedPlayersType } from "./types/room";
 import { JoinRoomDto } from './dtos/joinRoom.dto';
 import RoomToList from './types/roomToList';
 import { NewRoom } from './dtos/newRoom.dto';
@@ -17,7 +17,7 @@ export class UsersService {
     private readonly usersModel: Model<UserDocument>
   ) {}
 
-    private rooms: Room[] = [{ id: '111111', name: 'Lior', password: 'aaaa', players: 5, time: 60, rounds: 2, connectedPlayers: 0, currentDrawing: '' }]
+    private rooms: Room[] = [{ id: '111111', name: 'Lior', password: 'aaaa', players: 5, time: 60, rounds: 2, connectedPlayers: [], currentDrawing: '' }]
 
     async findOne(username: string): Promise<UserDto> {
       try{
@@ -66,8 +66,10 @@ export class UsersService {
       const existingRoom = this.rooms.find(room => room.id === data.room)
       if(data.password.length === 0 || data.password === existingRoom.password){
         this.rooms = this.rooms.map(room => {
-          if(room.id === data.room)
-            return {...room, connectedPlayers: room.connectedPlayers + 1}
+          if(room.id === data.room){
+            const updatedRoom = {id: room.connectedPlayers.length + 1,username: data.username, score: 0, roomOwner: false} 
+            return {...room, connectedPlayers: [...room.connectedPlayers, updatedRoom ]}
+          }
           return room
         })
         return data.room
@@ -75,9 +77,14 @@ export class UsersService {
       return null
     }
 
+    getPlayersAfterJoin(id: string): ConnectedPlayersType[] {
+      return this.rooms.find(room => room.id === id).connectedPlayers
+    }
+
     createRoom(data: NewRoom): string {
       const newId = this.generateNewId()
-      this.rooms.push({...data, id: newId, connectedPlayers: 0, currentDrawing: ''})
+      const newPlayer = {id: 1, username: data.username, score: 0, roomOwner: true}
+      this.rooms.push({...data, id: newId, connectedPlayers: [newPlayer], currentDrawing: ''})
       return newId
     }
 
@@ -96,10 +103,12 @@ export class UsersService {
       return false
     }
 
-    leaveRoom(id: string): void{
+    leaveRoom(id: string, username: string): void{
       this.rooms = this.rooms.map(room => {
-        if(room.id === id)
-          return {...room, connectedPlayers: room.connectedPlayers - 1}
+        if(room.id === id){
+          const newConnctedPlayers = room.connectedPlayers.filter(player => player.username != username)
+          return {...room, connectedPlayers: newConnctedPlayers}
+        }
         return room
       })
     }

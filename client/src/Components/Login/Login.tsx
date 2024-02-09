@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { LoginFormFields, schema } from '../../types/loginFormFields'
+import { LoginFormFields, schema } from '../../types/LoginTypes/loginFormFields'
 import { fetchToApi } from '../../Api/fetch'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { setUsername } from '../../store/counterSlice'

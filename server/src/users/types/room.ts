@@ -5,8 +5,15 @@ interface Room {
     players: number,
     time: number,
     rounds: number,
-    connectedPlayers: number,
+    connectedPlayers: ConnectedPlayersType[],
     currentDrawing: string
+}
+
+export type ConnectedPlayersType = {
+    id: number,
+    username: string, 
+    score: number,
+    roomOwner: boolean
 }
 
 export default Room

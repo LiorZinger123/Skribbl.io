@@ -2,10 +2,11 @@ import { Fragment, useContext } from 'react'
 import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CreateRoomFormFields, schema } from "../../types/createRoomFormFields"
+import { CreateRoomFormFields, schema } from "../../types/CreateRoomTypes/createRoomFormFields"
 import { fetchToApi } from "../../Api/fetch"
 import { setRoomId } from '../../store/counterSlice'
-import { useAppDispatch } from '../../store/hooks'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { RootState } from '../../store/store'
 
 const CreateRoom = () => {
 
@@ -16,6 +17,7 @@ const CreateRoom = () => {
 
   const dispatch = useAppDispatch()
   const nav = useContext(StableNavigateContext)
+  const username = useAppSelector((state: RootState) => state.username)
 
   const { 
         register, 
@@ -28,7 +30,7 @@ const CreateRoom = () => {
 
   const onSubmit: SubmitHandler<CreateRoomFormFields> = async (data): Promise<void> => {
     try{
-      const res = await fetchToApi('users/createroom', data)
+      const res = await fetchToApi('users/createroom', {username: username, ...data})
       dispatch(setRoomId(await res.text()))
       nav('/room')
     }
