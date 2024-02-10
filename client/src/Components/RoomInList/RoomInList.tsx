@@ -20,7 +20,7 @@ const RoomInList = (props: Props) => {
 
   const joinRoom = async (id: string): Promise<void> => {
     try{
-        const res = await fetchToApi('users/join', { room: id, password: password, username: username })
+        const res = await fetchToApi('rooms/join', { room: id, password: password, username: username })
         if(res.ok){
           dispatch(setRoomId(await res.text()))
           nav('/room')

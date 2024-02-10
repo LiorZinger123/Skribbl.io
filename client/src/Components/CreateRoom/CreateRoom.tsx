@@ -14,6 +14,7 @@ const CreateRoom = () => {
   const times = {id: 'time',label: 'Drawing Time', options: Array.from({ length: 16 }, (_, k) => 10 * (k + 3))}
   const rounds = {id: 'rounds', label: 'Rounds', options: Array.from({ length: 10 }, (_, k) => k + 1)}
   const createSettings = [players, times, rounds]
+  let roomSettings = {players: '3', time: '30', rounds: '1'}
 
   const dispatch = useAppDispatch()
   const nav = useContext(StableNavigateContext)
@@ -30,13 +31,18 @@ const CreateRoom = () => {
 
   const onSubmit: SubmitHandler<CreateRoomFormFields> = async (data): Promise<void> => {
     try{
-      const res = await fetchToApi('users/createroom', {username: username, ...data})
+      const res = await fetchToApi('rooms/createroom', {username: username, ...roomSettings, ...data})
       dispatch(setRoomId(await res.text()))
       nav('/room')
     }
     catch{
       setError('root', {message: "Something went wrong, please try again later"})
     }
+  }
+
+  const updateRoomSettings = (id: string, data: string): void => {
+    const key = id as keyof typeof roomSettings
+    roomSettings[key] = data
   }
 
   return (
@@ -50,9 +56,9 @@ const CreateRoom = () => {
       {createSettings.map(setting => (
         <Fragment key={setting.id}>
           <label htmlFor={setting.id}>{setting.label}:</label>
-          <select id={setting.id}>
+          <select id={setting.id} onChange={(e) => updateRoomSettings(setting.id, e.target.value)}>
             {setting.options.map(item => (
-              <option key={item}>{item}</option>
+              <option key={item} value={item}>{item}</option>
             ))}
           </select>
         </Fragment>

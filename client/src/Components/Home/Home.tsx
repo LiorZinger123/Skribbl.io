@@ -11,7 +11,7 @@ const Home = () => {
 
     useEffect(() => {
         const getRoomsFromApi = async (): Promise<void> => {
-            const res = await getFromApi('users/rooms')
+            const res = await getFromApi('rooms/getrooms')
             if(res.ok)
               setRooms(await res.json())
         }

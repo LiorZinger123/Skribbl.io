@@ -6,6 +6,7 @@ import configuration from './config/configuration';
 import { ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { WsModule } from './webSocket/ws.module';
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { WsModule } from './webSocket/ws.module';
     }), 
     AuthModule,
     UsersModule,
+    RoomsModule,
     WsModule
   ]
 })

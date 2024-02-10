@@ -1,13 +1,14 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Socket } from "socket.io-client"
 import { Point } from "../../types/RoomTypes/canvasFunctions"
 import { drawStarightLine } from "./CanvasFunctions"
+import PlayerType from "../../types/RoomTypes/playerType"
 
 type Props = {
-    drawing: string,
     socket: Socket,
-    room: string,
-    myTurn: boolean
+    players: PlayerType[],
+    username: string,
+    currentPlayerNumber: React.MutableRefObject<number>
 }
 
 const Canvas = (props: Props) => {
@@ -18,6 +19,7 @@ const Canvas = (props: Props) => {
     const prevPoint = useRef<Point | null>(null)
     const width = useRef<number>(5)
     const color = useRef<string>('black')
+    const [drawing, setDrawing] = useState<string>('')
 
     useEffect(() => {
 
@@ -35,16 +37,24 @@ const Canvas = (props: Props) => {
         
         const mouseUp = (): void => {
             isDrawing.current = false
+            prevPoint.current = null
         }
-        
+
+        const handleDrawing = (drawing: string): void => {
+            if(drawing.length > 0)
+              setDrawing(drawing)
+        }
+
         const draw = (e: MouseEvent): void => {
-            if(contextRef.current && isDrawing.current){
-                const canvasRect = canvasRef.current?.getBoundingClientRect()
-                if(canvasRect){
-                    const data = {e: e, canvasRect: canvasRect, ctx: contextRef.current,
-                        prevPoint: prevPoint, width: width.current , color: color.current}
-                    drawStarightLine(data)
-                    props.socket.emit('drawing', {drawing: canvasRef.current?.toDataURL(), room: props.room})
+            if(props.players[0].username === props.username){
+                if(contextRef.current && isDrawing.current){
+                    const canvasRect = canvasRef.current?.getBoundingClientRect()
+                    if(canvasRect){
+                        const data = {e: e, canvasRect: canvasRect, ctx: contextRef.current,
+                            prevPoint: prevPoint, width: width.current , color: color.current}
+                        drawStarightLine(data)
+                        props.socket.emit('drawing', {drawing: canvasRef.current?.toDataURL()})
+                    }
                 }
             }
         }
@@ -52,22 +62,24 @@ const Canvas = (props: Props) => {
         canvasRef.current?.addEventListener('mousedown', mouseDown)
         window.addEventListener('mouseup', mouseUp)
         canvasRef.current?.addEventListener('mousemove', draw)
+        props.socket.on('updatedrawing', handleDrawing)
 
         return (): void => {
             canvasRef.current?.removeEventListener('mousedown', mouseDown)
             window.removeEventListener('mouseup', mouseUp)
             canvasRef.current?.removeEventListener('mousemove', draw)
+            props.socket.off('updatedrawing', handleDrawing)
         }
 
-    }, [props.socket])
+    }, [props.players])
 
     useEffect(() => {
         const img = new Image()
-        img.src = props.drawing
+        img.src = drawing
         img.onload = () => {
             contextRef.current?.drawImage(img, 0, 0)
         }
-    }, [props.drawing])
+    }, [drawing])
 
     return (
         <canvas ref={canvasRef} width={500} height={500} />

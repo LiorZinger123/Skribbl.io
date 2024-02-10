@@ -5,10 +5,6 @@ import { User, UserDocument } from 'src/schemas/users.schema';
 import { UserDto } from './dtos/user.dto';
 import { encode } from './utils/hash';
 import { CreateUserDto } from './dtos/createUser.dto';
-import Room, { ConnectedPlayersType } from "./types/room";
-import { JoinRoomDto } from './dtos/joinRoom.dto';
-import RoomToList from './types/roomToList';
-import { NewRoom } from './dtos/newRoom.dto';
 
 @Injectable()
 export class UsersService {
@@ -16,8 +12,6 @@ export class UsersService {
     @InjectModel(User.name)
     private readonly usersModel: Model<UserDocument>
   ) {}
-
-    private rooms: Room[] = [{ id: '111111', name: 'Lior', password: 'aaaa', players: 5, time: 60, rounds: 2, connectedPlayers: [], currentDrawing: '' }]
 
     async findOne(username: string): Promise<UserDto> {
       try{
@@ -47,77 +41,5 @@ export class UsersService {
       catch{
         return 'Something went wrong, please try again later.'
       }
-    }
-
-    getRooms(): RoomToList[] {
-      const lastRooms = this.rooms.slice(-10)
-      return lastRooms.map(room => (
-        {
-          id: room.id,
-          name: room.name,
-          hasPassword: room.password !== '' ? true : false,
-          connectedPlayers: room.connectedPlayers,
-          maxPlayers: room.players 
-        }
-      ))
-    }
-
-    joinRoom(data: JoinRoomDto): string {
-      const existingRoom = this.rooms.find(room => room.id === data.room)
-      if(data.password.length === 0 || data.password === existingRoom.password){
-        this.rooms = this.rooms.map(room => {
-          if(room.id === data.room){
-            const updatedRoom = {id: room.connectedPlayers.length + 1,username: data.username, score: 0, roomOwner: false} 
-            return {...room, connectedPlayers: [...room.connectedPlayers, updatedRoom ]}
-          }
-          return room
-        })
-        return data.room
-      }
-      return null
-    }
-
-    getPlayersAfterJoin(id: string): ConnectedPlayersType[] {
-      return this.rooms.find(room => room.id === id).connectedPlayers
-    }
-
-    createRoom(data: NewRoom): string {
-      const newId = this.generateNewId()
-      const newPlayer = {id: 1, username: data.username, score: 0, roomOwner: true}
-      this.rooms.push({...data, id: newId, connectedPlayers: [newPlayer], currentDrawing: ''})
-      return newId
-    }
-
-    generateNewId(): string {
-      let roomID = ''
-      do{
-        roomID = Math.floor(Math.random() * (999999 + 100000) + 100000).toString()
-      }while(this.findRoomById(roomID))
-      return roomID
-    }
-
-    findRoomById(id: string): Boolean{
-      const room = this.rooms.find(room => room.id === id)
-      if(room)
-        return true
-      return false
-    }
-
-    leaveRoom(id: string, username: string): void{
-      this.rooms = this.rooms.map(room => {
-        if(room.id === id){
-          const newConnctedPlayers = room.connectedPlayers.filter(player => player.username != username)
-          return {...room, connectedPlayers: newConnctedPlayers}
-        }
-        return room
-      })
-    }
-
-    updateDrawing(id: string, drawing: string): void{
-      this.rooms = this.rooms.map(room => {
-        if(room.id === id)
-          return {...room, drawing: drawing}
-        return room
-      })
     }
 }

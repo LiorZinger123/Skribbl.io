@@ -1,21 +1,43 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ChatMessage from "../../types/RoomTypes/chatMessage"
 import { Socket } from "socket.io-client"
+import { Word } from "../../types/RoomTypes/screenMsgs"
 
 type Props = {
     socket: Socket,
-    room: string,
     username: string,
-    messages: ChatMessage[]
+    messages: ChatMessage[],
+    setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+    currentWord: Word
 }
 
 const Chat = (props: Props) => {
 
   const [msg, setMsg] = useState<string>('')
-    
+
+  useEffect(() => {
+
+    const handleMsg = (msg: string): void => {
+      props.setMessages(messages => [...messages, { id: messages.length + 1, msg: msg}])
+    }
+
+    props.socket.on('message', handleMsg)
+    props.socket.on('leaveroom', handleMsg)
+
+    return (): void => {
+      props.socket.off('message', handleMsg)
+      props.socket.off('leaveroom', handleMsg)
+    }
+
+  }, [])
+
   const sendMsg = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
-    props.socket.send({room: props.room, msg: msg, username: props.username})
+    const data = {msg: msg, username: props.username}
+    if(msg.toLowerCase() === props.currentWord.word.toLowerCase())
+      props.socket.emit('correct', data)
+    else
+      props.socket.send(data)
     setMsg('')
   }
 

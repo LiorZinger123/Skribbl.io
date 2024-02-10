@@ -1,12 +1,9 @@
-import { Controller, Get, Post, Body, Res, UsePipes, ValidationPipe, HttpStatus, UseGuards, HttpException } from '@nestjs/common';
+import { Controller, Post, Body, Res, UsePipes, ValidationPipe, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Response } from 'express';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
-import { JoinRoomDto } from './dtos/joinRoom.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { NewRoom } from './dtos/newRoom.dto';
 
 @Controller('users')
 export class UsersController {
@@ -33,28 +30,5 @@ export class UsersController {
     catch(msg){
       res.status(500).send(msg)
     }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('rooms')
-  getRooms(@Res() res: Response): void {
-    res.send(this.usersService.getRooms())
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('join')
-  joinRoom(@Res() res: Response, @Body() data: JoinRoomDto): void {
-    const id = this.usersService.joinRoom(data)
-    if(id)
-      res.status(HttpStatus.OK).send(id)
-    else
-      res.sendStatus(HttpStatus.UNAUTHORIZED)
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @UsePipes(ValidationPipe)  
-  @Post('createroom')
-  createRoom(@Res() res: Response, @Body() data: NewRoom): void {
-    res.send(this.usersService.createRoom(data))
   }
 }
