@@ -25,7 +25,9 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     joinRoom(@MessageBody() data: {room: string, username: string}, @ConnectedSocket() socket: Socket): void {
         socket.join(data.room)
         const connectedPlayers = this.roomsService.getPlayers(data.room)
+        const drawingTime = this.roomsService.getTime(data.room)
         this.server.to(socket.id).emit('players', connectedPlayers)
+        this.server.to(socket.id).emit('time', drawingTime)
         this.server.to(data.room).emit('message', `${data.username} joined the room`)
         this.server.to(data.room).except(socket.id).emit('players', connectedPlayers.slice(-1))
     }
@@ -52,6 +54,13 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     startTurn(@MessageBody() data: {word: string, length: string}, @ConnectedSocket() socket: Socket): void {
         const room = Array.from(socket.rooms.values())[1]
         this.server.to(room).emit('startturn', data)
+        this.server.to(socket.id).emit('startdraw')
+    }
+
+    @SubscribeMessage('endturn')
+    endTurn(@ConnectedSocket() socket: Socket): void{
+        const room = Array.from(socket.rooms.values())[1]
+        this.server.to(room).emit('endturn')
     }
 
     @SubscribeMessage('leaveRoom')

@@ -23,7 +23,8 @@ const Room = () => {
   const [players, setPlayers] = useState<PlayerType[]>([])
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [currentWord, setCurrentWord] = useState<Word>({word: '', length: ''})
-  const turnsInRound = useRef<number>(0) 
+  const turnsInRound = useRef<number>(0)
+  const [round, setRound] = useState<number>(1) 
 
   useEffect(() => {
 
@@ -57,7 +58,7 @@ const Room = () => {
         <div>
           <Players socket={socket} players={players} setPlayers={setPlayers} />
           <Canvas socket={socket} players={players} username={username} currentPlayerNumber={turnsInRound} />
-          <MsgsScreen socket={socket} players={players} currentPlayerNumber={turnsInRound} username={username} />
+          <MsgsScreen socket={socket} players={players} currentPlayerNumber={turnsInRound} username={username} setRound={setRound} />
           <StartButton socket={socket} players={players} username={username} setMessages={setMessages} />
           <Chat socket={socket} username={username} messages={messages} setMessages={setMessages} currentWord={currentWord} />
           <LeaveRoom socket={socket} username={username} />

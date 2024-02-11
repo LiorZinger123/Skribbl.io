@@ -8,7 +8,8 @@ type Props = {
   socket: Socket,
   players: PlayerType[],
   currentPlayerNumber: React.MutableRefObject<number>,
-  username: string
+  username: string,
+  setRound: React.Dispatch<React.SetStateAction<number>>
 }
 
 const MsgsScreen = (props: Props) => {
@@ -20,15 +21,23 @@ const MsgsScreen = (props: Props) => {
     const nextTurn = async (): Promise<void> => {
       try{
         const res = await getFromApi('rooms/words')
-        props.currentPlayerNumber.current += 1
         if(res.ok){
           setTimeout(async () => {
-            if(props.players[0].username === props.username){
+            console.log(props.players[props.currentPlayerNumber.current])
+            if(props.players[props.currentPlayerNumber.current].username === props.username){
               const newWords = await res.json()
               setScreen({ show: true, msg: {msg: 'Please choose one word', words: newWords} })
             }
             else
-              setScreen({ show: true, msg: `${props.players[0].username} is choosing a word` })
+              setScreen({ show: true, msg: `${props.players[props.currentPlayerNumber.current].username} is choosing a word` })
+            
+            if(props.currentPlayerNumber.current !== props.players.length + 1)
+              props.currentPlayerNumber.current += 1
+            else{
+              props.currentPlayerNumber.current = 0
+              props.setRound(round => round + 1)
+            }
+
           }, 3000)
         }
       }
@@ -37,7 +46,7 @@ const MsgsScreen = (props: Props) => {
       }
     }
 
-    const handleMsg = (msg: string): void => {
+    const startMsg = (msg: string): void => {
       setScreen({ show: true, msg: msg })
       nextTurn()
     }
@@ -46,14 +55,16 @@ const MsgsScreen = (props: Props) => {
       setScreen({show: false, msg: ''})
     }
 
-    props.socket.on('startgame', handleMsg)
+    props.socket.on('startgame', startMsg)
     props.socket.on('startturn', startTurn)
+    props.socket.on('endturn', nextTurn)
 
     return (): void => {
-      props.socket.off('startgame', handleMsg)
+      props.socket.off('startgame', startMsg)
       props.socket.off('startturn', startTurn)
+      props.socket.off('endturn', nextTurn)
     }
-  })
+  }, [props.players])
 
   const chooseWord = (word: Word): void => {
     props.socket.emit('turn', word)

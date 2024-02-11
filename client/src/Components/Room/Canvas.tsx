@@ -13,13 +13,54 @@ type Props = {
 
 const Canvas = (props: Props) => {
   
+    const time = useRef<number>(0)
+    const intervalRef = useRef<any>(null)
+    const [timeLeft, setTimeLeft] = useState<number>(0)
+   
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const contextRef = useRef<CanvasRenderingContext2D | null>(null)
     const isDrawing  = useRef<boolean>(false)
     const prevPoint = useRef<Point | null>(null)
     const width = useRef<number>(5)
     const color = useRef<string>('black')
+    const canDraw = useRef<boolean>(false)
+    
     const [drawing, setDrawing] = useState<string>('')
+
+    useEffect(() => {
+        const handleTime = (drawingTime: number): void => {
+            time.current = drawingTime
+            setTimeLeft(drawingTime)
+        }
+
+        const startTurn = (): void => {
+            intervalRef.current =  setInterval(() => {
+                setTimeLeft(time => time - 1)
+            }, 1000)
+            setTimeout(() => {
+                clearInterval(intervalRef.current)
+                canDraw.current = false
+                setTimeLeft(time.current)
+                // setDrawing('')
+                props.socket.emit('endturn')
+            }, time.current * 1000)
+        } 
+
+        const enableDrawing = (): void => {
+            canDraw.current = true
+        }
+
+        props.socket.on('time', handleTime)
+        props.socket.on('startturn', startTurn)
+        props.socket.on('startdraw', enableDrawing)
+
+        return (): void => {
+            props.socket.off('time', handleTime)
+            props.socket.off('startturn', startTurn)
+            props.socket.off('startdraw', enableDrawing)
+            clearInterval(intervalRef.current)
+        }
+    }, [])
 
     useEffect(() => {
 
@@ -46,7 +87,7 @@ const Canvas = (props: Props) => {
         }
 
         const draw = (e: MouseEvent): void => {
-            if(props.players[0].username === props.username){
+            if(canDraw.current){
                 if(contextRef.current && isDrawing.current){
                     const canvasRect = canvasRef.current?.getBoundingClientRect()
                     if(canvasRect){
@@ -82,7 +123,10 @@ const Canvas = (props: Props) => {
     }, [drawing])
 
     return (
-        <canvas ref={canvasRef} width={500} height={500} />
+        <>
+            <canvas ref={canvasRef} width={500} height={500} />
+            {timeLeft}
+        </>
     ) 
 }
 

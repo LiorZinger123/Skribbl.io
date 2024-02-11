@@ -49,6 +49,10 @@ export class RoomsService{
     return this.rooms.find(room => room.id === id).connectedPlayers
   }
 
+  getTime(id: string): number{
+    return this.rooms.find(room => room.id === id).time  
+  }
+
   createRoom(data: NewRoomDto): string {
     const newId = this.generateNewId()
     const newPlayer = {id: 1, username: data.username, score: 0, roomOwner: true}
