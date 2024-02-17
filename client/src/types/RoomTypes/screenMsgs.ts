@@ -1,11 +1,6 @@
-type ScreenMsgsType = {
-    show: boolean,
-    msg: string | Msg
-}
-
-type Msg = {
+export type Msg = {
     msg: string, 
-    words: Word[]
+    words?: Word[]
 }
 
 export type Word = {
@@ -13,4 +8,7 @@ export type Word = {
     length: string
 }
 
-export default ScreenMsgsType
+export type score = {
+    username: string,
+    score: number
+}

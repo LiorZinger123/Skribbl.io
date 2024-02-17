@@ -6,6 +6,7 @@ interface Room {
     time: number,
     rounds: number,
     connectedPlayers: ConnectedPlayersType[],
+    turnScores: playerTurnScore[]
     currentDrawing: string
 }
 
@@ -14,6 +15,11 @@ export type ConnectedPlayersType = {
     username: string, 
     score: number,
     roomOwner: boolean
+}
+
+export type playerTurnScore = {
+    username: string, 
+    score: number
 }
 
 export default Room

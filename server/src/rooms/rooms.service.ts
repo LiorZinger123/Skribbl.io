@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import Room, { ConnectedPlayersType } from "./types/room";
+import Room, { ConnectedPlayersType, playerTurnScore } from "./types/room";
 import RoomToList from "./types/roomToList";
 import { JoinRoomDto } from "./dtos/joinRoom.dto";
 import { NewRoomDto } from "./dtos/newRoom.dto";
@@ -15,7 +15,7 @@ export class RoomsService{
     private readonly wordsModule: Model<WordDocument>
   ){}
 
-  private rooms: Room[] = [{ id: '111111', name: 'Lior', password: 'aaaa', players: 5, time: 60, rounds: 2, connectedPlayers: [], currentDrawing: '' }]
+  private rooms: Room[] = [{ id: '111111', name: 'Lior', password: 'aaaa', players: 5, time: 60, rounds: 2, connectedPlayers: [], turnScores: [], currentDrawing: '' }]
 
   getRooms(): RoomToList[] {
     const lastRooms = this.rooms.slice(-10)
@@ -55,8 +55,9 @@ export class RoomsService{
 
   createRoom(data: NewRoomDto): string {
     const newId = this.generateNewId()
-    const newPlayer = {id: 1, username: data.username, score: 0, roomOwner: true}
-    this.rooms.push({...data, id: newId, connectedPlayers: [newPlayer], currentDrawing: ''})
+    const { username, ...roomData } = data
+    const newPlayer = {id: 1, username: username, score: 0, roomOwner: true}
+    this.rooms.push({...roomData, id: newId, connectedPlayers: [newPlayer], turnScores: [], currentDrawing: ''})
     return newId
   }
 
@@ -75,6 +76,15 @@ export class RoomsService{
     return false
   }
 
+  async getWords(): Promise<Word[] | void>{
+    try{
+      return await this.wordsModule.aggregate([{$project: {_id: 0, id: 0}}, {$sample: {size: 3}}])
+    }
+    catch(e){
+      return e
+    }
+  }
+
   updateDrawing(id: string, drawing: string): void{
     this.rooms = this.rooms.map(room => {
       if(room.id === id)
@@ -83,13 +93,19 @@ export class RoomsService{
     })
   }
 
-  async getWords(): Promise<Word[] | void>{
-    try{
-      return await this.wordsModule.aggregate([{$project: {_id: 0, id: 0}}, {$sample: {size: 3}}])
-    }
-    catch(e){
-      return e
-    }
+  addNewTurnScore(roomID: string, username: string): void{
+    this.rooms = this.rooms.map(room => {
+      if(room.id === roomID){
+        const score = (room.connectedPlayers.length - room.turnScores.length) * 50
+        return {...room, turnScores: [...room.turnScores, {username: username, score: score}]}
+      }
+      return room
+    })
+  }
+
+  getTurnScores(roomID: string): playerTurnScore[]{
+    const room = this.rooms.find(room => room.id === roomID)
+    return room.turnScores
   }
 
   leaveRoom(id: string, username: string): void{

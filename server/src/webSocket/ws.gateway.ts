@@ -43,13 +43,11 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         this.server.emit('startgame', 'Starting Game!')
     }   
 
-    @SubscribeMessage('correct')
-    correctAnswer(@MessageBody() data: { msg: string, username: string }, @ConnectedSocket() socket: Socket): void{
-        const room = Array.from(socket.rooms.values())[1]
-        this.server.to(socket.id).emit('message', `${data.username}: ${data.msg}`)
-        this.server.to(room).except(socket.id).emit('message', `${data.username} guessed the word!`)
+    @SubscribeMessage('chooseword')
+    chooseWord(@ConnectedSocket() socket: Socket): void {
+        this.server.to(socket.id).emit('chooseword')
     }
-
+    
     @SubscribeMessage('turn')
     startTurn(@MessageBody() data: {word: string, length: string}, @ConnectedSocket() socket: Socket): void {
         const room = Array.from(socket.rooms.values())[1]
@@ -57,10 +55,19 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         this.server.to(socket.id).emit('startdraw')
     }
 
+    @SubscribeMessage('correct')
+    correctAnswer(@MessageBody() data: { msg: string, username: string }, @ConnectedSocket() socket: Socket): void{
+        const room = Array.from(socket.rooms.values())[1]
+        this.roomsService.addNewTurnScore(room, data.username)
+        this.server.to(socket.id).emit('message', `${data.username}: ${data.msg}`)
+        this.server.to(room).except(socket.id).emit('message', `${data.username} guessed the word!`)
+    }
+
     @SubscribeMessage('endturn')
     endTurn(@ConnectedSocket() socket: Socket): void{
         const room = Array.from(socket.rooms.values())[1]
-        this.server.to(room).emit('endturn')
+        const scores = this.roomsService.getTurnScores(room)
+        this.server.to(room).emit('endturn', scores)
     }
 
     @SubscribeMessage('leaveRoom')

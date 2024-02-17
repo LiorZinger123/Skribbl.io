@@ -8,14 +8,14 @@ type Props = {
     socket: Socket,
     players: PlayerType[],
     username: string,
-    currentPlayerNumber: React.MutableRefObject<number>
+    currentPlayerNumber: React.MutableRefObject<number>,
+    setTime: React.Dispatch<React.SetStateAction<number>>,
+    roundTime: React.MutableRefObject<number>
 }
 
 const Canvas = (props: Props) => {
-  
-    const time = useRef<number>(0)
-    const intervalRef = useRef<any>(null)
-    const [timeLeft, setTimeLeft] = useState<number>(0)
+
+    const intervalRef = useRef<any>(null) //change
    
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const contextRef = useRef<CanvasRenderingContext2D | null>(null)
@@ -28,34 +28,29 @@ const Canvas = (props: Props) => {
     const [drawing, setDrawing] = useState<string>('')
 
     useEffect(() => {
-        const handleTime = (drawingTime: number): void => {
-            time.current = drawingTime
-            setTimeLeft(drawingTime)
-        }
 
         const startTurn = (): void => {
-            intervalRef.current =  setInterval(() => {
-                setTimeLeft(time => time - 1)
+            intervalRef.current = setInterval(() => {
+                props.setTime(time => time - 1)
             }, 1000)
             setTimeout(() => {
                 clearInterval(intervalRef.current)
-                canDraw.current = false
-                setTimeLeft(time.current)
-                // setDrawing('')
-                props.socket.emit('endturn')
-            }, time.current * 1000)
+                contextRef.current?.clearRect(0, 0, 500, 500) //change
+                if(canDraw.current){
+                    canDraw.current = false
+                    props.socket.emit('endturn')
+                }
+            }, props.roundTime.current * 1000)
         } 
 
         const enableDrawing = (): void => {
             canDraw.current = true
         }
 
-        props.socket.on('time', handleTime)
         props.socket.on('startturn', startTurn)
         props.socket.on('startdraw', enableDrawing)
 
         return (): void => {
-            props.socket.off('time', handleTime)
             props.socket.off('startturn', startTurn)
             props.socket.off('startdraw', enableDrawing)
             clearInterval(intervalRef.current)
@@ -67,7 +62,7 @@ const Canvas = (props: Props) => {
         if(canvasRef.current){
             contextRef.current = canvasRef.current.getContext('2d')
             if(contextRef.current){
-                contextRef.current.fillStyle = 'lightgreen'
+                contextRef.current.fillStyle = 'white'
                 contextRef.current.fillRect(0 , 0, canvasRef.current.width, canvasRef.current.height)
             }
         }
@@ -125,7 +120,6 @@ const Canvas = (props: Props) => {
     return (
         <>
             <canvas ref={canvasRef} width={500} height={500} />
-            {timeLeft}
         </>
     ) 
 }
