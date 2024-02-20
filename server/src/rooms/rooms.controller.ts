@@ -28,7 +28,7 @@ export class RoomsController{
     }
 
     @UseGuards(JwtAuthGuard)
-    @UsePipes(ValidationPipe)  
+    @UsePipes(new ValidationPipe({ transform: true }))  
     @Post('createroom')
     createRoom(@Res() res: Response, @Body() data: NewRoomDto): void {
         res.send(this.roomsService.createRoom(data))

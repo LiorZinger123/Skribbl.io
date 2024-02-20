@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react"
 import { Socket } from "socket.io-client"
-import { Point } from "../../types/RoomTypes/canvasFunctions"
+import { useAppSelector } from "../../../store/hooks"
+import { RootState } from "../../../store/store"
+import { Point, PlayerType } from "../../../types/RoomTypes/types"
 import { drawStarightLine } from "./CanvasFunctions"
-import PlayerType from "../../types/RoomTypes/playerType"
 
 type Props = {
     socket: Socket,
     players: PlayerType[],
-    username: string,
     currentPlayerNumber: React.MutableRefObject<number>,
     setTime: React.Dispatch<React.SetStateAction<number>>,
     roundTime: React.MutableRefObject<number>
@@ -15,7 +15,10 @@ type Props = {
 
 const Canvas = (props: Props) => {
 
-    const intervalRef = useRef<any>(null) //change
+    const room = useAppSelector((state: RootState) => state.room)
+
+    const intervalRef = useRef<NodeJS.Timeout>(null!)
+    const timeoutRef = useRef<NodeJS.Timeout>(null!)
    
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const contextRef = useRef<CanvasRenderingContext2D | null>(null)
@@ -33,27 +36,39 @@ const Canvas = (props: Props) => {
             intervalRef.current = setInterval(() => {
                 props.setTime(time => time - 1)
             }, 1000)
-            setTimeout(() => {
-                clearInterval(intervalRef.current)
-                contextRef.current?.clearRect(0, 0, 500, 500) //change
-                if(canDraw.current){
-                    canDraw.current = false
-                    props.socket.emit('endturn')
-                }
+            timeoutRef.current = setTimeout(() => {
+                endTurn()
             }, props.roundTime.current * 1000)
-        } 
+        }
+        
+        const endTurn = (): void => {
+            clearInterval(intervalRef.current)
+            contextRef.current?.clearRect(0, 0, 500, 500) //change
+            if(canDraw.current){
+                canDraw.current = false
+                props.socket.emit('end_turn', {room: room})
+            }
+        }
 
         const enableDrawing = (): void => {
             canDraw.current = true
         }
 
-        props.socket.on('startturn', startTurn)
-        props.socket.on('startdraw', enableDrawing)
+        const endTurnNow = (): void =>{
+            clearTimeout(timeoutRef.current)
+            endTurn()
+        }
+
+        props.socket.on('start_turn', startTurn)
+        props.socket.on('start_draw', enableDrawing)
+        props.socket.on('end_turn_now', endTurnNow)
 
         return (): void => {
-            props.socket.off('startturn', startTurn)
-            props.socket.off('startdraw', enableDrawing)
+            props.socket.off('start_turn', startTurn)
+            props.socket.off('start_draw', enableDrawing)
+            props.socket.off('end_turn_now', endTurn)
             clearInterval(intervalRef.current)
+            clearTimeout(timeoutRef.current)
         }
     }, [])
 
@@ -89,7 +104,7 @@ const Canvas = (props: Props) => {
                         const data = {e: e, canvasRect: canvasRect, ctx: contextRef.current,
                             prevPoint: prevPoint, width: width.current , color: color.current}
                         drawStarightLine(data)
-                        props.socket.emit('drawing', {drawing: canvasRef.current?.toDataURL()})
+                        props.socket.emit('drawing', {drawing: canvasRef.current?.toDataURL(), room: room})
                     }
                 }
             }
@@ -98,13 +113,13 @@ const Canvas = (props: Props) => {
         canvasRef.current?.addEventListener('mousedown', mouseDown)
         window.addEventListener('mouseup', mouseUp)
         canvasRef.current?.addEventListener('mousemove', draw)
-        props.socket.on('updatedrawing', handleDrawing)
+        props.socket.on('update_drawing', handleDrawing)
 
         return (): void => {
             canvasRef.current?.removeEventListener('mousedown', mouseDown)
             window.removeEventListener('mouseup', mouseUp)
             canvasRef.current?.removeEventListener('mousemove', draw)
-            props.socket.off('updatedrawing', handleDrawing)
+            props.socket.off('update_drawing', handleDrawing)
         }
 
     }, [props.players])

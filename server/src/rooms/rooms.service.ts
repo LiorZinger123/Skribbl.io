@@ -6,6 +6,7 @@ import { NewRoomDto } from "./dtos/newRoom.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Word, WordDocument } from "src/schemas/words.schema";
 import { Model } from "mongoose";
+import { RoomDetails } from "./types/RoomDetails";
 
 @Injectable()
 export class RoomsService{
@@ -15,11 +16,11 @@ export class RoomsService{
     private readonly wordsModule: Model<WordDocument>
   ){}
 
-  private rooms: Room[] = [{ id: '111111', name: 'Lior', password: 'aaaa', players: 5, time: 60, rounds: 2, connectedPlayers: [], turnScores: [], currentDrawing: '' }]
+  private rooms: Room[] = [{ id: '111111', name: 'Lior', password: 'aaaa', players: 5, time: 60, rounds: 2, startPlaying: false, connectedPlayers: [], turnScores: [], currentDrawing: '' }]
 
   getRooms(): RoomToList[] {
-    const lastRooms = this.rooms.slice(-10)
-    return lastRooms.map(room => (
+    const rooms = this.rooms.slice(-10)
+    return rooms.map(room => (
       {
         id: room.id,
         name: room.name,
@@ -46,18 +47,22 @@ export class RoomsService{
   }
   
   getPlayers(id: string): ConnectedPlayersType[] {
-    return this.rooms.find(room => room.id === id).connectedPlayers
+    const connectedPlayers = this.rooms.find(room => room.id === id).connectedPlayers
+    return connectedPlayers.length > 0 ? connectedPlayers : []
   }
 
-  getTime(id: string): number{
-    return this.rooms.find(room => room.id === id).time  
+  getRoomDetails(id: string): RoomDetails{
+    const room = this.rooms.find(room => room.id === id)
+    const time = room.time
+    const rounds = room.rounds
+    return time != null &&  rounds != null ? {time: time, rounds: rounds} : {time: 0, rounds: 0}
   }
 
   createRoom(data: NewRoomDto): string {
     const newId = this.generateNewId()
     const { username, ...roomData } = data
     const newPlayer = {id: 1, username: username, score: 0, roomOwner: true}
-    this.rooms.push({...roomData, id: newId, connectedPlayers: [newPlayer], turnScores: [], currentDrawing: ''})
+    this.rooms.push({...roomData, id: newId, startPlaying: false, connectedPlayers: [newPlayer], turnScores: [], currentDrawing: ''})
     return newId
   }
 
@@ -74,6 +79,14 @@ export class RoomsService{
     if(room)
       return true
     return false
+  }
+
+  startPlaying(id: string): void {
+    this.rooms.map(room => {
+      if(room.id === id)
+        return {...room, startPlaying: true}
+      return room
+    })
   }
 
   async getWords(): Promise<Word[] | void>{
@@ -93,28 +106,60 @@ export class RoomsService{
     })
   }
 
-  addNewTurnScore(roomID: string, username: string): void{
+  addNewTurnScore(roomID: string, username: string, currentDrawer: string): void{
     this.rooms = this.rooms.map(room => {
       if(room.id === roomID){
-        const score = (room.connectedPlayers.length - room.turnScores.length) * 50
-        return {...room, turnScores: [...room.turnScores, {username: username, score: score}]}
+        let newScores = [{username: username, score: (room.connectedPlayers.length - room.turnScores.length) * 50}]
+        if(room.turnScores.length === 0)
+          newScores.push({ username: currentDrawer, score: 75 })
+        return {...room, turnScores: [...room.turnScores, ...newScores]}
       }
       return room
     })
+  }
+
+  checkIfAllPlayersGuested(roomID: string): boolean{
+    const room = this.rooms.find(room => room.id === roomID)
+    if(room.connectedPlayers.length === room.turnScores.length)
+      return true
+    return false
   }
 
   getTurnScores(roomID: string): playerTurnScore[]{
     const room = this.rooms.find(room => room.id === roomID)
-    return room.turnScores
+    room.turnScores.sort((a, b) => b.score - a.score)
+    const playersNames = room.connectedPlayers.map(player => player.username)
+    const playersNamesWithScore = room.turnScores.map(player => player.username)
+    playersNames.forEach(name => {
+      if(!playersNamesWithScore.includes(name))
+        room.turnScores.push({username: name, score: 0})
+    })
+    const currentTurnScores = room.turnScores
+    room.turnScores = []
+    return currentTurnScores
   }
 
-  leaveRoom(id: string, username: string): void{
-    this.rooms = this.rooms.map(room => {
-      if(room.id === id){
-        const newConnctedPlayers = room.connectedPlayers.filter(player => player.username != username)
-        return {...room, connectedPlayers: newConnctedPlayers}
-      }
-      return room
-    })
+  leaveRoom(id: string, username: string): ConnectedPlayersType[] | null{ //remove player or close room if one left
+    const room = this.rooms.find(room => room.id === id)
+    if(!room) return null
+    else if(room.connectedPlayers.length === 1 || (room.startPlaying && room.connectedPlayers.length === 2)){
+      this.rooms = this.rooms.filter(room => room.id === id)
+      return null
+    }
+    else{
+      let updatedPlayers: ConnectedPlayersType[] = []
+      this.rooms = this.rooms.map(room => {
+        if(room.id === id){
+          const leavingPlayer = room.connectedPlayers.find(player => player.username === username)
+          const newConnctedPlayers = room.connectedPlayers.filter(player => player !== leavingPlayer)
+          if(leavingPlayer.roomOwner)
+            newConnctedPlayers[0].roomOwner = true
+          updatedPlayers = newConnctedPlayers
+          return {...room, connectedPlayers: newConnctedPlayers}
+        }
+        return room
+      })
+      return updatedPlayers
+    }
   }
 }

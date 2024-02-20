@@ -1,7 +1,7 @@
-import { useEffect } from "react"
-import PlayerType from "../../types/RoomTypes/playerType"
-import { SetConnectedPlayersType } from "../../types/RoomTypes/setConnectedPlayersType"
+import { useEffect, useContext } from "react"
+import { StableNavigateContext } from "../../App"
 import { Socket } from "socket.io-client"
+import { PlayerType, SetConnectedPlayersType } from "../../types/RoomTypes/types"
 
 type Props = {
   socket: Socket,
@@ -11,23 +11,34 @@ type Props = {
 
 const Players = (props: Props) => {
 
+  const nav = useContext(StableNavigateContext)
+
   useEffect(() => {
 
     const setConnectedPlayers = (data: SetConnectedPlayersType): void => {
-      if(Array.isArray(data))
+      if(Array.isArray(data)) //add player on entrance
         props.setPlayers(currentPlayers => [...currentPlayers, ...data])
-      else{
-        if(typeof data !== 'string')
-          props.setPlayers(currentPlayers => [...currentPlayers, data])
-        else
-          props.setPlayers(currentPlayers => currentPlayers.filter(player => player.username !== data))
-      }
+      else //add new player
+        props.setPlayers(currentPlayers => [...currentPlayers, data])
+    }
+
+    const removePlayer = (updatedPlayers: PlayerType[]): void => {
+      props.setPlayers(updatedPlayers)
+    }
+
+    const leave = (): void => {
+      //send msg to client befaore leaving
+      nav('/home')
     }
 
     props.socket.on('players', setConnectedPlayers)
+    props.socket.on('player_left', removePlayer)
+    props.socket.on('room_closed', leave)
 
     return (): void => {
       props.socket.off('players', setConnectedPlayers)
+      props.socket.off('player_left', removePlayer)
+      props.socket.off('closed_room', leave)
     }
 
   }, [])
