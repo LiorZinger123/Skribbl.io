@@ -6,6 +6,7 @@ interface Room {
     time: number,
     rounds: number,
     connectedPlayers: ConnectedPlayersType[],
+    currentPlayerPos: number,
     startPlaying: boolean,
     turnScores: playerTurnScore[]
     currentDrawing: string

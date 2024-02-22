@@ -47,3 +47,8 @@ export type RoomDetails = {
     time: number, 
     rounds: number
 }
+
+export type ShowScoresType = {
+    scores: Score[],
+    painter: string
+}

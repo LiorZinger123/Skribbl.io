@@ -6,10 +6,9 @@ import StartRoundMsgs from "./StartRoundMsgs"
 import ScoresScreen from "./ScoresScreen"
 
 type Props = {
-  socket: Socket,
   players: PlayerType[],
   setPlayers: React.Dispatch<React.SetStateAction<PlayerType[]>>,
-  currentPlayerNumber: React.MutableRefObject<number>,
+  painter: React.MutableRefObject<string>,
   setRound: React.Dispatch<React.SetStateAction<number>>,
   setTime: React.Dispatch<React.SetStateAction<number>>,
   roundTime: React.MutableRefObject<number>,
@@ -24,9 +23,9 @@ const ScreenMsgs = (props: Props) => {
 
   return (
     <>
-      {startMsg && <StartMsg socket={props.socket} players={props.players} setStartMsg={setStartMsg} />}
-      <ScoresScreen socket={props.socket} players={props.players} currentPlayerNumber={props.currentPlayerNumber} setPlayers={props.setPlayers} round={props.round} maxRounds={props.maxRounds} setEndMsg={setEndMsg} />
-      <StartRoundMsgs socket={props.socket} players={props.players} currentPlayerNumber={props.currentPlayerNumber} setRound={props.setRound} setTime={props.setTime} roundTime={props.roundTime} />
+      {startMsg && <StartMsg players={props.players} setStartMsg={setStartMsg} painter={props.painter} />}
+      <ScoresScreen players={props.players} painter={props.painter} setPlayers={props.setPlayers} round={props.round} maxRounds={props.maxRounds} setEndMsg={setEndMsg} />
+      <StartRoundMsgs players={props.players} painter={props.painter} setRound={props.setRound} setTime={props.setTime} roundTime={props.roundTime} />
     </>
   )
 }

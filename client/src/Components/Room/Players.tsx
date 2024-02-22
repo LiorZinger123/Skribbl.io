@@ -1,10 +1,9 @@
 import { useEffect, useContext } from "react"
 import { StableNavigateContext } from "../../App"
-import { Socket } from "socket.io-client"
+import { SocketContext } from "./Room"
 import { PlayerType, SetConnectedPlayersType } from "../../types/RoomTypes/types"
 
 type Props = {
-  socket: Socket,
   players: PlayerType[],
   setPlayers: React.Dispatch<React.SetStateAction<PlayerType[]>>
 }
@@ -12,6 +11,7 @@ type Props = {
 const Players = (props: Props) => {
 
   const nav = useContext(StableNavigateContext)
+  const socket = useContext(SocketContext)
 
   useEffect(() => {
 
@@ -31,14 +31,14 @@ const Players = (props: Props) => {
       nav('/home')
     }
 
-    props.socket.on('players', setConnectedPlayers)
-    props.socket.on('player_left', removePlayer)
-    props.socket.on('room_closed', leave)
+    socket.on('players', setConnectedPlayers)
+    socket.on('player_left', removePlayer)
+    socket.on('room_closed', leave)
 
     return (): void => {
-      props.socket.off('players', setConnectedPlayers)
-      props.socket.off('player_left', removePlayer)
-      props.socket.off('closed_room', leave)
+      socket.off('players', setConnectedPlayers)
+      socket.off('player_left', removePlayer)
+      socket.off('closed_room', leave)
     }
 
   }, [])

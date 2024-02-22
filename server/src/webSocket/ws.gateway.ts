@@ -42,7 +42,8 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     @SubscribeMessage('start_game')
     startGame(@MessageBody() data: { room: string }): void{
         this.roomsService.startPlaying(data.room)
-        this.server.emit('start_game', 'Starting Game!')
+        this.server.to(data.room).emit('hide_start_btn')
+        this.server.to(data.room).emit('start_game', 'Starting Game!')
     }   
 
     @SubscribeMessage('choose_word')
@@ -51,11 +52,10 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     }
     
     @SubscribeMessage('turn')
-    startTurn(@MessageBody() data: {word: Word, currentDrawer: string, room: string}, @ConnectedSocket() socket: Socket): void {
+    startTurn(@MessageBody() data: {word: Word, currentPainter: string, room: string}, @ConnectedSocket() socket: Socket): void {
         this.server.to(data.room).emit('start_turn', data.word)
         this.server.to(socket.id).emit('start_draw')
-        this.server.to(data.room).emit('current_drawer', data.currentDrawer)
-        this.server.to(data.room).emit('message', `${data.currentDrawer} is drawing now!`)
+        this.server.to(data.room).emit('message', `${data.currentPainter} is drawing now!`)
     }
 
     @SubscribeMessage('drawing')
@@ -65,8 +65,8 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     }
     
     @SubscribeMessage('correct')
-    correctAnswer(@MessageBody() data: { msgData: msgData, currentDrawer: string, room: string}, @ConnectedSocket() socket: Socket): void{
-        this.roomsService.addNewTurnScore(data.room, data.msgData.username, data.currentDrawer)
+    correctAnswer(@MessageBody() data: { msgData: msgData, currentPainter: string, room: string}, @ConnectedSocket() socket: Socket): void{
+        this.roomsService.addNewTurnScore(data.room, data.msgData.username, data.currentPainter)
         this.server.to(socket.id).emit('message', `${data.msgData.username}: ${data.msgData.msg}`)
         this.server.to(data.room).except(socket.id).emit('message', `${data.msgData.username} guessed the word!`)
         if(this.roomsService.checkIfAllPlayersGuested(data.room))
@@ -74,17 +74,28 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     }
 
     @SubscribeMessage('end_turn')
-    endTurn(@MessageBody() data: { room: string }): void{
+    endTurn(@MessageBody() data: { room: string }, ifPainterLeft?: boolean): void{
+        let updatedPainter = ''
+        if(ifPainterLeft)
+            updatedPainter = this.roomsService.getNewPainter(data.room)
+        else
+            updatedPainter = this.roomsService.updatePainter(data.room)
         const scores = this.roomsService.getTurnScores(data.room)
-        this.server.to(data.room).emit('end_turn', scores)
+        this.server.to(data.room).emit('end_turn', {scores: scores, painter: updatedPainter})
     }
 
     @SubscribeMessage('leave_Room')
-    leaveRoom(@MessageBody() data: {username: string, room: string}, @ConnectedSocket() socket: Socket): void {
+    leaveRoom(@MessageBody() data: {username: string, room: string, currentPainter: string}, @ConnectedSocket() socket: Socket): void {
         const updatedPlayers = this.roomsService.leaveRoom(data.room, data.username)
         this.server.to(data.room).emit('message', `${data.username} has left the room`)
-        if(updatedPlayers != null)
+        if(updatedPlayers != null){
             this.server.to(data.room).emit('player_left', updatedPlayers)
+            if(data.username === data.currentPainter){
+                this.server.to(data.room).emit('end_turn_now')
+                this.roomsService.setTurnScoreToZero(data.room)
+                this.endTurn({room: data.room}, true)
+            }
+        }
         else
             this.server.to(data.room).emit('room_closed')
         socket.disconnect(true)

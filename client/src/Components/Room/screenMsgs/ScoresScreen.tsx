@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useContext } from "react"
+import { SocketContext } from "../Room"
 import { Socket } from "socket.io-client"
 import { useAppSelector } from "../../../store/hooks"
 import { RootState } from "../../../store/store"
-import { PlayerType, Score } from "../../../types/RoomTypes/types"
+import { PlayerType, Score, ShowScoresType } from "../../../types/RoomTypes/types"
 
 type Props = {
-    socket: Socket,
     players: PlayerType[],
     setPlayers: React.Dispatch<React.SetStateAction<PlayerType[]>>,
-    currentPlayerNumber: React.MutableRefObject<number>,
+    painter: React.MutableRefObject<string>,
     round: number,
     maxRounds: number,
     setEndMsg: React.Dispatch<React.SetStateAction<boolean>>
@@ -17,50 +17,48 @@ type Props = {
 const ScoresScreen = (props: Props) => {
   
     const room = useAppSelector((state: RootState) => state.room)
+    const socket = useContext(SocketContext)
     const username = useAppSelector((state: RootState) => state.username)
     const [turnScores, setTurnScores] = useState<Score[]>([])
 
     useEffect(() => {
         
-        const showScores = (scores: Score[]): void => {
-            setTurnScores(scores)
+        const showScores = (data: ShowScoresType): void => {
+            if(data.painter)
+                props.painter.current = data.painter
+            
+            setTurnScores(data.scores)
             props.setPlayers(players => {
                 return players.map(player => {
-                    const currentScore = scores.find(score => score.username === player.username)?.score
+                    const currentScore = data.scores.find(score => score.username === player.username)?.score
                     if(currentScore)
                         return {...player, score: player.score + currentScore}
                     return player
                 })
             })
+
             setTimeout(() => {
                 setTurnScores([])
-                console.log(props.round, props.maxRounds)
                 if(props.round === props.maxRounds + 1)
                     props.setEndMsg(true)
-                else{
-                    if(props.players[props.currentPlayerNumber.current].username === username)
-                        props.socket.emit('choose_word', {room:room})
-                }
+                else if(props.painter.current === username)
+                    socket.emit('choose_word', {room:room})
             }, 3000)
         }   
 
-        props.socket.on('end_turn', showScores)
+        socket.on('end_turn', showScores)
 
         return (): void => {
-            props.socket.off('end_turn', showScores)
+            socket.off('end_turn', showScores)
         }
     })
 
     return (
-    <>
-        {turnScores.length > 0 &&
-            <ul>
-                {turnScores.map(playerScore => (
-                    <li key={playerScore.username}>{playerScore.username}: {playerScore.score}</li>
-                ))}
-            </ul>
-        }
-    </>
+    <ul>       
+        {turnScores.map(playerScore => (
+            <li key={playerScore.username}>{playerScore.username}: {playerScore.score}</li>
+        ))}
+    </ul>
   )
 }
 

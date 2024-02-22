@@ -31,7 +31,6 @@ const CreateRoom = () => {
 
   const onSubmit: SubmitHandler<CreateRoomFormFields> = async (data): Promise<void> => {
     try{
-      console.log(roomSettings)
       const res = await fetchToApi('rooms/createroom', {username: username, ...roomSettings, ...data})
       dispatch(setRoomId(await res.text()))
       nav('/room')

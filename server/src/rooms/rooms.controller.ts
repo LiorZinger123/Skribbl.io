@@ -4,6 +4,7 @@ import { RoomsService } from "./rooms.service";
 import { JoinRoomDto } from './dtos/joinRoom.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { NewRoomDto } from './dtos/newRoom.dto';
+import { IfGameStartedDto } from "./dtos/ifGameStarted.dto";
 
 @Controller('rooms')
 export class RoomsController{
@@ -34,6 +35,11 @@ export class RoomsController{
         res.send(this.roomsService.createRoom(data))
     }
 
+    @Post('ifgamestarted')
+    checkIfStarted(@Res() res: Response, @Body() data: IfGameStartedDto): void{
+        res.send(this.roomsService.checkIfGameStarted(data.room))
+    }
+    
     @Get('words')
     async getWords(@Res() res: Response): Promise<void> {
         try{

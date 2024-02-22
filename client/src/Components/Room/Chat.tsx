@@ -1,42 +1,36 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState, useContext } from "react"
+import { SocketContext } from "./Room"
 import { ChatMessage } from "../../types/RoomTypes/types"
-import { Socket } from "socket.io-client"
 import { useAppSelector } from "../../store/hooks"
 import { RootState } from "../../store/store"
 import { Word } from "../../types/RoomTypes/types"
 
 type Props = {
-    socket: Socket,
     messages: ChatMessage[],
     setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-    currentWord: Word
+    currentWord: Word,
+    painter: React.MutableRefObject<string>,
 }
 
 const Chat = (props: Props) => {
 
   const room = useAppSelector((state: RootState) => state.room)
   const username = useAppSelector((state: RootState) => state.username)
+  const socket = useContext(SocketContext)
   const [msg, setMsg] = useState<string>('')
-  const currentDrawer = useRef<string>('')
 
   useEffect(() => {
-
-    const setCurrentDrawer = (name: string): void => {
-      currentDrawer.current = name      
-    }
 
     const handleMsg = (msg: string): void => {
       props.setMessages(messages => [...messages, { id: messages.length + 1, msg: msg}])
     }
 
-    props.socket.on('current_drawer', setCurrentDrawer)
-    props.socket.on('message', handleMsg)
-    props.socket.on('leave_room', handleMsg)
+    socket.on('message', handleMsg)
+    socket.on('leave_room', handleMsg)
 
     return (): void => {
-      props.socket.off('current_drawer', setCurrentDrawer)
-      props.socket.off('message', handleMsg)
-      props.socket.off('leave_room', handleMsg)
+      socket.off('message', handleMsg)
+      socket.off('leave_room', handleMsg)
     }
 
   }, [])
@@ -45,15 +39,15 @@ const Chat = (props: Props) => {
     e.preventDefault()
     const data = {msg: msg, username: username}
     if(msg.toLowerCase() === props.currentWord.word.toLowerCase()){
-      if(currentDrawer.current !== username)
-        props.socket.emit('correct', {msgData: data, currentDrawer: currentDrawer.current, room: room})
+      if(props.painter.current !== username)
+        socket.emit('correct', {msgData: data, currentPainter: props.painter.current, room: room})
       else{
         const newMsg = {id: props.messages.length + 1, msg: `${data.username}: ${data.msg}`}
         props.setMessages(msgs => [...msgs, newMsg])
       }
     }
     else
-      props.socket.send(data)
+      socket.send(data)
     setMsg('')
   }
 

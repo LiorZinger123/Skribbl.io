@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react"
 import { Socket, io } from "socket.io-client"
 import { useAppSelector } from "../../store/hooks"
 import { RootState } from "../../store/store"
+import { createContext } from "react"
 // import { StableNavigateContext } from "../../App"
 // import { useContext } from "react"
+import { fetchToApi } from "../../Api/fetch"
 import { ChatMessage, PlayerType, RoomDetails, Word } from "../../types/RoomTypes/types"
 import Chat from "./Chat"
 import Canvas from "./Canvas/Canvas"
@@ -12,31 +14,54 @@ import StartButton from "./StartButton"
 import ScreenMsgs from "./ScreenMsgs/ScreenMsgs"
 import { LeaveRoom } from "./LeaveRoom"
 
+export const SocketContext = createContext<Socket>(null!)
+
 const Room = () => {
  
   // const nav = useContext(StableNavigateContext)
   const room = useAppSelector((state: RootState) => state.room)
   const username = useAppSelector((state: RootState) => state.username)
 
+  const [startBtn, setStartBtn] = useState<boolean>(true)
+
   const [socket, setSocket] = useState<Socket>(null!)
   const [players, setPlayers] = useState<PlayerType[]>([])
   const [messages, setMessages] = useState<ChatMessage[]>([])
+
   const [currentWord, setCurrentWord] = useState<Word>({word: '', length: ''})
+  const currentPainter = useRef<string>('')
 
   const roundTime = useRef<number>(0)
   const [time, setTime] = useState<number>(0)
 
-  const turnsInRound = useRef<number>(0)
-  const [round, setRound] = useState<number>(1) 
+  const [round, setRound] = useState<number>(0) 
   const maxRounds = useRef<number>(0)
 
   useEffect(() => {
+
+    const checkIfGameStarted = async (): Promise<void> => {
+      try{
+          const res = await fetchToApi('rooms/ifgamestarted', {room: room})
+          const ifStarted = await res.json()
+          if(ifStarted)
+              setStartBtn(false)
+          else
+              setStartBtn(true)
+      }
+      catch{
+
+      }
+    }
 
     const handleDetails = (roomDetails: RoomDetails): void => {
       roundTime.current = roomDetails.time
       maxRounds.current = roomDetails.rounds
     }
 
+    const hideBtn = (): void => {
+      setStartBtn(false)
+    }
+    
     const handleWord = (word: Word): void => {
       setCurrentWord(word)
     }
@@ -52,11 +77,14 @@ const Room = () => {
     setSocket(newSocket)
     newSocket.emit('join', {room: room, username: username})
     newSocket.on('room_details', handleDetails)
+    newSocket.on('hide_start_btn', hideBtn)
     newSocket.on('start_turn', handleWord)
     // window.addEventListener('beforeunload', leaveOnRefresh)
+    checkIfGameStarted()
 
     return (): void => {
       newSocket.off('room_details', handleDetails)
+      newSocket.off('hide_start_btn', hideBtn)
       newSocket.off('start_turn', handleWord)
       // window.removeEventListener('beforeunload', leaveOnRefresh)
       newSocket.disconnect()
@@ -66,16 +94,18 @@ const Room = () => {
   return (
     <>
       {socket &&
-        <div>
-          {time}
-          <Players socket={socket} players={players} setPlayers={setPlayers} />
-          <Canvas socket={socket} players={players} currentPlayerNumber={turnsInRound} setTime={setTime} roundTime={roundTime}/>
-          <ScreenMsgs socket={socket} players={players} currentPlayerNumber={turnsInRound} setRound={setRound} setTime={setTime}
-            round={round} maxRounds={maxRounds.current} roundTime={roundTime} setPlayers={setPlayers} />
-          <StartButton socket={socket} players={players} setMessages={setMessages} />
-          <Chat socket={socket} messages={messages} setMessages={setMessages} currentWord={currentWord} />
-          <LeaveRoom socket={socket} />
-        </div> 
+        <SocketContext.Provider value={socket}>
+          <div> 
+            {time}
+            <Players players={players} setPlayers={setPlayers} />
+            <Canvas  players={players} setTime={setTime} roundTime={roundTime}/>
+            <ScreenMsgs players={players} painter={currentPainter} setRound={setRound} setTime={setTime}
+              round={round} maxRounds={maxRounds.current} roundTime={roundTime} setPlayers={setPlayers} />
+            {startBtn && <StartButton players={players} setMessages={setMessages} />}
+            <Chat messages={messages} setMessages={setMessages} currentWord={currentWord} painter={currentPainter} />
+            <LeaveRoom painter={currentPainter} />
+          </div>
+        </SocketContext.Provider>
       }
     </>
   )
