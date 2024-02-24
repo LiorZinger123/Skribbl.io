@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from "react"
 import { SocketContext } from "../Room"
 import { useAppSelector } from "../../../store/hooks"
 import { RootState } from "../../../store/store"
-import { getFromApi } from "../../../Api/fetch"
+import { fetchToApi, getFromApi } from "../../../Api/fetch"
 import { PlayerType } from "../../../types/RoomTypes/types"
 import { Word, Msg } from "../../../types/RoomTypes/types"
 
@@ -37,8 +37,11 @@ const StartRoundMsgs = (props: Props) => {
                         setScreenMsg({msg: `${props.painter.current} is choosing a word`})
                     }
                   
-                    if(props.painter.current === props.players[props.players.length - 1].username)
+                    if(props.painter.current === props.players[0].username){
+                        if(props.painter.current === username)
+                            fetchToApi('rooms/currentround', {room: room})
                         props.setRound(round => round + 1)
+                    }
                 }                  
             }
             catch{
@@ -71,7 +74,6 @@ const StartRoundMsgs = (props: Props) => {
                 wordsTimeOutId.current = setTimeout(() => {
                     clearInterval(wordsIntervalId.current)
                     const word = screenMsg.words![Math.floor(Math.random() * screenMsg.words!.length)]
-                    console.log(props.painter.current)
                     socket.emit('turn', {word: word, currentDrawer: props.painter.current, room: room})
                 }, 15 * 1000)
             }

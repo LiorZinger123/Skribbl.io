@@ -1,10 +1,11 @@
-interface Room {
+type Room = {
     id: string,
     name: string,
     password?: string,
     players: number,
     time: number,
     rounds: number,
+    currentRound: number,
     connectedPlayers: ConnectedPlayersType[],
     currentPlayerPos: number,
     startPlaying: boolean,

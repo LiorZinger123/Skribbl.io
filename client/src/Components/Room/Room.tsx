@@ -13,6 +13,7 @@ import Players from "./Players"
 import StartButton from "./StartButton"
 import ScreenMsgs from "./ScreenMsgs/ScreenMsgs"
 import { LeaveRoom } from "./LeaveRoom"
+import TopRoom from "./TopRoom"
 
 export const SocketContext = createContext<Socket>(null!)
 
@@ -96,7 +97,7 @@ const Room = () => {
       {socket &&
         <SocketContext.Provider value={socket}>
           <div> 
-            {time}
+            <TopRoom time={time} round={round} maxRounds={maxRounds.current} painter={currentPainter} />
             <Players players={players} setPlayers={setPlayers} />
             <Canvas  players={players} setTime={setTime} roundTime={roundTime}/>
             <ScreenMsgs players={players} painter={currentPainter} setRound={setRound} setTime={setTime}

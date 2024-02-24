@@ -50,5 +50,11 @@ export type RoomDetails = {
 
 export type ShowScoresType = {
     scores: Score[],
-    painter: string
+    painter: string | null,
+    owner: string
+}
+
+export type EndMsgInfoType = {
+    winner: string,
+    owner: string
 }

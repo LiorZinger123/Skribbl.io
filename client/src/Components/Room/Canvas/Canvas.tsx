@@ -41,6 +41,7 @@ const Canvas = (props: Props) => {
         
         const endTurn = (): void => {
             clearInterval(intervalRef.current)
+            props.setTime(0)
             contextRef.current?.clearRect(0, 0, canvasRef.current?.width!, canvasRef.current?.height!)
             if(canDraw.current){
                 canDraw.current = false

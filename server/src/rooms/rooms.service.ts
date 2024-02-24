@@ -16,7 +16,7 @@ export class RoomsService{
     private readonly wordsModule: Model<WordDocument>
   ){}
 
-  private rooms: Room[] = [{ id: '111111', name: 'Lior', password: 'aaaa', players: 5, time: 60, rounds: 2, startPlaying: false, connectedPlayers: [], currentPlayerPos: 0,turnScores: [], currentDrawing: '' }]
+  private rooms: Room[] = []
 
   getRooms(): RoomToList[] {
     const rooms = this.rooms.slice(-10)
@@ -50,7 +50,7 @@ export class RoomsService{
     const newId = this.generateNewId()
     const { username, ...roomData } = data
     const newPlayer = {id: 1, username: username, score: 0, roomOwner: true}
-    this.rooms.push({...roomData, id: newId, startPlaying: false, connectedPlayers: [newPlayer], currentPlayerPos: 0, turnScores: [], currentDrawing: ''})
+    this.rooms.push({...roomData, id: newId, startPlaying: false, connectedPlayers: [newPlayer], currentPlayerPos: 0, currentRound: 0, turnScores: [], currentDrawing: ''})
     return newId
   }
 
@@ -93,22 +93,49 @@ export class RoomsService{
     })
   }
 
-  getNewPainter(id: string): string{
-    const room = this.rooms.find(room => room.id === id)
-    return room.connectedPlayers[room.currentPlayerPos].username
-  }
-  
-  updatePainter(id: string): string{
+  updateCurrentRound(id: string): void{
     this.rooms = this.rooms.map(room => {
-      if(room.id === id){
-        if(room.currentPlayerPos === room.connectedPlayers.length - 1)
-          return {...room, currentPlayerPos: 0}
-        return {...room, currentPlayerPos: room.currentPlayerPos + 1}
-      }
+      if(room.id === id)
+        return {...room, currentRound: room.currentRound + 1}
       return room
     })
+  }
+
+  checkLeavingPlayerPos(username: string, id: string): boolean{
     const room = this.rooms.find(room => room.id === id)
+    const leavingPlayerPos = room.connectedPlayers.findIndex(player => player.username === username)
+    const painterPos = room.connectedPlayers.findIndex(player => player.username === room.connectedPlayers[room.currentPlayerPos].username)
+    if(leavingPlayerPos < painterPos)
+      return true
+    return false
+  }
+
+  updatePainter(id: string, ifIncreaseCurrentPos: boolean): string | null{ //if last turn return null else return new painter
+    let room = this.rooms.find(room => room.id === id)
+    if(room.currentPlayerPos === room.connectedPlayers.length - 1 && room.currentRound === room.rounds)
+      return null
+    else{
+      this.rooms = this.rooms.map(room => {
+        if(room.id === id){
+          if(room.currentPlayerPos === room.connectedPlayers.length - 1)
+            return {...room, currentPlayerPos: 0}
+          if(ifIncreaseCurrentPos)
+            return {...room, currentPlayerPos: room.currentPlayerPos + 1}
+        }
+        return room
+      })
+    }
+    room = this.rooms.find(room => room.id === id)
     return room.connectedPlayers[room.currentPlayerPos].username
+  }
+
+  getOwner(id: string): string{
+    const room = this.rooms.find(room => room.id === id)
+    const owner =room.connectedPlayers.map(player => {
+      if(player.roomOwner)
+        return player.username
+    })
+    return owner[0]
   }
 
   async getWords(): Promise<Word[] | void>{
@@ -183,16 +210,44 @@ export class RoomsService{
       let updatedPlayers: ConnectedPlayersType[] = []
       this.rooms = this.rooms.map(room => {
         if(room.id === id){
+          let currentPos = 0
           const leavingPlayer = room.connectedPlayers.find(player => player.username === username)
           const newConnctedPlayers = room.connectedPlayers.filter(player => player !== leavingPlayer)
+
           if(leavingPlayer.roomOwner)
             newConnctedPlayers[0].roomOwner = true
+          if(leavingPlayer.id === room.connectedPlayers.length || this.checkLeavingPlayerPos(username, id))
+            currentPos = room.currentPlayerPos - 1
+          else
+            currentPos = room.currentPlayerPos
+
           updatedPlayers = newConnctedPlayers
-          return {...room, connectedPlayers: newConnctedPlayers}
+          return {...room, connectedPlayers: newConnctedPlayers, currentPlayerPos: currentPos}
         }
         return room
       })
       return updatedPlayers
     }
+  }
+
+  getWinner(id: string): string | null{
+    const room = this.rooms.find(room => room.id === id)
+    if(room){
+      room.connectedPlayers.sort((a, b) => b.score - a.score)
+      return room.connectedPlayers[0].username
+    }
+    return null
+  }
+
+  closeRoom(id: string): void{
+    this.rooms = this.rooms.filter(room => room.id != id)
+  }
+
+  restartGame(id: string): void{
+    this.rooms = this.rooms.map(room => {
+      if(room.id === id)
+        return {...room, currentRound: 1, currentPlayerPos: 0, currentDrawing: ''}
+      return room
+    })
   }
 }

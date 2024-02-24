@@ -4,7 +4,6 @@ import { RoomsService } from "./rooms.service";
 import { JoinRoomDto } from './dtos/joinRoom.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { NewRoomDto } from './dtos/newRoom.dto';
-import { IfGameStartedDto } from "./dtos/ifGameStarted.dto";
 
 @Controller('rooms')
 export class RoomsController{
@@ -36,7 +35,7 @@ export class RoomsController{
     }
 
     @Post('ifgamestarted')
-    checkIfStarted(@Res() res: Response, @Body() data: IfGameStartedDto): void{
+    checkIfStarted(@Res() res: Response, @Body() data: {room: string}): void{
         res.send(this.roomsService.checkIfGameStarted(data.room))
     }
     
@@ -48,5 +47,10 @@ export class RoomsController{
         catch(e){
             res.send(e)
         }
+    }
+
+    @Post('currentround')
+    updateCurrentRound(@Res() res: Response, @Body() data: {room: string}): void{
+        res.send(this.roomsService.updateCurrentRound(data.room))
     }
 }

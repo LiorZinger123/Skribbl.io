@@ -1,9 +1,9 @@
 import React, { useState } from "react"
-import { Socket } from "socket.io-client"
 import { PlayerType } from "../../../types/RoomTypes/types"
 import StartMsg from "./StartMsg"
 import StartRoundMsgs from "./StartRoundMsgs"
 import ScoresScreen from "./ScoresScreen"
+import EndMsg from "./EndMsg"
 
 type Props = {
   players: PlayerType[],
@@ -26,6 +26,7 @@ const ScreenMsgs = (props: Props) => {
       {startMsg && <StartMsg players={props.players} setStartMsg={setStartMsg} painter={props.painter} />}
       <ScoresScreen players={props.players} painter={props.painter} setPlayers={props.setPlayers} round={props.round} maxRounds={props.maxRounds} setEndMsg={setEndMsg} />
       <StartRoundMsgs players={props.players} painter={props.painter} setRound={props.setRound} setTime={props.setTime} roundTime={props.roundTime} />
+      {endMsg && <EndMsg setEndMsg={setEndMsg} />}
     </>
   )
 }

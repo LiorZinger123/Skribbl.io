@@ -74,14 +74,12 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     }
 
     @SubscribeMessage('end_turn')
-    endTurn(@MessageBody() data: { room: string }, ifPainterLeft?: boolean): void{
-        let updatedPainter = ''
-        if(ifPainterLeft)
-            updatedPainter = this.roomsService.getNewPainter(data.room)
-        else
-            updatedPainter = this.roomsService.updatePainter(data.room)
+    endTurn(@MessageBody() data: { room: string }, ifIncreaseCurrentPos?: boolean): void{
+        const increase = ifIncreaseCurrentPos ? ifIncreaseCurrentPos : true
+        const updatedPainter = this.roomsService.updatePainter(data.room, increase)
         const scores = this.roomsService.getTurnScores(data.room)
-        this.server.to(data.room).emit('end_turn', {scores: scores, painter: updatedPainter})
+        const owner = this.roomsService.getOwner(data.room)
+        this.server.to(data.room).emit('end_turn', {scores: scores, painter: updatedPainter, owner: owner})
     }
 
     @SubscribeMessage('leave_Room')
@@ -93,11 +91,29 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
             if(data.username === data.currentPainter){
                 this.server.to(data.room).emit('end_turn_now')
                 this.roomsService.setTurnScoreToZero(data.room)
-                this.endTurn({room: data.room}, true)
+                this.endTurn({room: data.room}, false)
             }
         }
         else
             this.server.to(data.room).emit('room_closed')
         socket.disconnect(true)
+    }
+
+    @SubscribeMessage('end_game')
+    endGame(@MessageBody() data: {room: string}): void{
+        const winner = this.roomsService.getWinner(data.room)
+        const owner = this.roomsService.getOwner(data.room)
+        this.server.to(data.room).emit('end_game', {winner: winner, owner: owner})
+    }
+
+    @SubscribeMessage('close_room')
+    closeRoom(@MessageBody() data: {room: string}): void{
+        this.roomsService.closeRoom(data.room)
+    }
+
+    @SubscribeMessage('restart')
+    restart(@MessageBody() data: {room: string}): void{
+        this.roomsService.restartGame(data.room)
+        this.server.to(data.room).emit('start_game', 'Starting Game!')
     }
 }   

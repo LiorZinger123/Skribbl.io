@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from "react"
 import { SocketContext } from "../Room"
-import { Socket } from "socket.io-client"
 import { useAppSelector } from "../../../store/hooks"
 import { RootState } from "../../../store/store"
 import { PlayerType, Score, ShowScoresType } from "../../../types/RoomTypes/types"
@@ -24,9 +23,6 @@ const ScoresScreen = (props: Props) => {
     useEffect(() => {
         
         const showScores = (data: ShowScoresType): void => {
-            if(data.painter)
-                props.painter.current = data.painter
-            
             setTurnScores(data.scores)
             props.setPlayers(players => {
                 return players.map(player => {
@@ -39,10 +35,16 @@ const ScoresScreen = (props: Props) => {
 
             setTimeout(() => {
                 setTurnScores([])
-                if(props.round === props.maxRounds + 1)
+                if(data.painter === null){
                     props.setEndMsg(true)
-                else if(props.painter.current === username)
-                    socket.emit('choose_word', {room:room})
+                    if(username === data.owner)
+                        socket.emit('end_game', {room: room})
+                }
+                else{
+                    props.painter.current = data.painter
+                    if(username === data.painter)
+                        socket.emit('choose_word', {room:room})
+                }
             }, 3000)
         }   
 
