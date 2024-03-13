@@ -43,7 +43,7 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     startGame(@MessageBody() data: { room: string }): void{
         this.roomsService.startPlaying(data.room)
         this.server.to(data.room).emit('hide_start_btn')
-        this.server.to(data.room).emit('start_game', 'Starting Game!')
+        this.server.to(data.room).emit('start_game')
     }   
 
     @SubscribeMessage('choose_word')
@@ -114,6 +114,12 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     @SubscribeMessage('restart')
     restart(@MessageBody() data: {room: string}): void{
         this.roomsService.restartGame(data.room)
-        this.server.to(data.room).emit('start_game', 'Starting Game!')
+        const owner = this.roomsService.getOwner(data.room)
+        this.server.to(data.room).emit('restart', owner)
+    }
+
+    @SubscribeMessage('start_new_game')
+    startNewGame(@MessageBody() data: {room: string}): void{
+        this.server.to(data.room).emit('start_game')
     }
 }   

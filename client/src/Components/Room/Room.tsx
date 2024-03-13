@@ -11,7 +11,7 @@ import Chat from "./Chat"
 import Canvas from "./Canvas/Canvas"
 import Players from "./Players"
 import StartButton from "./StartButton"
-import ScreenMsgs from "./ScreenMsgs/ScreenMsgs"
+import ScreenMsgs from "./screenMsgs/ScreenMsgs"
 import { LeaveRoom } from "./LeaveRoom"
 import TopRoom from "./TopRoom"
 

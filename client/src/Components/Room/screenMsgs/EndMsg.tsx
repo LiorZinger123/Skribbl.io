@@ -6,6 +6,7 @@ import { SocketContext } from "../Room"
 import { StableNavigateContext } from "../../../App"
 
 type Props = {
+    setStartMsg: React.Dispatch<React.SetStateAction<boolean>>,
     setEndMsg: React.Dispatch<React.SetStateAction<boolean>>
 }
 
@@ -23,7 +24,6 @@ const EndMsg = (props: Props) => {
     useEffect(() => {   
         
         const setWinner = (data: EndMsgInfoType) => {
-            console.log('dmdmdmdm')
             setMsgInfo({winner: data.winner, owner: data.owner})
 
             intervalRef.current = setInterval(() => {
@@ -31,7 +31,6 @@ const EndMsg = (props: Props) => {
             }, 1000)
 
             timeoutRef.current = setTimeout(() => {
-                clearInterval(intervalRef.current)
                 props.setEndMsg(false)
                 if(username === data.owner)
                     socket.emit('close_room', {room: room})
@@ -39,8 +38,16 @@ const EndMsg = (props: Props) => {
             }, 15 * 1000)
         }
 
+        const restart = (owner: string): void => {
+            props.setStartMsg(true)
+            props.setEndMsg(false)
+            if(username === owner)
+                socket.emit('start_new_game', {room: room})
+        }
+
         socket.on('end_game', setWinner)
-    
+        socket.on('restart', restart)
+
         return (): void => {
             socket.off('end_game', setWinner)
             clearInterval(intervalRef.current)
@@ -50,8 +57,6 @@ const EndMsg = (props: Props) => {
 
     const restartGame = (): void => {
         socket.emit('restart', {room: room})
-        clearInterval(intervalRef.current)
-        clearTimeout(timeoutRef.current)
     }
 
   return (
