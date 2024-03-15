@@ -23,8 +23,8 @@ const EndMsg = (props: Props) => {
     useEffect(() => {   
         
         const setWinner = (data: EndMsgInfoType) => {
-            console.log('dmdmdmdm')
-            setMsgInfo(data)
+
+            setMsgInfo({winner: data.winner, owner: data.owner})
 
             intervalRef.current = setInterval(() => {
                 setTime(time => time - 1)
