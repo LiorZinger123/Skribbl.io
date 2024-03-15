@@ -1,4 +1,4 @@
-import { Fragment, useContext } from 'react'
+import { Fragment, useContext, useState } from 'react'
 import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -9,6 +9,9 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { RootState } from '../../store/store'
 
 const CreateRoom = () => {
+
+  const [disablePass, setDisablePass] = useState<boolean>(true)
+  const [type, setType] = useState<string>('password')
 
   const players = {id: 'players', label: 'Maximum Players', options: Array.from({ length: 8 }, (_, k) => k + 3)}
   const times = {id: 'time',label: 'Drawing Time', options: Array.from({ length: 16 }, (_, k) => 10 * (k + 3))}
@@ -40,6 +43,13 @@ const CreateRoom = () => {
     }
   }
 
+  const changeType = (): void => {
+    if(type === 'password')
+        setType('text')
+    else
+        setType('password')
+  }
+
   const updateRoomSettings = (id: string, data: string): void => {
     const key = id as keyof typeof roomSettings
     roomSettings[key] = data
@@ -49,9 +59,11 @@ const CreateRoom = () => {
     <form onSubmit={handleSubmit(onSubmit)}>
       <label htmlFor="name">Name:</label>
       <input {...register('name')} id='name' type="text" placeholder="Room Name" />
-
+      
+      <input type='checkbox' id='password' onChange={() => setDisablePass(!disablePass)} />
       <label htmlFor="password">Password:</label>
-      <input {...register('password')} id='password' placeholder="Enter Password"/>
+      <input {...register('password')} id='pass' placeholder="Enter Password" disabled={disablePass} type={type} />
+      <button type='button' onClick={changeType} disabled={disablePass}>show/hide</button>
 
       {createSettings.map(setting => (
         <Fragment key={setting.id}>

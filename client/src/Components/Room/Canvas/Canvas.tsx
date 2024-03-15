@@ -33,6 +33,7 @@ const Canvas = (props: Props) => {
         const startTurn = (): void => {
             intervalRef.current = setInterval(() => {
                 props.setTime(time => time - 1)
+                socket.emit('tick', {room: room})
             }, 1000)
             timeoutRef.current = setTimeout(() => {
                 endTurn()

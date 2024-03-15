@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { LoginFormFields, schema } from '../../types/LoginTypes/loginFormFields'
@@ -11,6 +11,7 @@ const Login = () => {
 
     const dispatch = useAppDispatch()
     const nav = useContext(StableNavigateContext)
+    const [type, setType] = useState<string>('password')
     
     const { 
         register, 
@@ -36,10 +37,18 @@ const Login = () => {
         }
     }
 
+    const changeType = (): void => {
+        if(type === 'password')
+            setType('text')
+        else
+            setType('password')
+    }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
         <input {...register("username")} type='text' placeholder='Username' />
-        <input {...register("password")} type='password' placeholder='Password' />
+        <input {...register("password")} type={type} placeholder='Password' />
+        <button type='button' onClick={changeType}>show/hide</button>
         <button disabled={isSubmitting} type='submit'>
             {isSubmitting ? "Loading..." : "Submit"}
         </button>

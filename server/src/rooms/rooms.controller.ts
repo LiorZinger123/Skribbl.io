@@ -18,13 +18,19 @@ export class RoomsController{
     }
 
     @UseGuards(JwtAuthGuard)
+    @Post('get_more_rooms')
+    getMoreRooms(@Res() res: Response, @Body() data: { roomsLength: number }): void{
+        res.send(this.roomsService.getMoreRooms(data.roomsLength))
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Post('join')
     joinRoom(@Res() res: Response, @Body() data: JoinRoomDto): void {
         const id = this.roomsService.joinRoom(data)
         if(id)
-        res.status(HttpStatus.OK).send(id)
+            res.status(HttpStatus.OK).send(id)
         else
-        res.sendStatus(HttpStatus.UNAUTHORIZED)
+            res.sendStatus(HttpStatus.UNAUTHORIZED)
     }
 
     @UseGuards(JwtAuthGuard)

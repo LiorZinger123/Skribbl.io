@@ -58,6 +58,11 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         this.server.to(data.room).emit('message', `${data.currentPainter} is drawing now!`)
     }
 
+    @SubscribeMessage('tick')
+    tick(@MessageBody() data: {room: string}): void{
+        this.roomsService.tick(data.room)
+    }
+
     @SubscribeMessage('drawing')
     sendDrawing(@MessageBody() data: {drawing: string, room: string}, @ConnectedSocket() socket: Socket): void{
         this.roomsService.updateDrawing(data.room, data.drawing)
@@ -101,9 +106,22 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
     @SubscribeMessage('end_game')
     endGame(@MessageBody() data: {room: string}): void{
+        let winnerMsg = null
         const winner = this.roomsService.getWinner(data.room)
+        if(winner.length === 1)
+            winnerMsg = winner[0]
+        else{
+            winnerMsg = winner.map(w => {
+                if(winner.indexOf(w) < winner.length - 2)
+                    return `${w}, `
+                else if (winner.indexOf(w) === winner.length - 2)
+                    return `${w} and`
+                else
+                    return `${w}`
+            })
+        }
         const owner = this.roomsService.getOwner(data.room)
-        this.server.to(data.room).emit('end_game', {winner: winner, owner: owner})
+        this.server.to(data.room).emit('end_game', {winnerMsg: winnerMsg, owner: owner})
     }
 
     @SubscribeMessage('close_room')
