@@ -5,6 +5,7 @@ type Room = {
     players: number,
     time: number,
     rounds: number,
+    currentTime: number,
     currentRound: number,
     connectedPlayers: ConnectedPlayersType[],
     currentPlayerPos: number,

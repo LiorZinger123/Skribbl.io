@@ -99,7 +99,7 @@ const Room = () => {
           <div> 
             <TopRoom time={time} round={round} maxRounds={maxRounds.current} painter={currentPainter} />
             <Players players={players} setPlayers={setPlayers} />
-            <Canvas  players={players} setTime={setTime} roundTime={roundTime}/>
+            <Canvas players={players} setTime={setTime} roundTime={roundTime}/>
             <ScreenMsgs players={players} painter={currentPainter} setRound={setRound} setTime={setTime}
               round={round} maxRounds={maxRounds.current} roundTime={roundTime} setPlayers={setPlayers} />
             {startBtn && <StartButton players={players} setMessages={setMessages} />}

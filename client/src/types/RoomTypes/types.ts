@@ -55,6 +55,6 @@ export type ShowScoresType = {
 }
 
 export type EndMsgInfoType = {
-    winner: string,
+    winnerMsg: string,
     owner: string
 }

@@ -37,8 +37,10 @@ const ScoresScreen = (props: Props) => {
                 setTurnScores([])
                 if(data.painter === null){
                     props.setEndMsg(true)
-                    if(username === data.owner)
+                    if(username === data.owner){
                         socket.emit('end_game', {room: room})
+                        console.log('kfkfkf')
+                    }
                 }
                 else{
                     props.painter.current = data.painter

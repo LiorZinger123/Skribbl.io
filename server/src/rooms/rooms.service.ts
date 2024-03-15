@@ -20,11 +20,20 @@ export class RoomsService{
 
   getRooms(): RoomToList[] {
     const rooms = this.rooms.slice(-10)
+    return this.sendRoomsDetails(rooms)
+  }
+
+  getMoreRooms(roomsLength: number): RoomToList[] {
+    const rooms = this.rooms.slice( -roomsLength - 10, -roomsLength)
+    return this.sendRoomsDetails(rooms)  
+  }
+
+  sendRoomsDetails(rooms: Room[]): RoomToList[] {
     return rooms.map(room => (
       {
         id: room.id,
         name: room.name,
-        hasPassword: room.password !== '' ? true : false,
+        hasPassword: room.password !== '' && room.password !== undefined ? true : false,
         connectedPlayers: room.connectedPlayers,
         maxPlayers: room.players 
       }
@@ -50,7 +59,8 @@ export class RoomsService{
     const newId = this.generateNewId()
     const { username, ...roomData } = data
     const newPlayer = {id: 1, username: username, score: 0, roomOwner: true}
-    this.rooms.push({...roomData, id: newId, startPlaying: false, connectedPlayers: [newPlayer], currentPlayerPos: 0, currentRound: 0, turnScores: [], currentDrawing: ''})
+    this.rooms.push({...roomData, id: newId, startPlaying: false, connectedPlayers: [newPlayer],
+      currentTime: 0, currentPlayerPos: 0, currentRound: 0, turnScores: [], currentDrawing: ''})
     return newId
   }
 
@@ -89,6 +99,14 @@ export class RoomsService{
     this.rooms = this.rooms.map(room => {
       if(room.id === id)
         return {...room, startPlaying: true}
+      return room
+    })
+  }
+
+  tick(id: string): void{
+    this.rooms = this.rooms.map(room => {
+      if(room.id === id)
+        return {...room, currentTime: room.currentTime - 1}
       return room
     })
   }
@@ -158,7 +176,7 @@ export class RoomsService{
   addNewTurnScore(roomID: string, username: string, currentPainter: string): void{
     this.rooms = this.rooms.map(room => {
       if(room.id === roomID){
-        let newScores = [{username: username, score: (room.connectedPlayers.length - room.turnScores.length) * 50}]
+        let newScores = [{username: username, score: room.connectedPlayers.length * room.currentTime * 30}]
         if(room.turnScores.length === 0)
           newScores.push({ username: currentPainter, score: 75 })
         return {...room, turnScores: [...room.turnScores, ...newScores]}
@@ -230,11 +248,16 @@ export class RoomsService{
     }
   }
 
-  getWinner(id: string): string | null{
+  getWinner(id: string): string[] | null{
     const room = this.rooms.find(room => room.id === id)
     if(room){
       room.connectedPlayers.sort((a, b) => b.score - a.score)
-      return room.connectedPlayers[0].username
+      let maxScore = room.connectedPlayers[0].score
+      const winner = room.connectedPlayers.map(player => {
+        if(player.score === maxScore)
+          return player.username
+      })
+      return winner
     }
     return null
   }
