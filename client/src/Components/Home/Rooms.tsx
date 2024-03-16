@@ -5,11 +5,12 @@ type Props = {
     search: string,
     rooms: Room[],
     searchRooms: Room[],
-    showSearchError: boolean
+    showSearchError: boolean,
+    refreshTime: number
 }
 
 const Rooms = (props: Props) => {
-  
+
     const rooms = 
     <div>
         {
@@ -36,15 +37,19 @@ const Rooms = (props: Props) => {
         }
     </div>
 
+    const refreshTime = <p>Next Refresh: {Math.floor(props.refreshTime / 60) != 0 && `${Math.floor(props.refreshTime / 60)} Minutes`}
+    {props.refreshTime % 60 != 0 && ` ${props.refreshTime % 60} Seconds`}</p> 
+
     return (
-    <div>
-         {
-            props.search.length === 0
-            ? (rooms)
-            : (serachRooms)
-        }
-    </div>
-  )
+        <div className="rooms">
+            {refreshTime}
+            {
+                props.search.length === 0
+                ? (rooms)
+                : (serachRooms)
+            }
+        </div>
+    )
 }
 
 export default Rooms

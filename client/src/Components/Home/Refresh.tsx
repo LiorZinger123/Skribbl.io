@@ -1,36 +1,51 @@
 import { useRef, useEffect } from "react"
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 type Props = {
-    getRoomsFromApi: () => Promise<void>
+    getRoomsFromApi: () => Promise<void>,
+    setRefreshTime: React.Dispatch<React.SetStateAction<number>>
 }
 
 const Refresh = (props: Props) => {
 
     const intervalRef = useRef<NodeJS.Timeout>(null!)
-    const refreshTime = 1000 * 60 * 5
+    const timeoutRef = useRef<NodeJS.Timeout>(null!)
+    const time = 1000 * 60 * 5
 
     useEffect(() => {
-        intervalRef.current = setInterval(() => {
-          refreshRooms()
-        }, refreshTime)
-  
-        return (): void => {
-          clearInterval(intervalRef.current)
-        }
-      }, [])
 
-    const refreshRooms = async (): Promise<void> => { 
-      await props.getRoomsFromApi()
+      refreshRooms()
+
+      return (): void => {
+        clearInterval(intervalRef.current)
+        clearTimeout(timeoutRef.current)
+      }
+    }, [])
+
+    const refreshRooms = (): void => {
       clearInterval(intervalRef.current)
+      clearTimeout(timeoutRef.current)
+      props.setRefreshTime(time / 1000)
+      
       intervalRef.current = setInterval(() => {
+        props.setRefreshTime(t => t - 1)
+      }, 1000)
+
+      timeoutRef.current = setTimeout(async () => {
+        await props.getRoomsFromApi()
         refreshRooms()
-      }, refreshTime)
-    }  
+      }, time)
+    }
+
+    const handleRefresh = async (): Promise<void> => {
+      await props.getRoomsFromApi()
+      refreshRooms()
+    }
 
   return (
-    <div>
-        <button onClick={refreshRooms}>RERESH</button>
-    </div>
+    <>
+      <RefreshIcon className="refresh" onClick={handleRefresh} fontSize="large" />
+    </>
   )
 }
 

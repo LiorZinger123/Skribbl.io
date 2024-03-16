@@ -3,9 +3,10 @@
         width: 400px;
     }
 
-    .icon{
+    .login-icon{
         top: 22%;
         right: 4%;
+        transform: scale(1.1);
     }
 }
 
@@ -14,7 +15,7 @@
         width: 350px;
     }
 
-    .icon{
+    .login-icon{
         top: 22%;
         right: 4%;
     }
@@ -25,10 +26,10 @@
         width: 300px;
     }
 
-    .icon{
+    .login-icon{
         top: 15%;
-        right: 2%;
-        transform: scale(0.9);
+        right: 3%;
+        transform: scale(0.8);
     }
     
     .login-error{
@@ -44,7 +45,10 @@
     height: 11%;
 }
 
-.register{
-    font-weight: bold;
-    cursor: pointer;
+.login-options{
+    margin: 15px 0;
+}
+
+.login-options-with-error{
+    margin-bottom: 15px;
 }

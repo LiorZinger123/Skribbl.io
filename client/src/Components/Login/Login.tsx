@@ -1,13 +1,14 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { LoginFormFields, schema } from '../../types/LoginTypes/loginFormFields'
-import { fetchToApi } from '../../Api/fetch'
+import { fetchToApi, getFromApi } from '../../Api/fetch'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { setUsername } from '../../store/counterSlice'
 import { useAppDispatch } from '../../store/hooks'
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
+import { Checkbox, FormControlLabel } from '@mui/material'
 
 const Login = () => {
 
@@ -23,6 +24,23 @@ const Login = () => {
         resolver: zodResolver(schema)
     })
 0
+    useEffect(() => {
+        const rememberMe = async (): Promise<void> => {
+            try{
+                const res = await getFromApi('auth/remember_me')
+                if(res.ok){
+                    dispatch(setUsername(await res.text()))
+                    nav('home')
+                }
+            }
+            catch(e){
+                throw e
+            }
+        }
+
+        rememberMe()
+    }, [])
+
     const onSubmit: SubmitHandler<LoginFormFields> = async (data): Promise<void> => {
         try{
             const res = await fetchToApi('auth/login', data)
@@ -45,19 +63,25 @@ const Login = () => {
             
             <div className='input-box input-space login-input'>
                 <input {...register("username")} type='text' placeholder='Username'  />
-                <PersonIcon className='icon' />
+                <PersonIcon className='icon login-icon' />
             </div>
             
-            <div className={!errors.root ? 'input-box input-space login-input' : 'input-box login-input'}>
+            <div className='input-box login-input'>
                 <input {...register("password")} type='password' placeholder='Password' />
-                <LockIcon className='icon' />
+                <LockIcon className='icon login-icon' />
             </div>
             
-            {errors.root && <div className='authorization-error'>{errors.root.message}</div>}
+            {errors.root && <div className='authorization-error login-error'>{errors.root.message}</div>}
+            
+            <div className={!errors.root ? 'login-options' : 'login-options-with-error'}>
+                <FormControlLabel className='' control={<Checkbox {...register("rememberMe")} 
+                sx={{ color: "white", "&.Mui-checked": {color: "#DA56EF"} }} />} label="Remember Me" />
+            </div>
+            
             <button className='authorization-btn login-btn' disabled={isSubmitting} type='submit'>
                 {isSubmitting ? "Loading..." : "Login"}
             </button>
-            <p>Dont have an account? <span className='register' onClick={() => nav('signup')}>Register</span></p>
+            <p>Dont have an account? <span className='link' onClick={() => nav('signup')}>Register</span></p>
         </form>
     </div>
   )

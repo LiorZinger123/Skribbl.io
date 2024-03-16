@@ -15,8 +15,9 @@ const SignUp = () => {
 
     const dispatch = useAppDispatch()
     const nav = useContext(StableNavigateContext)
-    const classname = 'input-box signin-input input-space'
-    const errorClassName = 'input-box signin-input'
+    const inputClassName = 'input-box signin-input input-space'
+    const inputErrorClassName = 'input-box signin-input'
+    const errorClassName = 'authorization-error signin-error'
 
     const { 
         register, 
@@ -52,36 +53,36 @@ const SignUp = () => {
              <form onSubmit={handleSubmit(onSubmit)}>
                 <h1>Sign In</h1>
 
-                <div className={!errors.username ? classname : errorClassName}>
+                <div className={!errors.username ? inputClassName : inputErrorClassName}>
                     <input {...register("username")} type='text' placeholder='Username' />
-                    <PersonIcon className='icon' />
+                    <PersonIcon className='icon signin-icon' />
                 </div>
-                {errors.username && <div className='authorization-error'>{errors.username.message}</div>}
+                {errors.username && <div className={errorClassName}>{errors.username.message}</div>}
 
-                <div className={!errors.password ? classname : errorClassName}>
+                <div className={!errors.password ? inputClassName : inputErrorClassName}>
                     <input {...register("password")} type='password' placeholder='Password' />
-                    <LockIcon className='icon' />
+                    <LockIcon className='icon signin-icon' />
                 </div>
-                {errors.password && <div className='authorization-error'>{errors.password.message}</div>}
+                {errors.password && <div className={errorClassName}>{errors.password.message}</div>}
                             
-                <div className={!errors.submitPassword ? classname : errorClassName}>
+                <div className={!errors.submitPassword ? inputClassName : inputErrorClassName}>
                     <input {...register("submitPassword")} type='password' placeholder='Submit Password' />
-                    <LockOpenIcon className='icon' />
+                    <LockOpenIcon className='icon signin-icon' />
                 </div>
-                {errors.submitPassword && <div className='authorization-error'>{errors.submitPassword.message}</div>}
+                {errors.submitPassword && <div className={errorClassName}>{errors.submitPassword.message}</div>}
 
-                <div className={(!errors.email && !errors.root) ? classname : errorClassName}>
+                <div className={(!errors.email && !errors.root) ? inputClassName : inputErrorClassName}>
                     <input {...register("email")} type='text' placeholder='Email' />
-                    <MailIcon className='icon' />
+                    <MailIcon className='icon signin-icon' />
                 </div>
-                {errors.email && <div className='authorization-error'>{errors.email.message}</div>}
+                {errors.email && <div className={errorClassName}>{errors.email.message}</div>}
 
-                {errors.root && <div className='authorization-error'>{errors.root.message}</div>}
+                {errors.root && <div className={errorClassName}>{errors.root.message}</div>}
                 <button className='authorization-btn signin-btn' disabled={isSubmitting} type='submit'>
                     {isSubmitting ? "Loading..." : "Sign In"}
                 </button>
 
-                <button className='authorization-btn signin-btn' type='button' onClick={() => nav('/')}>Login</button>
+                <p>Have an account already? <span className='link' onClick={() => nav('/')}>Login</span></p>
 
             </form>
         </div>

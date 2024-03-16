@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useContext } from 'react'
 import { StableNavigateContext } from '../../App'
 import { fetchToApi } from "../../Api/fetch"
@@ -17,8 +17,21 @@ const RoomInList = (props: Props) => {
   const [password, setPassward] = useState<string>('')
   const nav = useContext(StableNavigateContext)
   const username = useAppSelector((state: RootState) => state.username)
-  const [showError, setShowError] = useState<boolean>(false)
+  const disable = props.room.hasPassword && password.length < 3
+  const [errorAnimations, setErrorAnimations] = useState<boolean>(false)
+  const [showErrorMsg, setShowErrorMsg] = useState<boolean>(false)
+  const animationRef = useRef<NodeJS.Timeout | null>(null)
+  const errorRef = useRef<NodeJS.Timeout | null>(null)
 
+  useEffect(() => {
+    return () => {
+      if(animationRef.current)
+        clearTimeout(animationRef.current)
+      if(errorRef.current)
+        clearTimeout(errorRef.current)
+    }
+  }, [])
+  
   const joinRoom = async (id: string): Promise<void> => {
     try{
         const res = await fetchToApi('rooms/join', { room: id, password: password, username: username })
@@ -26,27 +39,46 @@ const RoomInList = (props: Props) => {
           dispatch(setRoomId(await res.text()))
           nav('/room')
         }
-        else
-          setShowError(true)
+        else if(res.status === 401){
+          setErrorAnimations(true)
+          animationRef.current = setTimeout(() => {
+            setErrorAnimations(false)
+          }, 700)
+        }
+        else{
+          setShowErrorMsg(true)
+          errorRef.current = setTimeout(() => {
+            setShowErrorMsg(false)
+          }, 3000)
+        }
     }
     catch{
-      setShowError(true)
+      setShowErrorMsg(true)
+      errorRef.current = setTimeout(() => {
+        setShowErrorMsg(false)
+      }, 3000)
     } 
   }
 
   return (
     <div>
-      <li key={props.room.id}>
-        id: {props.room.id} name: {props.room.name} Players: {props.room.connectedPlayers.length} / {props.room.maxPlayers}
+      <li key={props.room.id} className="room-item">
         
+        <p>Id: {props.room.id}</p>
+        <p>Name: {props.room.name}</p>
+        <p>Players: {props.room.connectedPlayers.length} / {props.room.maxPlayers}</p>
+
         {props.room.hasPassword &&
-          <input type="text" value={password} onChange={e => setPassward(e.target.value)}
-            placeholder="Enter Password" required disabled={props.room.connectedPlayers.length === props.room.maxPlayers}/>}
+          <input className={!errorAnimations ? "enter-password" : "enter-password enter-password-animations"} type="text" value={password} 
+            onChange={e => setPassward(e.target.value)} placeholder="Enter Password" 
+            disabled={props.room.connectedPlayers.length === props.room.maxPlayers} />
+        }
             
-        <button type='submit' disabled={props.room.hasPassword && password.length < 3} 
+        <button className={disable ? "join-room" : "join-room join-room-enable"} type='submit' disabled={disable} 
           onClick={() => joinRoom(props.room.id)}>Join Room</button>
+  
       </li>
-      {showError && <p>Failed to join room, please try again later.</p>}
+      {showErrorMsg && <p className="room-join-error">Join room {props.room.id} failed, please try again later</p>}
     </div>
   )
 }

@@ -14,6 +14,7 @@ const Home = () => {
     const [search, setSearch] = useState<string>('')
     const [searchRooms, setSearchRooms] = useState<Room[]>([])
     const [showSearchError, setShowSearchError] = useState<boolean>(false)
+    const [refreshTime, setRefreshTime] = useState<number>(0)
 
     useEffect(() => {
 
@@ -54,14 +55,20 @@ const Home = () => {
     }
 
   return (
-    <div>
-        <button onClick={() => nav('/createroom')}>Create Room</button>
-        <Search search={search} setSearch={setSearch} setSearchRooms={setSearchRooms} setShowSearchError={setShowSearchError} />
-        <Refresh getRoomsFromApi={getRoomsFromApi} />
+    <div className="home">
+      <h1>SKRIBBLE.IO</h1>
+        
+        <div className="search-div">
+          <Search search={search} setSearch={setSearch} setSearchRooms={setSearchRooms} setShowSearchError={setShowSearchError} />
+          <Refresh getRoomsFromApi={getRoomsFromApi} setRefreshTime={setRefreshTime} />
+        </div>
+        
         {!showError
-          ? <Rooms search={search} rooms={rooms} searchRooms={searchRooms} showSearchError={showSearchError} />
+          ? <Rooms search={search} rooms={rooms} searchRooms={searchRooms} showSearchError={showSearchError} refreshTime={refreshTime} />
           : <p>An error has occurred while loading game rooms. Please try again later.</p>
         }
+
+        <button className='create-btn' onClick={() => nav('/createroom')}>+</button>
     </div>
   )
 }

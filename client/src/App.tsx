@@ -4,12 +4,12 @@ import { useRef, createContext } from "react";
 import Login from './Components/Login/Login'
 import SignUp from './Components/SignUp/SignUp'
 import Home from "./Components/Home/Home";
-import './App.css'
 import Room from "./Components/Room/Room";
 import CreateRoom from "./Components/CreateRoom/CreateRoom";
 import './design/authorization.css'
 import './design/login.css'
 import './design/signin.css'
+import './design/home.css'
 
 export const StableNavigateContext = createContext<NavigateFunction>(null!)
 

@@ -1,9 +1,3 @@
-.authorization{
-    background-image: url('../images/background.jpg');
-    background-size: 100%;
-    height: 100vh;
-}
-
 .authorization h1{
     margin-bottom: 35px;
 }
@@ -47,6 +41,7 @@
     border-radius: 25px;
     padding-left: 5%;
     color: white;
+    font-family: "Poppins", sans-serif;
 }
 
 .input-box input::placeholder{
@@ -72,4 +67,11 @@
 
 .authorization-error{
     margin: 15px 0;
+    width: 80%;
+    word-break: keep-all;
+}
+
+.link{
+    font-weight: bold;
+    cursor: pointer;
 }

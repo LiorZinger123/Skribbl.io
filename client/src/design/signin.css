@@ -1,8 +1,46 @@
+@media screen and (min-width: 1200px) {
+    .signin form{
+        width: 400px;
+    }
+
+    .signin-icon{
+        top: 23%;
+        right: 4%;
+        transform: scale(1.1);
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .signin form{
+        width: 350px;
+    }
+
+    .signin-icon{
+        top: 20%;
+        right: 4%;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .signin form{
+        width: 300px;
+    }
+
+    .signin-icon{
+        top: 15%;
+        right: 3%;
+        transform: scale(0.8);
+    }
+
+    .signin-error{
+        font-size: smaller;
+    }
+}
+
 .signin form{
-    width: 400px;
     aspect-ratio: 0.8;
 }
 
 .signin-input, .signin-btn{
-    height: 8%;
+    height: 9%;
 }

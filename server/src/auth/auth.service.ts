@@ -1,9 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserDto } from 'src/users/dtos/user.dto';
 import { compare } from 'src/users/utils/hash';
-import { CreateUserDto } from 'src/users/dtos/createUser.dto';
+import { ValidateType, LoginType, CreateUserType, AccessTokenType } from './types/authTypes';
 
 @Injectable()
 export class AuthService {
@@ -12,19 +11,21 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async validateUser(user: UserDto): Promise<UserDto>{
+  async validateUser(user: ValidateType): Promise<boolean>{
     const userDB = await this.usersService.findOne(user.username)
     if(userDB){
       const matched = compare(user.password, userDB?.password) 
       if(!matched)
-        return null
-      return userDB
+        return false
+      return true
     }
-    return null
+    return false
   }
 
-  login(user: UserDto | CreateUserDto){
-    const payload = { username: user.username }
+  login(data: LoginType | CreateUserType): AccessTokenType{
+    let payload = { username: data.username, rememberMe: false }
+    if("rememberMe" in data)
+      payload.rememberMe = data.rememberMe
     return{
       accessToken: this.jwtService.sign(payload)
     }   
