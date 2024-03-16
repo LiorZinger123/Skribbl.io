@@ -37,10 +37,12 @@ const TopRoom = (props: Props) => {
 
         socket.on('choose_word', setToWaiting)
         socket.on('start_turn', setWord)
+        socket.on('restart', setToWaiting)
 
         return (): void => {
             socket.off('choose_word', setToWaiting)
             socket.off('start_turn', setWord)
+            socket.off('restart', setToWaiting)
         } 
     }, [])
 

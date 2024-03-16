@@ -50,7 +50,7 @@ const Room = () => {
               setStartBtn(true)
       }
       catch{
-
+        //popup error        
       }
     }
 

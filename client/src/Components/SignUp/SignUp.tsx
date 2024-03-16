@@ -6,11 +6,17 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { SignUpFormFields, schema } from '../../types/SignUpTypes/signUpFormFields'
 import { fetchToApi } from '../../Api/fetch'
 import { setUsername } from '../../store/counterSlice'
+import PersonIcon from '@mui/icons-material/Person';
+import LockIcon from '@mui/icons-material/Lock'
+import MailIcon from '@mui/icons-material/Mail';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 
 const SignUp = () => {
 
     const dispatch = useAppDispatch()
     const nav = useContext(StableNavigateContext)
+    const classname = 'input-box signin-input input-space'
+    const errorClassName = 'input-box signin-input'
 
     const { 
         register, 
@@ -30,8 +36,10 @@ const SignUp = () => {
                     dispatch(setUsername(await res.text()))
                     nav('/home')
                 }
-                else
+                else if(res.status === 403)
                     setError("root", { message: await res.text() })
+                else
+                    setError("root", { message: "Something went wrong, please try again later."})
             }
         }
         catch{
@@ -40,27 +48,43 @@ const SignUp = () => {
     }
 
     return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-        <input {...register("username")} type='text' placeholder='Username' />
-        {errors.username && <div>{errors.username.message}</div>}
+        <div className='authorization signin'>
+             <form onSubmit={handleSubmit(onSubmit)}>
+                <h1>Sign In</h1>
 
-        <input {...register("password")} type='password' placeholder='Password' />
-        {errors.password && <div>{errors.password.message}</div>}
-        
-        <input {...register("submitPassword")} type='password' placeholder='Submit Password' />
-        {errors.submitPassword && <div>{errors.submitPassword.message}</div>}
-        
-        <input {...register("email")} type='text' placeholder='Email' />
-        {errors.email && <div>{errors.email.message}</div>}
+                <div className={!errors.username ? classname : errorClassName}>
+                    <input {...register("username")} type='text' placeholder='Username' />
+                    <PersonIcon className='icon' />
+                </div>
+                {errors.username && <div className='authorization-error'>{errors.username.message}</div>}
 
-        <button disabled={isSubmitting} type='submit'>
-            {isSubmitting ? "Loading..." : "Submit"}
-        </button>
+                <div className={!errors.password ? classname : errorClassName}>
+                    <input {...register("password")} type='password' placeholder='Password' />
+                    <LockIcon className='icon' />
+                </div>
+                {errors.password && <div className='authorization-error'>{errors.password.message}</div>}
+                            
+                <div className={!errors.submitPassword ? classname : errorClassName}>
+                    <input {...register("submitPassword")} type='password' placeholder='Submit Password' />
+                    <LockOpenIcon className='icon' />
+                </div>
+                {errors.submitPassword && <div className='authorization-error'>{errors.submitPassword.message}</div>}
 
-        <button type='button' onClick={() => nav('/')}>Login</button>
+                <div className={(!errors.email && !errors.root) ? classname : errorClassName}>
+                    <input {...register("email")} type='text' placeholder='Email' />
+                    <MailIcon className='icon' />
+                </div>
+                {errors.email && <div className='authorization-error'>{errors.email.message}</div>}
 
-        {errors.root && <div>{errors.root.message}</div>}
-    </form>
+                {errors.root && <div className='authorization-error'>{errors.root.message}</div>}
+                <button className='authorization-btn signin-btn' disabled={isSubmitting} type='submit'>
+                    {isSubmitting ? "Loading..." : "Sign In"}
+                </button>
+
+                <button className='authorization-btn signin-btn' type='button' onClick={() => nav('/')}>Login</button>
+
+            </form>
+        </div>
   )
 }
 

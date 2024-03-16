@@ -1,0 +1,50 @@
+@media screen and (min-width: 1100px) {
+    .login form{
+        width: 400px;
+    }
+
+    .icon{
+        top: 22%;
+        right: 4%;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    .login form{
+        width: 350px;
+    }
+
+    .icon{
+        top: 22%;
+        right: 4%;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .login form{
+        width: 300px;
+    }
+
+    .icon{
+        top: 15%;
+        right: 2%;
+        transform: scale(0.9);
+    }
+    
+    .login-error{
+        font-size: smaller;
+    }
+}
+
+.login form{
+    aspect-ratio: 1;
+}
+
+.login-input, .login-btn{
+    height: 11%;
+}
+
+.register{
+    font-weight: bold;
+    cursor: pointer;
+}

@@ -4,10 +4,13 @@ import { useAppSelector } from "../../../store/hooks"
 import { RootState } from "../../../store/store"
 import { SocketContext } from "../Room"
 import { StableNavigateContext } from "../../../App"
+import { PlayerType } from "../../../types/RoomTypes/types"
 
 type Props = {
     setStartMsg: React.Dispatch<React.SetStateAction<boolean>>,
-    setEndMsg: React.Dispatch<React.SetStateAction<boolean>>
+    setEndMsg: React.Dispatch<React.SetStateAction<boolean>>,
+    setRound: React.Dispatch<React.SetStateAction<number>>,
+    setPlayers: React.Dispatch<React.SetStateAction<PlayerType[]>>,
 }
 
 const EndMsg = (props: Props) => {
@@ -16,7 +19,7 @@ const EndMsg = (props: Props) => {
     const room = useAppSelector((state: RootState) => state.room)
     const username = useAppSelector((state: RootState) => state.username)
     const socket = useContext(SocketContext)
-    const [msgInfo, setMsgInfo] = useState<EndMsgInfoType>({winner: '', owner: ''})
+    const [msgInfo, setMsgInfo] = useState<EndMsgInfoType>({winnerMsg: '', owner: ''})
     const [time, setTime] = useState<number>(15)
     const intervalRef = useRef<NodeJS.Timeout>(null!)
     const timeoutRef = useRef<NodeJS.Timeout>(null!)
@@ -24,7 +27,7 @@ const EndMsg = (props: Props) => {
     useEffect(() => {   
         
         const setWinner = (data: EndMsgInfoType) => {
-            setMsgInfo({winner: data.winner, owner: data.owner})
+            setMsgInfo(data)
 
             intervalRef.current = setInterval(() => {
                 setTime(time => time - 1)
@@ -41,6 +44,10 @@ const EndMsg = (props: Props) => {
         const restart = (owner: string): void => {
             props.setStartMsg(true)
             props.setEndMsg(false)
+            props.setRound(0)
+            props.setPlayers(players => players.map(player => {
+                return {...player, score: 0}
+            }))
             if(username === owner)
                 socket.emit('start_new_game', {room: room})
         }
@@ -50,6 +57,7 @@ const EndMsg = (props: Props) => {
     
         return (): void => {
             socket.off('end_game', setWinner)
+            socket.off('restart', restart)
             clearInterval(intervalRef.current)
             clearTimeout(timeoutRef.current)
         }
@@ -63,7 +71,7 @@ const EndMsg = (props: Props) => {
     <div>
         <p>{msgInfo.winnerMsg} won the game!</p>
         {msgInfo.owner === username
-            ? <p>Press to restart game: <button onClick={restartGame}>RESTART</button></p>
+            ? <p>Press to restart game <button onClick={restartGame}>RESTART</button></p>
             : <p>{msgInfo.owner} is deciding whether reset the game or not</p>
         }
         <p>The room will be closed in {time} seconds</p>

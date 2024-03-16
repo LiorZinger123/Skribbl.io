@@ -39,7 +39,6 @@ const ScoresScreen = (props: Props) => {
                     props.setEndMsg(true)
                     if(username === data.owner){
                         socket.emit('end_game', {room: room})
-                        console.log('kfkfkf')
                     }
                 }
                 else{

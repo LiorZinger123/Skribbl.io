@@ -1,0 +1,8 @@
+.signin form{
+    width: 400px;
+    aspect-ratio: 0.8;
+}
+
+.signin-input, .signin-btn{
+    height: 8%;
+}

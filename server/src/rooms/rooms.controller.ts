@@ -24,6 +24,12 @@ export class RoomsController{
     }
 
     @UseGuards(JwtAuthGuard)
+    @Post('search')
+    search(@Res() res: Response, @Body() data:{ search: string }): void{
+        res.send(this.roomsService.searchRooms(data.search))
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Post('join')
     joinRoom(@Res() res: Response, @Body() data: JoinRoomDto): void {
         const id = this.roomsService.joinRoom(data)

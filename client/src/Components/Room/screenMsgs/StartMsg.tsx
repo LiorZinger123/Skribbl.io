@@ -15,14 +15,14 @@ const StartMsg = (props: Props) => {
   const room = useAppSelector((state: RootState) => state.room)
   const socket = useContext(SocketContext)
   const username = useAppSelector((state: RootState) => state.username)
-  const [screenMsg, setScreenMsg] = useState<string>('')
+  const [showMsg, setShowMsg] = useState<boolean>(false)
   const timeoutRef = useRef<NodeJS.Timeout>(null!)
 
   useEffect(() => {
 
-    const startMsg = (msg: string): void => {
+    const startMsg = (): void => {
       props.painter.current = props.players[0].username
-      setScreenMsg(msg)
+      setShowMsg(true)
       timeoutRef.current = setTimeout(() => {
         props.setStartMsg(false)
         if(props.players[0].username === username)
@@ -40,7 +40,7 @@ const StartMsg = (props: Props) => {
 
   return (
     <div>
-        <p>{screenMsg}</p>
+        {showMsg && <p>Starting Game!</p>}
     </div>
   )
 }

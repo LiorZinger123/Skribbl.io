@@ -1,0 +1,75 @@
+.authorization{
+    background-image: url('../images/background.jpg');
+    background-size: 100%;
+    height: 100vh;
+}
+
+.authorization h1{
+    margin-bottom: 35px;
+}
+
+.authorization form{
+    background: transparent;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(255, 255, 255, .2);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-box, .authorization-btn{
+    border-radius: 25px;
+    border: 2px solid rgba(255, 255, 255, .2);
+    font-family: "Poppins", sans-serif;
+}
+
+.input-box{
+    background: transparent;
+    width: 80%;
+    font-size: 16px;
+    display: flex;
+}
+
+.input-box input{
+    background: transparent;
+    width: 85%;
+    margin-right: 15px;
+    border: none;
+    outline: none;
+    border-radius: 25px;
+    padding-left: 5%;
+    color: white;
+}
+
+.input-box input::placeholder{
+    color: white;
+}
+
+.input-space{
+    margin-bottom: 30px;
+}
+
+.icon{
+    position: relative;
+}
+
+.authorization button{
+    background-color: white;
+    width: 85%;
+    margin-bottom: 10px;
+    color: black;
+    cursor: pointer;
+    font-size: larger;
+}
+
+.authorization-error{
+    margin: 15px 0;
+}

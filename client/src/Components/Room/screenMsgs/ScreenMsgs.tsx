@@ -26,7 +26,7 @@ const ScreenMsgs = (props: Props) => {
       {startMsg && <StartMsg players={props.players} setStartMsg={setStartMsg} painter={props.painter} />}
       <ScoresScreen players={props.players} painter={props.painter} setPlayers={props.setPlayers} round={props.round} maxRounds={props.maxRounds} setEndMsg={setEndMsg} />
       <StartRoundMsgs players={props.players} painter={props.painter} setRound={props.setRound} setTime={props.setTime} roundTime={props.roundTime} />
-      {endMsg && <EndMsg setEndMsg={setEndMsg} />}
+      {endMsg && <EndMsg setStartMsg={setStartMsg} setEndMsg={setEndMsg} setRound={props.setRound} setPlayers={props.setPlayers} />}
     </>
   )
 }

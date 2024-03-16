@@ -74,7 +74,7 @@ const StartRoundMsgs = (props: Props) => {
                 wordsTimeOutId.current = setTimeout(() => {
                     clearInterval(wordsIntervalId.current)
                     const word = screenMsg.words![Math.floor(Math.random() * screenMsg.words!.length)]
-                    socket.emit('turn', {word: word, currentDrawer: props.painter.current, room: room})
+                    socket.emit('turn', {word: word, currentPainter: props.painter.current, room: room})
                 }, 15 * 1000)
             }
         }
