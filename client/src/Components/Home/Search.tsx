@@ -6,7 +6,8 @@ type Props = {
     search: string,
     setSearch: React.Dispatch<React.SetStateAction<string>>,
     setSearchRooms: React.Dispatch<React.SetStateAction<Room[]>>,
-    setShowSearchError: React.Dispatch<React.SetStateAction<boolean>>
+    setShowSearchError: React.Dispatch<React.SetStateAction<boolean>>,
+    setShowTokenError: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const Search = (props: Props) => {
@@ -19,6 +20,8 @@ const Search = (props: Props) => {
                 const rooms = await res.json()
                 props.setSearchRooms(rooms)
             }
+            else if(res.status === 401)
+                props.setShowTokenError(true)
             else
                 props.setShowSearchError(true)
         }

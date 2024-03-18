@@ -6,7 +6,8 @@ type Props = {
     rooms: Room[],
     searchRooms: Room[],
     showSearchError: boolean,
-    refreshTime: number
+    refreshTime: number,
+    setShowTokenError: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const Rooms = (props: Props) => {
@@ -16,7 +17,7 @@ const Rooms = (props: Props) => {
         {
             props.rooms.length > 0
             ? (props.rooms.map(room => (
-                <RoomInList key={room.id} room={room} />
+                <RoomInList key={room.id} room={room} setShowTokenError={props.setShowTokenError} />
                 )))
             : <p>There are no active rooms. Create one and start play!</p>
         }
@@ -27,7 +28,7 @@ const Rooms = (props: Props) => {
         {
             props.searchRooms.length > 0
             ? (props.searchRooms.map(room => (
-                <RoomInList key={room.id} room={room} />
+                <RoomInList key={room.id} room={room} setShowTokenError={props.setShowTokenError} />
                 )))
             : (
                 !props.showSearchError
@@ -37,8 +38,8 @@ const Rooms = (props: Props) => {
         }
     </div>
 
-    const refreshTime = <p>Next Refresh: {Math.floor(props.refreshTime / 60) != 0 && `${Math.floor(props.refreshTime / 60)} Minutes`}
-    {props.refreshTime % 60 != 0 && ` ${props.refreshTime % 60} Seconds`}</p> 
+    const refreshTime = <p className="next-refresh-time">Next Refresh: {Math.floor(props.refreshTime / 60) != 0 && 
+        `${Math.floor(props.refreshTime / 60)} Minutes`} {props.refreshTime % 60 != 0 && ` ${props.refreshTime % 60} Seconds`}</p> 
 
     return (
         <div className="rooms">

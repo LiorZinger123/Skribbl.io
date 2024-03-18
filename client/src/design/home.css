@@ -1,5 +1,78 @@
+@media screen and (min-width: 1400px) {
+    .disconnect-div{
+        justify-content: space-between;
+        width: 310px;
+        font-size: medium;
+    }
+
+    .search-bar{
+        width: 300px;
+    }
+
+    .room-item{
+        height: 60px;
+    }
+
+    .token-error{
+        width: 350px;
+    }
+}
+
+@media screen and (min-width: 1150px) and (max-width: 1400px) {
+    .disconnect-div{
+        justify-content: space-between;
+        width: 290px;
+        font-size: 15px;
+    }
+
+    .title{
+        font-size: 30px;
+    }
+
+    .search-bar{
+        width: 250px;
+    }
+
+    .room-item{
+        height: 60px;
+    }
+
+    .token-error{
+        width: 330px;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    .disconnect-div{
+        flex-direction: column;
+    }
+
+    .title{
+        font-size: 25px;
+    }
+    
+    .next-refresh-time{
+        width: 35%;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .room-item{
+        height: 80px;
+    }
+
+    .search-bar{
+        width: 220px;
+    }
+
+    .token-error{
+        width: 315px;
+    }
+}
+
 .home{
-    width: 90%;
+    width: 50%;
     height: 100vh;
     margin: auto;
     display: flex;
@@ -8,21 +81,35 @@
     color: white;
 }
 
-.home p{
-    backdrop-filter: blur(20px);
+.home-when-error{
+    opacity: .5;
 }
 
+/* Disconnect */
+.disconnect-div{
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 1%;
+}
+
+.disconnect-link{
+    cursor: pointer;
+}
+
+.disconnect-link:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
 /* Search */
 .search-div{
-    width: 28%;
     display: flex;
-    justify-content: space-around;
-    margin: 2% 0;
+    margin: 2% 0 5% 0;
 }
 
 .search-bar{
-    width: 300px;
     height: 30px;
+    margin-right: 10px;
     border-radius: 20px;
     padding-left: 10px;
     outline: none;
@@ -36,18 +123,15 @@
 
 /* Rooms */
 .rooms{
-    width: 70%;
-    aspect-ratio: 2.1;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
     text-align: center;
 }
 
 .room-item{
     background-color: transparent;
-    width: 750px;
-    height: 60px;
+    width: 100%;
     border: 1px solid white;
     margin: 30px 0;
     display: flex; 
@@ -124,7 +208,7 @@
 .create-btn{
     position: absolute;
     bottom: 5%;
-    right: 5%;
+    right: 3%;
     width: 70px;
     aspect-ratio: 1;
     background-color: rgb(204, 120, 222);
@@ -133,4 +217,50 @@
     cursor: pointer;
     color: white;
     font-size: 40px;
+}
+
+/* Token Error */
+.token-error{
+    aspect-ratio: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid white;
+    border-radius: 5px;
+    color: white;
+    backdrop-filter: blur(10px);
+    text-align: center;
+    animation: slide 1.5s ease-in-out;
+}
+
+@keyframes slide{
+    0% { top: 0 }
+    100% { top: 50%}
+}
+
+.token-error p{
+    width: 80%;
+    word-break: keep-all;
+}
+
+.token--error-icon{
+    transform: scale(2);
+    margin: 10% 0;
+}   
+
+.token-error-btn{
+    background: transparent;
+    width: 60%;
+    height: 10%;
+    margin-top: 10%;
+    border-radius: 5px;
+    border: 1px solid white;
+    outline: none;
+    cursor: pointer;
+    color: white;
+    font-family: "Poppins", sans-serif;
 }

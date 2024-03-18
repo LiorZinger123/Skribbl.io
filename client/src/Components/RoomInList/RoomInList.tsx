@@ -8,7 +8,8 @@ import { setRoomId } from "../../store/counterSlice"
 import { RootState } from "../../store/store"
 
 type Props = {
-  room: Room
+  room: Room,
+  setShowTokenError: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const RoomInList = (props: Props) => {
@@ -40,10 +41,15 @@ const RoomInList = (props: Props) => {
           nav('/room')
         }
         else if(res.status === 401){
-          setErrorAnimations(true)
-          animationRef.current = setTimeout(() => {
-            setErrorAnimations(false)
-          }, 700)
+          const responseMsg = await res.json()
+          if(responseMsg.message === 'wrong_password'){
+            setErrorAnimations(true)
+            animationRef.current = setTimeout(() => {
+              setErrorAnimations(false)
+            }, 700)
+          }
+          else
+            props.setShowTokenError(true)
         }
         else{
           setShowErrorMsg(true)

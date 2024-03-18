@@ -28,7 +28,7 @@ export class AuthController {
         if(req.user.rememberMe){
             const token = this.authService.login({username: req.user.username, rememberMe: req.user.rememberMe})
             const maxAge = this.configService.get<number>('cookieExpirationTime')
-            res.cookie('Login', token, { httpOnly: true, maxAge: maxAge })
+            res.cookie('Login', token, { httpOnly: false, maxAge: maxAge })
             res.status(HttpStatus.OK).send(req.user.username)
         }
         else
@@ -41,7 +41,7 @@ export class AuthController {
     login(@Req() req: Request, @Res({ passthrough: true }) res: Response): void{
         const token = this.authService.login(req.body)
         const maxAge = this.configService.get<number>('cookieExpirationTime')
-        res.cookie('Login', token, { httpOnly: true, maxAge: maxAge })
+        res.cookie('Login', token, { httpOnly: false, maxAge: maxAge })
         res.status(HttpStatus.OK).send(req.body.username)
     }
 }

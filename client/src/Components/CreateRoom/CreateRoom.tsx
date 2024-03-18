@@ -7,11 +7,13 @@ import { fetchToApi } from "../../Api/fetch"
 import { setRoomId } from '../../store/counterSlice'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { RootState } from '../../store/store'
+import TokenError from '../TokenError/TokenError'
 
 const CreateRoom = () => {
 
   const [disablePass, setDisablePass] = useState<boolean>(true)
   const [showPass, setShowPass] = useState<boolean>(false)
+  const [showTokenError, setShowTokenError] = useState<boolean>(false)
 
   const players = {id: 'players', label: 'Maximum Players', options: Array.from({ length: 8 }, (_, k) => k + 3)}
   const times = {id: 'time',label: 'Drawing Time', options: Array.from({ length: 16 }, (_, k) => 10 * (k + 3))}
@@ -35,8 +37,12 @@ const CreateRoom = () => {
   const onSubmit: SubmitHandler<CreateRoomFormFields> = async (data): Promise<void> => {
     try{
       const res = await fetchToApi('rooms/createroom', {username: username, ...roomSettings, ...data})
-      dispatch(setRoomId(await res.text()))
-      nav('/room')
+      if(res.ok){
+        dispatch(setRoomId(await res.text()))
+        nav('/room')
+      }
+      else if(res.status === 401)
+        setShowTokenError(true)
     }
     catch{
       setError('root', {message: "Something went wrong, please try again later"})
@@ -92,6 +98,7 @@ const CreateRoom = () => {
       <button type='button' onClick={() => nav('/home')}>Back</button>
 
       {errors.root && <div>{errors.root.message}</div>}
+      {showTokenError && <TokenError />}
     </form>
   )
 }

@@ -3,7 +3,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 
 type Props = {
     getRoomsFromApi: () => Promise<void>,
-    setRefreshTime: React.Dispatch<React.SetStateAction<number>>
+    setRefreshTime: React.Dispatch<React.SetStateAction<number>>,
 }
 
 const Refresh = (props: Props) => {

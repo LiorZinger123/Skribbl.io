@@ -36,14 +36,14 @@ export class RoomsController{
         if(id)
             res.status(HttpStatus.OK).send(id)
         else
-            res.sendStatus(HttpStatus.UNAUTHORIZED)
+            res.status(HttpStatus.UNAUTHORIZED).send({message: 'wrong_password'})
     }
 
     @UseGuards(JwtAuthGuard)
     @UsePipes(new ValidationPipe({ transform: true }))  
     @Post('createroom')
     createRoom(@Res() res: Response, @Body() data: NewRoomDto): void {
-        res.send(this.roomsService.createRoom(data))
+        res.status(HttpStatus.CREATED).send(this.roomsService.createRoom(data))
     }
 
     @Post('ifgamestarted')
