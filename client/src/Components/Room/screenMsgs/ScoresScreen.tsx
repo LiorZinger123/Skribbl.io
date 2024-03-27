@@ -57,7 +57,7 @@ const ScoresScreen = (props: Props) => {
     })
 
     return (
-    <ul>       
+    <ul className="screen-msg">       
         {turnScores.map(playerScore => (
             <li key={playerScore.username}>{playerScore.username}: {playerScore.score}</li>
         ))}

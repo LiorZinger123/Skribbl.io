@@ -35,7 +35,6 @@ export class AuthController {
             res.sendStatus(HttpStatus.UNAUTHORIZED)
     }
 
-    @HttpCode(HttpStatus.OK)
     @UseGuards(LocalGuard)
     @Post('login')
     login(@Req() req: Request, @Res({ passthrough: true }) res: Response): void{

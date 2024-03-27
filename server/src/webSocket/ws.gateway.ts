@@ -74,6 +74,7 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         this.roomsService.addNewTurnScore(data.room, data.msgData.username, data.currentPainter)
         this.server.to(socket.id).emit('message', `${data.msgData.username}: ${data.msgData.msg}`)
         this.server.to(data.room).except(socket.id).emit('message', `${data.msgData.username} guessed the word!`)
+        // this.server.to(data.room).emit("change_color")
         if(this.roomsService.checkIfAllPlayersGuested(data.room))
             this.server.to(data.room).emit('end_turn_now')
     }

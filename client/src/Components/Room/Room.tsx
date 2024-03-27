@@ -9,7 +9,7 @@ import { fetchToApi } from "../../Api/fetch"
 import { ChatMessage, PlayerType, RoomDetails, Word } from "../../types/RoomTypes/types"
 import Chat from "./Chat"
 import Canvas from "./Canvas/Canvas"
-import Players from "./Players"
+import Players from "./Players/Players"
 import StartButton from "./StartButton"
 import ScreenMsgs from "./ScreenMsgs/ScreenMsgs"
 import { LeaveRoom } from "./LeaveRoom"
@@ -96,7 +96,7 @@ const Room = () => {
     <>
       {socket &&
         <SocketContext.Provider value={socket}>
-          <div> 
+          <div className="room"> 
             <TopRoom time={time} round={round} maxRounds={maxRounds.current} painter={currentPainter} />
             <Players players={players} setPlayers={setPlayers} />
             <Canvas players={players} setTime={setTime} roundTime={roundTime}/>

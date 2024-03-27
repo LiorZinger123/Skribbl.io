@@ -26,7 +26,7 @@ const StartButton = (props: Props) => {
 
   return (
     <>
-        {isRoomOwner && <button onClick={startGame}>START</button>}
+        {isRoomOwner && <button className="start-button" onClick={startGame}>START</button>}
     </>
   )
 }

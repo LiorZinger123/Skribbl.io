@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,22 +8,23 @@ import { setRoomId } from '../../store/counterSlice'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { RootState } from '../../store/store'
 import TokenError from '../TokenError/TokenError'
+import CustomSelect from './CustomSelect'
 
 const CreateRoom = () => {
-
-  const [disablePass, setDisablePass] = useState<boolean>(true)
-  const [showPass, setShowPass] = useState<boolean>(false)
-  const [showTokenError, setShowTokenError] = useState<boolean>(false)
-
-  const players = {id: 'players', label: 'Maximum Players', options: Array.from({ length: 8 }, (_, k) => k + 3)}
-  const times = {id: 'time',label: 'Drawing Time', options: Array.from({ length: 16 }, (_, k) => 10 * (k + 3))}
-  const rounds = {id: 'rounds', label: 'Rounds', options: Array.from({ length: 10 }, (_, k) => k + 1)}
-  const createSettings = [players, times, rounds]
-  let roomSettings = {players: '3', time: '30', rounds: '1'}
 
   const dispatch = useAppDispatch()
   const nav = useContext(StableNavigateContext)
   const username = useAppSelector((state: RootState) => state.username)
+  
+  const [disablePass, setDisablePass] = useState<boolean>(true)
+  const [showTokenError, setShowTokenError] = useState<boolean>(false)
+
+  const players = {id: 'players', label: 'Maximum Players', options: Array.from({ length: 8 }, (_, k) => k + 3)}
+  const times = {id: 'seconds',label: 'Drawing Time', options: Array.from({ length: 10 }, (_, k) => 10 * (k + 3))}
+  const rounds = {id: 'rounds', label: 'Rounds', options: Array.from({ length: 10 }, (_, k) => k + 1)}
+  const setPassword = {id: 'password', label: 'Password', options: ['No', 'Yes']}
+  const createSettings = [players, times, rounds, setPassword]
+  let roomSettings = {players: '3', time: '30', rounds: '1'}
 
   const { 
         register, 
@@ -43,61 +44,53 @@ const CreateRoom = () => {
       }
       else if(res.status === 401)
         setShowTokenError(true)
-    }
+0    }
     catch{
       setError('root', {message: "Something went wrong, please try again later"})
     }
-  }
-
-  const roomPassword = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    if(e.target.value === 'yes')
-      setDisablePass(false)
-    else
-      setDisablePass(true)
   }
 
   const updateRoomSettings = (id: string, data: string): void => {
     const key = id as keyof typeof roomSettings
     roomSettings[key] = data
   }
-
+  
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <label htmlFor="name">Name:</label>
-      <input {...register('name')} id='name' type="text" placeholder="Room Name" />
-
-      {createSettings.map(setting => (
-        <Fragment key={setting.id}>
-          <label htmlFor={setting.id}>{setting.label}:</label>
-          <select id={setting.id} onChange={(e) => updateRoomSettings(setting.id, e.target.value)}>
-            {setting.options.map(item => (
-              <option key={item} value={item}>{item}</option>
-            ))}
-          </select>
-        </Fragment>
-      ))}
-
-      <label>Set Password:</label>
-      <select onChange={roomPassword}>
-        <option value='no'>No</option>
-        <option value='yes'>Yes</option>
-      </select>
+    <form onSubmit={handleSubmit(onSubmit)} className='create-room'>
+      <h1>Create Room</h1>
       
-      <label htmlFor="password">Password:</label>
-      <div>
-        <input {...register('password')} id='pass' placeholder="Enter Password" disabled={disablePass} type={showPass ? 'text' : 'password'} />
-        <div onClick={() => setShowPass(!showPass)}>
-          <button type='button' disabled={disablePass}>show/hide</button>
+      <div className='room-settings'>
+
+        <div className='room-setting'>
+            <label htmlFor="name">Name:</label>
+            <input {...register('name')} id='name' className='name-input' type="text" placeholder="Room Name" />
+            {errors.name && <div className='create-room-error'>Name must contain 3 characters!</div>}
         </div>
+
+        {createSettings.map(setting => (
+          <div key={setting.id} className='room-setting'>
+            <label htmlFor={setting.id}>{setting.label}:</label>
+            <CustomSelect setting={setting} updateRoomSettings={updateRoomSettings} setDisablePass={setDisablePass} />
+          </div>
+        ))}
+        
+        <div className='room-setting'>
+          <label htmlFor="password">Set Password:</label>
+          <input {...register('password')} id='pass' className={disablePass ? 'password-disabled' : 'password-enabled'}
+            placeholder="Enter Password" disabled={disablePass} type='password' required />
+          {errors.password && <div className='create-room-error'>Password must contain 3 characters!</div>}
+        </div>
+
       </div>
-            
+  
+      {errors.root && <div>{errors.root.message}</div>}
+
       <button type='submit' disabled={isSubmitting}>
         {isSubmitting ? "Creating..." : "Create Room"}
       </button>
 
-      <button type='button' onClick={() => nav('/home')}>Back</button>
+      <p>Dont want to create a room? <span className='link' onClick={() => nav('/home')}>JOIN ONE</span></p>
 
-      {errors.root && <div>{errors.root.message}</div>}
       {showTokenError && <TokenError />}
     </form>
   )

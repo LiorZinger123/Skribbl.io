@@ -22,7 +22,6 @@
 .input-box, .authorization-btn{
     border-radius: 25px;
     border: 2px solid rgba(255, 255, 255, .2);
-    font-family: "Poppins", sans-serif;
 }
 
 .input-box{
@@ -41,7 +40,6 @@
     border-radius: 25px;
     padding-left: 5%;
     color: white;
-    font-family: "Poppins", sans-serif;
 }
 
 .input-box input::placeholder{
@@ -74,4 +72,8 @@
 .link{
     font-weight: bold;
     cursor: pointer;
+}
+
+.link:hover{
+    text-decoration: underline;
 }

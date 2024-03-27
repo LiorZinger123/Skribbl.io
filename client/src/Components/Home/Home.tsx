@@ -1,18 +1,17 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect } from "react"
 import Room from "../../types/room"
 import { fetchToApi, getFromApi } from "../../Api/fetch"
 import Rooms from "./Rooms"
-import { StableNavigateContext } from "../../App"
 import { useAppSelector } from "../../store/hooks"
 import { RootState } from "../../store/store"
 import Search from "./Search"
 import Refresh from "./Refresh"
 import Disconnect from "./Disconnect"
 import TokenError from "../TokenError/TokenError"
+import CreateButton from "./CreateButton"
 
 const Home = () => {
 
-    const nav = useContext(StableNavigateContext)
     const username = useAppSelector((state: RootState) => state.username)
     const [rooms, setRooms] = useState<Room[]>([])
     const [showError, setShowError] = useState<boolean>(false)
@@ -70,7 +69,7 @@ const Home = () => {
         <h1 className="title">WELCOME TO SKRIBBLE.IO</h1>
           
           <div className="disconnect-div">
-            <p>Welcome Back {username}</p>
+            <p>Welcome {username}</p>
             <Disconnect />
           </div>
 
@@ -82,12 +81,11 @@ const Home = () => {
           
           {!showError
             ? <Rooms search={search} rooms={rooms} searchRooms={searchRooms} showSearchError={showSearchError} 
-                setShowTokenError={setShowTokenError}refreshTime={refreshTime} />
+                setShowTokenError={setShowTokenError} refreshTime={refreshTime} />
             : <p>An error has occurred while loading game rooms. Please try again later.</p>
           }
 
-          <button className='create-btn' onClick={() => nav('/createroom')}>+</button>
-
+          <CreateButton setShowTokenError={setShowTokenError} />
       </div>
 
       {showTokenError && <TokenError />}

@@ -1,8 +1,10 @@
 @media screen and (min-width: 1400px) {
     .disconnect-div{
-        justify-content: space-between;
-        width: 310px;
         font-size: medium;
+    }
+
+    .search-div{
+        margin: 3% 0;
     }
 
     .search-bar{
@@ -10,18 +12,30 @@
     }
 
     .room-item{
+        width: 70%;
         height: 60px;
+    }
+
+    .create-btn-div{
+        right: 0;
+    }
+
+    .create-btn{
+        align-self: center;
     }
 
     .token-error{
         width: 350px;
     }
+
+    .refresh-popup{
+        width: 140px;
+        bottom: 20px;
+    }
 }
 
 @media screen and (min-width: 1150px) and (max-width: 1400px) {
     .disconnect-div{
-        justify-content: space-between;
-        width: 290px;
         font-size: 15px;
     }
 
@@ -29,16 +43,34 @@
         font-size: 30px;
     }
 
+    .search-div{
+        margin: 3% 0;
+    }
+
     .search-bar{
         width: 250px;
     }
 
+    .create-btn-div{
+        right: 0;
+    }
+
+    .create-btn{
+        align-self: center;
+    }
+
     .room-item{
+        width: 80%;
         height: 60px;
     }
 
     .token-error{
         width: 330px;
+    }
+
+    .refresh-popup{
+        width: 140px;
+        bottom: 20px;
     }
 }
 
@@ -59,20 +91,38 @@
     }
     
     .room-item{
+        width: 95%;
         height: 80px;
+    }
+
+    .search-div{
+        margin: 8% 0 3% 0;
     }
 
     .search-bar{
         width: 220px;
     }
 
+    .create-btn-div{
+        right: 10px;
+    }
+
+    .create-btn{
+        align-self: self-end;
+    }
+
     .token-error{
         width: 315px;
+    }
+
+    .refresh-popup{
+        width: 100px;
+        bottom: 30px;
     }
 }
 
 .home{
-    width: 50%;
+    width: 80%;
     height: 100vh;
     margin: auto;
     display: flex;
@@ -87,10 +137,15 @@
 
 /* Disconnect */
 .disconnect-div{
+    width: fit-content;
     display: flex;
     align-items: center;
     position: absolute;
     right: 1%;
+}
+
+.disconnect-div p{
+    margin-right: 10px;
 }
 
 .disconnect-link{
@@ -101,10 +156,10 @@
     cursor: pointer;
     text-decoration: underline;
 }
+
 /* Search */
 .search-div{
     display: flex;
-    margin: 2% 0 5% 0;
 }
 
 .search-bar{
@@ -113,12 +168,31 @@
     border-radius: 20px;
     padding-left: 10px;
     outline: none;
-    font-family: "Poppins", sans-serif;
 }
 
 /* Refresh */
 .refresh{
     cursor: pointer;
+}
+
+.refresh:hover{
+    transform: scale(1.1);
+}
+
+.refresh-rotate{
+    animation: rotate .4s linear;
+}
+
+@keyframes rotate{
+    0%{
+        transform: rotate(0deg);
+    }
+    50%{
+        transform: rotate(180deg);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
 }
 
 /* Rooms */
@@ -131,9 +205,8 @@
 
 .room-item{
     background-color: transparent;
-    width: 100%;
     border: 1px solid white;
-    margin: 30px 0;
+    margin: 30px auto;
     display: flex; 
     justify-content: space-around;
     align-items: center;
@@ -179,7 +252,6 @@
 
 .enter-password::placeholder{
     color: white;
-    font-family: "Poppins", sans-serif;
 }
 
 .join-room{
@@ -202,13 +274,25 @@
 
 .room-join-error{
     color: pink;
+    visibility: hidden;
+    animation: show 3s linear;
+}
+
+@keyframes show{
+    0%{ visibility: visible; }
 }
 
 /* Create Room Button */
-.create-btn{
+.create-btn-div{
+    width: 190px;
+    height: fit-content;
     position: absolute;
     bottom: 5%;
-    right: 3%;
+    display: flex;
+    flex-direction: column;
+}
+
+.create-btn{
     width: 70px;
     aspect-ratio: 1;
     background-color: rgb(204, 120, 222);
@@ -217,6 +301,45 @@
     cursor: pointer;
     color: white;
     font-size: 40px;
+}
+
+.create-btn:hover{
+    background-color: rgb(192, 80, 218);
+    animation: color .5s ease-in-out;
+}
+
+@keyframes color{
+    0% { background-color: rgb(204, 120, 222) }
+    100% { background-color: rgb(192, 80, 218) }
+}
+
+.popup{
+    background: transparent;
+    text-align: center;
+    backdrop-filter: blur(20px);
+    border: 1px solid white;
+    border-radius: 5px;
+    opacity: 0;
+    animation: slow 5s ease-in-out;
+}
+
+@keyframes slow{
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.create-popup{
+    width: 40%;
+    position: relative;
+    bottom: 10px;
+    align-self: center;
+}
+
+.refresh-popup{
+    position: relative;
+    color: white;
 }
 
 /* Token Error */
@@ -239,7 +362,7 @@
 
 @keyframes slide{
     0% { top: 0 }
-    100% { top: 50%}
+    100% { top: 50% }
 }
 
 .token-error p{
@@ -262,5 +385,4 @@
     outline: none;
     cursor: pointer;
     color: white;
-    font-family: "Poppins", sans-serif;
 }

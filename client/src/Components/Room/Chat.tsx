@@ -1,9 +1,10 @@
-import { useEffect, useState, useContext } from "react"
+import React, { useEffect, useState, useContext, useRef } from "react"
 import { SocketContext } from "./Room"
 import { ChatMessage } from "../../types/RoomTypes/types"
 import { useAppSelector } from "../../store/hooks"
 import { RootState } from "../../store/store"
 import { Word } from "../../types/RoomTypes/types"
+import SendIcon from '@mui/icons-material/Send';
 
 type Props = {
     messages: ChatMessage[],
@@ -18,6 +19,7 @@ const Chat = (props: Props) => {
   const username = useAppSelector((state: RootState) => state.username)
   const socket = useContext(SocketContext)
   const [msg, setMsg] = useState<string>('')
+  const msgsRef = useRef<HTMLDivElement>(null!)
 
   useEffect(() => {
 
@@ -35,7 +37,11 @@ const Chat = (props: Props) => {
 
   }, [])
 
-  const sendMsg = (e: React.FormEvent<HTMLFormElement>): void => {
+  useEffect(() => {
+    msgsRef.current.lastElementChild?.scrollIntoView()
+  }, [props.messages])
+
+  const sendMsg = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent): void => {
     e.preventDefault()
     const data = {msg: msg, username: username}
     if(msg.toLowerCase() === props.currentWord.word.toLowerCase()){
@@ -53,14 +59,19 @@ const Chat = (props: Props) => {
 
   return (
     <div className="chat">
+
+      <div className="chat-msgs" ref={msgsRef}>
         {props.messages.map(msg => (
           <p key={msg.id}>{msg.msg}</p>
         ))}
-        <form onSubmit={sendMsg}>
-          <input type="text" value={msg} onChange={e => setMsg(e.target.value)} required />
-          <button>SEND</button>
-        </form>
       </div>
+
+      <form onSubmit={sendMsg}>
+        <input type="text" value={msg} onChange={e => setMsg(e.target.value)} required placeholder="Type your message here" />
+        <SendIcon className="send-icon" onClick={sendMsg} fontSize="large" />
+      </form>
+
+    </div>
   )
 }
 

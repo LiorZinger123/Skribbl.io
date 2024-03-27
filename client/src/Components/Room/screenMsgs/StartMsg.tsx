@@ -39,7 +39,7 @@ const StartMsg = (props: Props) => {
   }, [props.players])
 
   return (
-    <div>
+    <div className="screen-msg">
         {showMsg && <p>Starting Game!</p>}
     </div>
   )

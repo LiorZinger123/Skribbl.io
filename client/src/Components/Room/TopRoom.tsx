@@ -47,7 +47,7 @@ const TopRoom = (props: Props) => {
     }, [])
 
   return (
-    <div>
+    <div className="top-room">
         <div>
             {props.time}
         </div>

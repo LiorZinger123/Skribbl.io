@@ -68,7 +68,7 @@ const EndMsg = (props: Props) => {
     }
 
   return (
-    <div>
+    <div className="screen-msg">
         <p>{msgInfo.winnerMsg} won the game!</p>
         {msgInfo.owner === username
             ? <p>Press to restart game <button onClick={restartGame}>RESTART</button></p>

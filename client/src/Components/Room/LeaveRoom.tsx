@@ -21,6 +21,6 @@ export const LeaveRoom = (props: Props) => {
     }
 
   return (
-      <button onClick={leaveRoom}>leave</button>
+      <button className="leave-room" onClick={leaveRoom}>leave</button>
   )
 }

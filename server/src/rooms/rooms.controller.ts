@@ -4,6 +4,7 @@ import { RoomsService } from "./rooms.service";
 import { JoinRoomDto } from './dtos/joinRoom.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { NewRoomDto } from './dtos/newRoom.dto';
+// import { Throttle } from "@nestjs/throttler";
 
 @Controller('rooms')
 export class RoomsController{
@@ -12,6 +13,7 @@ export class RoomsController{
     ){}
 
     @UseGuards(JwtAuthGuard)
+    // @Throttle(3, 60)
     @Get('getrooms')
     getRooms(@Res() res: Response): void {
         res.send(this.roomsService.getRooms())

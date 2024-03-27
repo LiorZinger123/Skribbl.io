@@ -6,7 +6,7 @@ const Disconnect = () => {
     
     const nav = useContext(StableNavigateContext)
 
-    const handleDisconnect = (): void => {
+    const handleDisconnect = (): void => { //delete username
         Cookies.remove("Login")
         nav('/')
     }

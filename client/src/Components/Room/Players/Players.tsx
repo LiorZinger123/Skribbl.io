@@ -1,7 +1,8 @@
 import { useEffect, useContext } from "react"
-import { StableNavigateContext } from "../../App"
-import { SocketContext } from "./Room"
-import { PlayerType, SetConnectedPlayersType } from "../../types/RoomTypes/types"
+import { StableNavigateContext } from "../../../App"
+import { SocketContext } from "../Room"
+import { PlayerType, SetConnectedPlayersType } from "../../../types/RoomTypes/types"
+import Player from "./Player"
 
 type Props = {
   players: PlayerType[],
@@ -44,13 +45,11 @@ const Players = (props: Props) => {
   }, [])
 
   return (
-    <div>
-      <ul>
-        {props.players.map(player => (
-          <li key={player.id}>{player.username}: {player.score}</li>
-        ))}
-      </ul>
-    </div>
+    <ul className="players">
+      {props.players.sort((a, b) => a.score - b.score).map((player, i) => (
+        <Player key={player.id} player={player} location={i + 1} />
+      ))}
+    </ul>
   )
 }
 

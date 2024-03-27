@@ -21,17 +21,26 @@ const RoomInList = (props: Props) => {
   const disable = props.room.hasPassword && password.length < 3
   const [errorAnimations, setErrorAnimations] = useState<boolean>(false)
   const [showErrorMsg, setShowErrorMsg] = useState<boolean>(false)
-  const animationRef = useRef<NodeJS.Timeout | null>(null)
-  const errorRef = useRef<NodeJS.Timeout | null>(null)
+  const passwordRef = useRef<HTMLInputElement | null>(null)
+  const errorRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
-    return () => {
-      if(animationRef.current)
-        clearTimeout(animationRef.current)
-      if(errorRef.current)
-        clearTimeout(errorRef.current)
+    const turnOffPassAnimation = (): void => {
+      setErrorAnimations(false)
     }
-  }, [])
+
+    const removeRoomError = (): void => {
+      setShowErrorMsg(false)
+    }
+
+    passwordRef.current?.addEventListener("animationend", turnOffPassAnimation)
+    errorRef.current?.addEventListener("animationend", removeRoomError)
+
+    return () => {
+      passwordRef.current?.removeEventListener("animationend", turnOffPassAnimation)
+      errorRef.current?.removeEventListener("animationend", removeRoomError)
+    }
+  }, [showErrorMsg])
   
   const joinRoom = async (id: string): Promise<void> => {
     try{
@@ -42,27 +51,16 @@ const RoomInList = (props: Props) => {
         }
         else if(res.status === 401){
           const responseMsg = await res.json()
-          if(responseMsg.message === 'wrong_password'){
+          if(responseMsg.message === 'wrong_password')
             setErrorAnimations(true)
-            animationRef.current = setTimeout(() => {
-              setErrorAnimations(false)
-            }, 700)
-          }
           else
             props.setShowTokenError(true)
         }
-        else{
+        else
           setShowErrorMsg(true)
-          errorRef.current = setTimeout(() => {
-            setShowErrorMsg(false)
-          }, 3000)
-        }
     }
     catch{
       setShowErrorMsg(true)
-      errorRef.current = setTimeout(() => {
-        setShowErrorMsg(false)
-      }, 3000)
     } 
   }
 
@@ -75,8 +73,8 @@ const RoomInList = (props: Props) => {
         <p>Players: {props.room.connectedPlayers.length} / {props.room.maxPlayers}</p>
 
         {props.room.hasPassword &&
-          <input className={!errorAnimations ? "enter-password" : "enter-password enter-password-animations"} type="text" value={password} 
-            onChange={e => setPassward(e.target.value)} placeholder="Enter Password" 
+          <input ref={passwordRef} className={!errorAnimations ? "enter-password" : "enter-password enter-password-animations"} type="text"
+            value={password} onChange={e => setPassward(e.target.value)} placeholder="Enter Password" 
             disabled={props.room.connectedPlayers.length === props.room.maxPlayers} />
         }
             
@@ -84,7 +82,7 @@ const RoomInList = (props: Props) => {
           onClick={() => joinRoom(props.room.id)}>Join Room</button>
   
       </li>
-      {showErrorMsg && <p className="room-join-error">Join room {props.room.id} failed, please try again later</p>}
+      {showErrorMsg && <p ref={errorRef} className="room-join-error">Join room {props.room.id} failed, please try again later</p>}
     </div>
   )
 }

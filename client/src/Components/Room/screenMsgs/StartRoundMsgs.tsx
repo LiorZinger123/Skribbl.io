@@ -94,7 +94,7 @@ const StartRoundMsgs = (props: Props) => {
     return (
         <>
             {screenMsg.msg.length > 0 && 
-                <div>
+                <div className="screen-msg">
                 {
                     screenMsg.words === undefined
                     ? <p>{screenMsg.msg}</p>

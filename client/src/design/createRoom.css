@@ -1,0 +1,128 @@
+@media screen and (min-width: 1400px) {
+    .create-room{
+        width: 30em;
+    }
+}
+
+@media screen and (max-width: 1400px) {
+    .create-room{
+        width: 28em;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .create-room{
+        width: 25em;
+    }
+}
+
+.create-room{
+    background: transparent;
+    aspect-ratio: .95;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(255, 255, 255, .2);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-settings{
+    width: 90%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    border: 1px solid white;
+    border-radius: 5px;
+}
+
+.room-setting{
+    width: 90%;
+    height: 15%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2%;
+}
+
+.room-setting:not(:last-child){
+    border-bottom: 1px solid white;
+}
+
+.name-input{
+    background: transparent;
+}
+
+.select-container{
+    width: 45%;
+}
+
+.create-room input{
+    width: 50%;
+    height: 50%;
+    border-radius: 10px;
+    outline: none;
+    border: 1px solid white;
+    color: white;
+    padding-left: 10px;
+}
+
+.create-room input::placeholder{
+    color: white;
+}
+
+.create-room button{
+    background-color: white;
+    width: 85%;
+    height: 10%;
+    margin-top: 20px;
+    color: black;
+    cursor: pointer;
+    font-size: larger;
+    border-radius: 25px;
+    border: 2px solid rgba(255, 255, 255, .2);
+}
+
+.password-enabled{
+    background: transparent;
+}
+
+.password-disabled{
+    background-color: rgb(204, 199, 199);
+}
+
+.create-room-error{
+    background-color: #8f3edc;
+    position: absolute;
+    left: 95%;
+    width: 50%;
+    height: fit-content;
+    color: white;
+    text-align: center;
+    border: 1px solid white;
+    border-radius: 5px;
+}
+
+.create-room-error:after {
+    content: "";
+    background-color: #8f3edc;
+    width: 20px;
+    aspect-ratio: 1;
+    position: absolute;
+    bottom: 30%;
+    left: -4%;
+    transform: rotate(-45deg);
+    border: 1px solid white;
+    box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.5);
+    z-index: -1;
+}
