@@ -8,12 +8,13 @@ import { createContext } from "react"
 import { fetchToApi } from "../../Api/fetch"
 import { ChatMessage, PlayerType, RoomDetails, Word } from "../../types/RoomTypes/types"
 import Chat from "./Chat"
-import Canvas from "./Canvas/Canvas"
+// import Canvas from "./Canvas/Canvas"
 import Players from "./Players/Players"
 import StartButton from "./StartButton"
 import ScreenMsgs from "./ScreenMsgs/ScreenMsgs"
 import { LeaveRoom } from "./LeaveRoom"
 import TopRoom from "./TopRoom"
+import CanvasContainer from "./CanvasContainer/CanvasContainer"
 
 export const SocketContext = createContext<Socket>(null!)
 
@@ -97,13 +98,16 @@ const Room = () => {
       {socket &&
         <SocketContext.Provider value={socket}>
           <div className="room"> 
-            <TopRoom time={time} round={round} maxRounds={maxRounds.current} painter={currentPainter} />
-            <Players players={players} setPlayers={setPlayers} />
-            <Canvas players={players} setTime={setTime} roundTime={roundTime}/>
+            <div className="room-grid-container">
+              <TopRoom time={time} round={round} maxRounds={maxRounds.current} painter={currentPainter} />
+              <Players players={players} setPlayers={setPlayers} />
+              <CanvasContainer players={players} setTime={setTime} roundTime={roundTime}/>
+              <Chat messages={messages} setMessages={setMessages} currentWord={currentWord} painter={currentPainter} />
+            </div>
+            
             <ScreenMsgs players={players} painter={currentPainter} setRound={setRound} setTime={setTime}
-              round={round} maxRounds={maxRounds.current} roundTime={roundTime} setPlayers={setPlayers} />
+              round={round} maxRounds={maxRounds.current} roundTime={roundTime} setPlayers={setPlayers} /> 
             {startBtn && <StartButton players={players} setMessages={setMessages} />}
-            <Chat messages={messages} setMessages={setMessages} currentWord={currentWord} painter={currentPainter} />
             <LeaveRoom painter={currentPainter} />
           </div>
         </SocketContext.Provider>

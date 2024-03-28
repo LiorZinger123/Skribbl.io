@@ -54,7 +54,7 @@ const ScoresScreen = (props: Props) => {
         return (): void => {
             socket.off('end_turn', showScores)
         }
-    })
+    }, [])
 
     return (
     <ul className="screen-msg">       

@@ -48,10 +48,10 @@ const TopRoom = (props: Props) => {
 
   return (
     <div className="top-room">
-        <div>
+        <div className="top-room-clock">
             {props.time}
         </div>
-        <div>
+        <div className="top-room-round">
             Round {props.round} of {props.maxRounds}
         </div>
         <div>

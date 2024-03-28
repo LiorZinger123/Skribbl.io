@@ -4,7 +4,6 @@ import { ChatMessage } from "../../types/RoomTypes/types"
 import { useAppSelector } from "../../store/hooks"
 import { RootState } from "../../store/store"
 import { Word } from "../../types/RoomTypes/types"
-import SendIcon from '@mui/icons-material/Send';
 
 type Props = {
     messages: ChatMessage[],
@@ -68,7 +67,6 @@ const Chat = (props: Props) => {
 
       <form onSubmit={sendMsg}>
         <input type="text" value={msg} onChange={e => setMsg(e.target.value)} required placeholder="Type your message here" />
-        <SendIcon className="send-icon" onClick={sendMsg} fontSize="large" />
       </form>
 
     </div>

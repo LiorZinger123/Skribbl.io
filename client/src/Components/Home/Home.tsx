@@ -51,8 +51,11 @@ const Home = () => {
     const getRoomsFromApi = async (): Promise<void> => {
       try{
         const res = await getFromApi('rooms/getrooms')
-        if(res.ok)
+        if(res.ok){
           setRooms(await res.json())
+          if(showError)
+            setShowError(false)
+        }
         else if(res.status === 401)
           setShowTokenError(true)
         else

@@ -1,14 +1,19 @@
 import { useEffect, useRef, useState, useContext } from "react"
-import { SocketContext } from "../Room"
-import { useAppSelector } from "../../../store/hooks"
-import { RootState } from "../../../store/store"
-import { Point, PlayerType } from "../../../types/RoomTypes/types"
+import { SocketContext } from "../../Room"
+import { useAppSelector } from "../../../../store/hooks"
+import { RootState } from "../../../../store/store"
+import { Point, PlayerType } from "../../../../types/RoomTypes/types"
 import { drawStarightLine } from "./CanvasFunctions"
 
 type Props = {
     players: PlayerType[],
     setTime: React.Dispatch<React.SetStateAction<number>>,
-    roundTime: React.MutableRefObject<number>
+    roundTime: React.MutableRefObject<number>,
+    currentColor: string,
+    drawLine: boolean,
+    currentWidth: number,
+    setCurrentWidth: React.Dispatch<React.SetStateAction<number>>,
+    deleteAll: boolean
 }
 
 const Canvas = (props: Props) => {
@@ -22,8 +27,6 @@ const Canvas = (props: Props) => {
     const contextRef = useRef<CanvasRenderingContext2D | null>(null)
     const isDrawing  = useRef<boolean>(false)
     const prevPoint = useRef<Point | null>(null)
-    const width = useRef<number>(5)
-    const color = useRef<string>('black')
     const canDraw = useRef<boolean>(false)
     
     const [drawing, setDrawing] = useState<string>('')
@@ -72,8 +75,7 @@ const Canvas = (props: Props) => {
         }
     }, [])
 
-    useEffect(() => {
-
+    useEffect(() => { // clear canvas on load
         if(canvasRef.current){
             contextRef.current = canvasRef.current.getContext('2d')
             if(contextRef.current){
@@ -81,6 +83,9 @@ const Canvas = (props: Props) => {
                 contextRef.current.fillRect(0 , 0, canvasRef.current.width, canvasRef.current.height)
             }
         }
+    }, [props.deleteAll])
+
+    useEffect(() => {
 
         const mouseDown = (): void => {
             isDrawing.current = true
@@ -97,32 +102,45 @@ const Canvas = (props: Props) => {
         }
 
         const draw = (e: MouseEvent): void => {
-            if(canDraw.current){
+            // if(canDraw.current){
                 if(contextRef.current && isDrawing.current){
                     const canvasRect = canvasRef.current?.getBoundingClientRect()
                     if(canvasRect){
-                        const data = {e: e, canvasRect: canvasRect, ctx: contextRef.current,
-                            prevPoint: prevPoint, width: width.current , color: color.current}
-                        drawStarightLine(data)
+                        if(props.drawLine){
+                            const data = {e: e, canvasRect: canvasRect, ctx: contextRef.current,
+                                prevPoint: prevPoint, width: props.currentWidth, color: props.currentColor}
+                            drawStarightLine(data)
+                        }
                         socket.emit('drawing', {drawing: canvasRef.current?.toDataURL(), room: room})
                     }
+                }
+            // }
+        }
+    
+        const canvasFill = (): void => {
+            if(!props.drawLine){
+                if(contextRef.current && canvasRef.current){
+                    contextRef.current.fillStyle = props.currentColor
+                    contextRef.current.fillRect(0 , 0, canvasRef.current.width, canvasRef.current.height)
                 }
             }
         }
 
         canvasRef.current?.addEventListener('mousedown', mouseDown)
         window.addEventListener('mouseup', mouseUp)
-        canvasRef.current?.addEventListener('mousemove', draw)
         socket.on('update_drawing', handleDrawing)
+        canvasRef.current?.addEventListener('mousemove', draw)
+        canvasRef.current?.addEventListener('click', canvasFill)
 
         return (): void => {
             canvasRef.current?.removeEventListener('mousedown', mouseDown)
             window.removeEventListener('mouseup', mouseUp)
-            canvasRef.current?.removeEventListener('mousemove', draw)
             socket.off('update_drawing', handleDrawing)
+            canvasRef.current?.removeEventListener('mousemove', draw)
+            canvasRef.current?.removeEventListener('click', canvasFill)
         }
 
-    }, [props.players])
+    }, [props.players, props.currentColor, props.drawLine])
 
     useEffect(() => {
         const img = new Image()
@@ -133,9 +151,7 @@ const Canvas = (props: Props) => {
     }, [drawing])
 
     return (
-        <>
-            <canvas className="canvas" ref={canvasRef} width={500} height={500} />
-        </>
+        <canvas className="canvas" ref={canvasRef} width={650} height={530}/> //fix size
     ) 
 }
 

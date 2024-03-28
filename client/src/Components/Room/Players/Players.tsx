@@ -47,7 +47,7 @@ const Players = (props: Props) => {
   return (
     <ul className="players">
       {props.players.sort((a, b) => a.score - b.score).map((player, i) => (
-        <Player key={player.id} player={player} location={i + 1} />
+        <Player key={player.id} player={player} index={i} />
       ))}
     </ul>
   )
