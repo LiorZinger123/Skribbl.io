@@ -117,6 +117,7 @@
     width: 100%;
     height: 10%;
     display: flex;
+    justify-content: space-around;
 }
 
 .toolbar-cell{
@@ -124,13 +125,14 @@
     aspect-ratio: 1;
 }
 
-.current-color{
-    margin-right: 20px; 
-    /* delete margin */
+.colors-container{
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
 }
 
 .colors{
-    width: 45%;
+    width: 80%;
     height: 100%;
     display: grid;
     grid-template-columns: repeat(11, auto);
@@ -146,7 +148,12 @@
 }
 
 .modes-cell{
+    margin: 0 5px;
     position: relative;
+}
+
+.pointer-modes-cell{
+    cursor: pointer;
 }
 
 .modes-icon{
@@ -154,5 +161,30 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.unselected-icon{
+    background-color: white;
+}
+
+.selected-icon{
+    background-color: blueviolet;
+}
+
+.undo-icon{
+    color: yellow;
     cursor: pointer;
+}
+
+.delete-icon{
+    color: red;
+    cursor: pointer;
+}
+
+
+
+.screen-msgs{
+    position: absolute;
+    bottom: 50%;
+    left: 20px;
 }

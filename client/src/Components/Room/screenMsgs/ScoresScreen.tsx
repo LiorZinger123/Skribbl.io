@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useContext } from "react"
+import React, { useEffect, useContext } from "react"
 import { SocketContext } from "../Room"
 import { useAppSelector } from "../../../store/hooks"
 import { RootState } from "../../../store/store"
-import { PlayerType, Score, ShowScoresType } from "../../../types/RoomTypes/types"
+import { PlayerType, Score, ScreenCurrentMsgType, ShowScoresType } from "../../../types/RoomTypes/types"
 
 type Props = {
     players: PlayerType[],
@@ -10,7 +10,7 @@ type Props = {
     painter: React.MutableRefObject<string>,
     round: number,
     maxRounds: number,
-    setEndMsg: React.Dispatch<React.SetStateAction<boolean>>
+    setScreenCurrentMsg: React.Dispatch<React.SetStateAction<ScreenCurrentMsgType>>
 }
 
 const ScoresScreen = (props: Props) => {
@@ -18,12 +18,18 @@ const ScoresScreen = (props: Props) => {
     const room = useAppSelector((state: RootState) => state.room)
     const socket = useContext(SocketContext)
     const username = useAppSelector((state: RootState) => state.username)
-    const [turnScores, setTurnScores] = useState<Score[]>([])
 
     useEffect(() => {
         
         const showScores = (data: ShowScoresType): void => {
-            setTurnScores(data.scores)
+            props.setScreenCurrentMsg({show: true, msg:
+                <ul className="screen-msg">       
+                    {data.scores.map(playerScore => (
+                        <li key={playerScore.username}>{playerScore.username}: {playerScore.score}</li>
+                    ))}
+                </ul>
+            })
+
             props.setPlayers(players => {
                 return players.map(player => {
                     const currentScore = data.scores.find(score => score.username === player.username)?.score
@@ -34,9 +40,7 @@ const ScoresScreen = (props: Props) => {
             })
 
             setTimeout(() => {
-                setTurnScores([])
                 if(data.painter === null){
-                    props.setEndMsg(true)
                     if(username === data.owner){
                         socket.emit('end_game', {room: room})
                     }
@@ -57,11 +61,7 @@ const ScoresScreen = (props: Props) => {
     }, [])
 
     return (
-    <ul className="screen-msg">       
-        {turnScores.map(playerScore => (
-            <li key={playerScore.username}>{playerScore.username}: {playerScore.score}</li>
-        ))}
-    </ul>
+    <></>
   )
 }
 

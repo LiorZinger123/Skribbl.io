@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { PlayerType } from "../../../types/RoomTypes/types"
+import React, { ReactNode, useState } from "react"
+import { PlayerType, ScreenCurrentMsgType } from "../../../types/RoomTypes/types"
 import StartMsg from "./StartMsg"
 import StartRoundMsgs from "./StartRoundMsgs"
 import ScoresScreen from "./ScoresScreen"
@@ -18,16 +18,16 @@ type Props = {
 
 const ScreenMsgs = (props: Props) => {
 
-  const [startMsg, setStartMsg] = useState<boolean>(true)
-  const [endMsg, setEndMsg] = useState<boolean>(false)
+  const [screenCurrentMsg, setScreenCurrentMsg] = useState<ScreenCurrentMsgType>({show: false, msg: ''}) //change type any in types
 
   return (
-    <>
-      {startMsg && <StartMsg players={props.players} setStartMsg={setStartMsg} painter={props.painter} />}
-      <ScoresScreen players={props.players} painter={props.painter} setPlayers={props.setPlayers} round={props.round} maxRounds={props.maxRounds} setEndMsg={setEndMsg} />
-      <StartRoundMsgs players={props.players} painter={props.painter} setRound={props.setRound} setTime={props.setTime} roundTime={props.roundTime} />
-      {endMsg && <EndMsg setStartMsg={setStartMsg} setEndMsg={setEndMsg} setRound={props.setRound} setPlayers={props.setPlayers} />}
-    </>
+    <div className="screen-msgs">
+      {screenCurrentMsg.show && screenCurrentMsg.msg}
+      <StartMsg players={props.players} painter={props.painter} setScreenCurrentMsg={setScreenCurrentMsg} />
+      <StartRoundMsgs players={props.players} painter={props.painter} setRound={props.setRound} setTime={props.setTime} roundTime={props.roundTime} setScreenCurrentMsg={setScreenCurrentMsg} />
+      <ScoresScreen players={props.players} painter={props.painter} setPlayers={props.setPlayers} round={props.round} maxRounds={props.maxRounds} setScreenCurrentMsg={setScreenCurrentMsg} />
+      <EndMsg setRound={props.setRound} setPlayers={props.setPlayers} setScreenCurrentMsg={setScreenCurrentMsg} setTime={props.setTime} />
+    </div>
   )
 }
 

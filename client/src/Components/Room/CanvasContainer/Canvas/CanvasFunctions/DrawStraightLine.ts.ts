@@ -1,6 +1,6 @@
-import { drawStarightLineType } from "../../../../types/RoomTypes/types"
+import { drawStarightLineType } from "../../../../../types/RoomTypes/types"
 
-export const drawStarightLine = ({e, canvasRect, ctx, prevPoint, width, color}: drawStarightLineType) => {
+const DrawStarightLine = ({e, canvasRect, ctx, prevPoint, width, color}: drawStarightLineType) => {
     const end = {x: e.clientX - canvasRect.left, y: e.clientY - canvasRect.top}
     const start = prevPoint.current ?? end
     ctx.beginPath()
@@ -11,3 +11,5 @@ export const drawStarightLine = ({e, canvasRect, ctx, prevPoint, width, color}: 
     ctx.stroke()
     prevPoint.current = end
 }
+
+export default DrawStarightLine

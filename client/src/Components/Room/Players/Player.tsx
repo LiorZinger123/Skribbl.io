@@ -23,15 +23,18 @@ const Player = (props: Props) => {
 
     return (
         <li className={`player ${props.index % 2 === 0 && 'player-dark'}`}>
+
             <p className='player-location'>#{props.index + 1}</p>
             <div className='player-details'>
                 <div className='player-name'>{props.player.username} {isOwner && '(YOU)'}</div>
                 <div>Points: {props.player.score}</div>
             </div>
+            
             <div className="player-icon">
                 {props.player.roomOwner && <FaCrown />}
                 {face}
             </div>
+            
         </li>
     )
 }

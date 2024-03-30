@@ -10,15 +10,17 @@ const Colors = (props: Props) => {
                     "#005510", "#00569e", "#0e0865", "#550069", "#a75574", "#63300d"]
   
   return (
-    <>
-        <div className="toolbar-cell current-color" style={{ "backgroundColor": props.currentColor }}></div>
+    <div className="colors-container">
+
+        <div className="toolbar-cell" style={{ "backgroundColor": props.currentColor }}></div>
         <div className="colors">
             {colors.map(color => (
                 <div key={color} className="color" style={{ "backgroundColor": color }} 
                     onClick={() => props.setCurrentColor(color)}></div>
             ))}
         </div>
-    </>
+    
+    </div>
   )
 }
 

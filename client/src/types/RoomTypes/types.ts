@@ -9,6 +9,8 @@ export type drawStarightLineType = {
     color: string
 }
 
+export type Drawings = string | undefined
+
 export type Point = {
     x: number, 
     y: number
@@ -26,8 +28,8 @@ export type PlayerType = {
     roomOwner: boolean
 }
 
-export type Msg = {
-    msg: string, 
+export type GetTurnWordsType = {
+    getWords: boolean, 
     words?: Word[]
 }
 
@@ -46,6 +48,11 @@ export type SetConnectedPlayersType = PlayerType[] | PlayerType
 export type RoomDetails = {
     time: number, 
     rounds: number
+}
+
+export type ScreenCurrentMsgType = {
+    show: boolean,
+    msg: any //change
 }
 
 export type ShowScoresType = {
