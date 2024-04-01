@@ -1,4 +1,3 @@
-import { Transform } from "class-transformer"
 import { IsNotEmpty } from "class-validator"
 
 export class NewRoomDto{
@@ -9,14 +8,15 @@ export class NewRoomDto{
     @IsNotEmpty()
     name: string
 
-    password: string
-
-    @Transform(({value}) => parseInt(value))
+    @IsNotEmpty()
     players: number
 
-    @Transform(({value}) => parseInt(value))
-    time: number
+    @IsNotEmpty()
+    seconds: number
 
-    @Transform(({value}) => parseInt(value))
+    @IsNotEmpty()
     rounds: number
+
+    @IsNotEmpty()
+    password?: string
 }

@@ -27,11 +27,13 @@ const TopRoom = (props: Props) => {
                 setScreenWord({word: currentWord.word, length: currentWord.length})
             else{
                 const wordArray = [...currentWord.word].map(char => {
-                    if(char != ' ')
+                    console.log(char === '', char === ' ')
+                    if(char != ' ' && char != '-')
                         return '_'
-                    return '-'
+                    return char
                 })
-                setScreenWord({word: wordArray.join(' '), length: currentWord.length})
+                console.log(wordArray)
+                setScreenWord({word: wordArray.join(''), length: currentWord.length})
             }
         }
 

@@ -13,7 +13,8 @@ type Props = {
     drawLine: boolean,
     currentColor: string,
     currentWidth: number,
-    players: PlayerType[]
+    players: PlayerType[],
+    canDraw: React.MutableRefObject<boolean>
 }
 
 const DrawingFunctions = (props: Props) => {
@@ -23,7 +24,7 @@ const DrawingFunctions = (props: Props) => {
 
     const isDrawing  = useRef<boolean>(false)
     const prevPoint = useRef<Point | null>(null)
-    const canDraw = useRef<boolean>(false)
+    // const canDraw = useRef<boolean>(false)
 
     useEffect(() => { // drawing functions
 
@@ -43,7 +44,7 @@ const DrawingFunctions = (props: Props) => {
         }
     
         const draw = (e: MouseEvent): void => {
-            // if(canDraw.current){
+            if(props.canDraw.current){
                 if(props.contextRef.current && isDrawing.current){
                     const canvasRect = props.canvasRef.current?.getBoundingClientRect()
                     if(canvasRect && props.drawLine){
@@ -53,7 +54,7 @@ const DrawingFunctions = (props: Props) => {
                         socket.emit('drawing', {drawing: props.canvasRef.current?.toDataURL(), room: room})
                     }
                 }
-            // }
+            }
         }
     
         const canvasFill = (): void => {

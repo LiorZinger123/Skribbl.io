@@ -23,7 +23,6 @@ const StartMsg = (props: Props) => {
       props.painter.current = props.players[0].username
       props.setScreenCurrentMsg({show: true,  msg: <p>Starting Game!</p>})
       timeoutRef.current = setTimeout(() => {
-        console.log(username, props.players[0].username)
         if(props.players[0].username === username)
           socket.emit('choose_word', {room: room})
       }, 3000)

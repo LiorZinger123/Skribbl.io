@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useRef } from 'react'
 import { StableNavigateContext } from '../../App'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -24,7 +24,7 @@ const CreateRoom = () => {
   const rounds = {id: 'rounds', label: 'Rounds', options: Array.from({ length: 10 }, (_, k) => k + 1)}
   const setPassword = {id: 'password', label: 'Password', options: ['No', 'Yes']}
   const createSettings = [players, times, rounds, setPassword]
-  let roomSettings = {players: '3', time: '30', rounds: '1'}
+  const roomSettings = useRef<any>({players: 3, seconds: 30, rounds: 1})
 
   const { 
         register, 
@@ -37,7 +37,7 @@ const CreateRoom = () => {
 
   const onSubmit: SubmitHandler<CreateRoomFormFields> = async (data): Promise<void> => {
     try{
-      const res = await fetchToApi('rooms/createroom', {username: username, ...roomSettings, ...data})
+      const res = await fetchToApi('rooms/createroom', {username: username, ...roomSettings.current, ...data})
       if(res.ok){
         dispatch(setRoomId(await res.text()))
         nav('/room')
@@ -50,9 +50,9 @@ const CreateRoom = () => {
     }
   }
 
-  const updateRoomSettings = (id: string, data: string): void => {
+  const updateRoomSettings = (id: string, data: number): void => {
     const key = id as keyof typeof roomSettings
-    roomSettings[key] = data
+    roomSettings.current[key] = data
   }
   
   return (

@@ -13,6 +13,13 @@ const Players = (props: Props) => {
 
   const nav = useContext(StableNavigateContext)
   const socket = useContext(SocketContext)
+  
+  let sortedPlayers = [...props.players].sort((a, b) => a.score - b.score) // sort players by score
+  const sortedPlayersWithScoreZero = sortedPlayers.filter(player => player.score === 0) //check how much players has score 0
+  sortedPlayers = sortedPlayers.length !== sortedPlayersWithScoreZero.length ? sortedPlayers.reverse() : sortedPlayers // reverse if all players has score 0
+  const locations = (props.players.map(player => { // updated locations of players
+    return sortedPlayers.findIndex(p => player.id === p.id) + 1
+  }))
 
   useEffect(() => {
 
@@ -46,8 +53,8 @@ const Players = (props: Props) => {
 
   return (
     <ul className="players">
-      {props.players.sort((a, b) => a.score - b.score).map((player, i) => (
-        <Player key={player.id} player={player} index={i} />
+      {props.players.map((player, i) => (
+        <Player key={player.id} player={player} index={i} location={locations[i]} />
       ))}
     </ul>
   )

@@ -32,6 +32,10 @@
         width: 140px;
         bottom: 20px;
     }
+
+    .create-popup{
+        align-self: center;
+    }
 }
 
 @media screen and (min-width: 1150px) and (max-width: 1400px) {
@@ -71,6 +75,10 @@
     .refresh-popup{
         width: 140px;
         bottom: 20px;
+    }
+
+    .create-popup{
+        align-self: center;
     }
 }
 
@@ -118,6 +126,11 @@
     .refresh-popup{
         width: 100px;
         bottom: 30px;
+    }
+
+    
+    .create-popup{
+        align-self: self-end;
     }
 }
 
@@ -334,7 +347,6 @@
     width: 40%;
     position: relative;
     bottom: 10px;
-    align-self: center;
 }
 
 .refresh-popup{

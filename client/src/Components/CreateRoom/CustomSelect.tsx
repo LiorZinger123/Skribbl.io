@@ -4,7 +4,7 @@ import { SetPassword, Setting } from "../../types/CreateRoomTypes/types"
 
 type Props = {
     setting: Setting | SetPassword,
-    updateRoomSettings: (id: string, data: string) => void,
+    updateRoomSettings: (id: string, data: number) => void,
     setDisablePass: React.Dispatch<React.SetStateAction<boolean>>
 }
 
@@ -75,16 +75,14 @@ const CustomSelect = (props: Props) => {
     }
 
     const handleSelectChange = (e: SingleValue<{ value: string | number, label: string | number }>, id: string): void => {
-        if(typeof e?.value === 'string'){
-            if(id !== 'password')
-                props.updateRoomSettings(props.setting.id, e.value)
-            else{
-                if(e.value === 'Yes')
-                    props.setDisablePass(false)
-                else
-                    props.setDisablePass(true)
-            }   
-        }
+        if(typeof e?.value === 'number')
+            props.updateRoomSettings(props.setting.id, e.value)
+        else{
+            if(e?.value === 'Yes')
+                props.setDisablePass(false)
+            else
+                props.setDisablePass(true)
+        }   
     }
 
   return (

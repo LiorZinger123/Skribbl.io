@@ -18,7 +18,13 @@ export type Point = {
 
 export type ChatMessage = {
     id: number,
-    msg: string
+    msg: string,
+    color?: string
+}
+
+export type CorrectMsgFromServer = {
+    msg: string,
+    color?: string
 }
 
 export type PlayerType = {

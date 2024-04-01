@@ -21,18 +21,43 @@ type Props = {
 
 const Canvas = (props: Props) => {
     
+    const parentRef = useRef<HTMLDivElement | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const contextRef = useRef<CanvasRenderingContext2D | null>(null)
-    
+
     const [drawing, setDrawing] = useState<string>('')
     const previusDrawings = useRef<Drawings[]>([])
+    const canDraw = useRef<boolean>(false)
+
+    useEffect(() => {
+        
+        const resize = (): void => {
+            if(parentRef.current && canvasRef.current && contextRef.current){
+                canvasRef.current.width = parentRef.current.clientWidth
+                canvasRef.current.height = parentRef.current.clientHeight
+                contextRef.current.fillStyle = 'white'
+                contextRef.current.fillRect(0 , 0, canvasRef.current.width, canvasRef.current.height)
+            }
+        }
+
+        resize()
+        window.addEventListener('resize', resize)
+
+        return (): void => {
+            window.removeEventListener('resize', resize)
+        }
+        
+    }, [])
 
     return (
         <>
-            <canvas className="canvas" ref={canvasRef} width={650} height={530}/> 
-            <TurnFunctions setTime={props.setTime} roundTime={props.roundTime} canvasRef={canvasRef} contextRef={contextRef} previusDrawings={previusDrawings} />
+            <div className="canvas-container" ref={parentRef}>
+                <canvas ref={canvasRef} /> 
+            </div>
+            <TurnFunctions setTime={props.setTime} roundTime={props.roundTime} canvasRef={canvasRef} contextRef={contextRef} 
+                previusDrawings={previusDrawings} canDraw={canDraw} />
             <DrawingFunctions previusDrawings={previusDrawings} canvasRef={canvasRef} setDrawing={setDrawing} contextRef={contextRef} 
-                drawLine={props.drawLine} currentColor={props.currentColor} currentWidth={props.currentWidth} players={props.players} />
+                drawLine={props.drawLine} currentColor={props.currentColor} currentWidth={props.currentWidth} players={props.players} canDraw={canDraw} />
             <UpdateDrawing drawing={drawing} contextRef={contextRef} />
             <DeleteAll canvasRef={canvasRef} contextRef={contextRef} deleteAll={props.deleteAll} /> 
             <Undo previusDrawings={previusDrawings} setDrawing={setDrawing} undo={props.undo} setDeleteAll={props.setDeleteAll} />

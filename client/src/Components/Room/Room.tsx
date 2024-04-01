@@ -101,7 +101,7 @@ const Room = () => {
             <div className="room-grid-container">
               <TopRoom time={time} round={round} maxRounds={maxRounds.current} painter={currentPainter} />
               <Players players={players} setPlayers={setPlayers} />
-              <CanvasContainer players={players} setTime={setTime} roundTime={roundTime}/>
+              <CanvasContainer players={players} setTime={setTime} roundTime={roundTime} currentPainter={currentPainter} />
               <Chat messages={messages} setMessages={setMessages} currentWord={currentWord} painter={currentPainter} />
             </div>
             

@@ -70,7 +70,7 @@ export class RoomsService{
     const { username, ...roomData } = data
     const newPlayer = {id: 1, username: username, score: 0, roomOwner: true}
     this.rooms.push({...roomData, id: newId, startPlaying: false, connectedPlayers: [newPlayer],
-      currentTime: data.time, currentPlayerPos: 0, currentRound: 0, turnScores: [], currentDrawing: ''})
+      currentTime: data.seconds, currentPlayerPos: 0, currentRound: 0, turnScores: [], currentDrawing: ''})
     return newId
   }
 
@@ -97,7 +97,7 @@ export class RoomsService{
   getRoomDetails(id: string): RoomDetails{
     const room = this.rooms.find(room => room.id === id)
     if(room != undefined)
-      return {time: room.time, rounds: room.rounds}
+      return {time: room.seconds, rounds: room.rounds}
     return {time: 0, rounds: 0}
   }
 
@@ -202,7 +202,7 @@ export class RoomsService{
   resetTurnClock(id: string): void{
     this.rooms = this.rooms.map(room => {
       if(room.id === id)
-        return {...room, currentTime: room.time}
+        return {...room, currentTime: room.seconds}
       return room
     })
   }

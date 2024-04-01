@@ -10,6 +10,7 @@ type Props = {
     canvasRef: React.MutableRefObject<HTMLCanvasElement | null>,
     contextRef: React.MutableRefObject<CanvasRenderingContext2D | null>,
     previusDrawings: React.MutableRefObject<Drawings[]>,
+    canDraw: React.MutableRefObject<boolean>
 }
 
 const TurnFunctions = (props: Props) => {
@@ -20,11 +21,10 @@ const TurnFunctions = (props: Props) => {
     const intervalRef = useRef<NodeJS.Timeout>(null!)
     const timeoutRef = useRef<NodeJS.Timeout>(null!)
 
-    const canDraw = useRef<boolean>(false)
-
     useEffect(() => { // turn functions
 
         const startTurn = (): void => {
+            
             if(props.contextRef.current){ //clear canvas every new turn
                 props.contextRef.current.clearRect(0, 0, props.canvasRef.current?.width!, props.canvasRef.current?.height!)
                 props.contextRef.current.fillStyle = 'white'
@@ -44,14 +44,14 @@ const TurnFunctions = (props: Props) => {
             clearInterval(intervalRef.current)
             props.previusDrawings.current = []
             props.setTime(0)
-            if(canDraw.current){
-                canDraw.current = false
+            if(props.canDraw.current){
+                props.canDraw.current = false
                 socket.emit('end_turn', {room: room})
             }
         }
 
         const enableDrawing = (): void => {
-            canDraw.current = true
+            props.canDraw.current = true
         }
 
         const endTurnNow = (): void =>{

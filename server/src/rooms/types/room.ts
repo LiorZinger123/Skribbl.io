@@ -3,7 +3,7 @@ type Room = {
     name: string,
     password?: string,
     players: number,
-    time: number,
+    seconds: number,
     rounds: number,
     currentTime: number,
     currentRound: number,
