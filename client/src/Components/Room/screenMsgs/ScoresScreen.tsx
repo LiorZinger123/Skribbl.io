@@ -2,7 +2,7 @@ import React, { useEffect, useContext } from "react"
 import { SocketContext } from "../Room"
 import { useAppSelector } from "../../../store/hooks"
 import { RootState } from "../../../store/store"
-import { PlayerType, Score, ScreenCurrentMsgType, ShowScoresType } from "../../../types/RoomTypes/types"
+import { PlayerType, ScreenCurrentMsgType, ShowScoresType } from "../../../types/RoomTypes/types"
 
 type Props = {
     players: PlayerType[],
@@ -25,7 +25,8 @@ const ScoresScreen = (props: Props) => {
             props.setScreenCurrentMsg({show: true, msg:
                 <ul className="screen-msg">       
                     {data.scores.map(playerScore => (
-                        <li key={playerScore.username}>{playerScore.username}: {playerScore.score}</li>
+                        <li key={playerScore.username} className={playerScore.score > 0 ? 'got-score' : 'zero-score'}>
+                            {playerScore.username}: {playerScore.score}</li>
                     ))}
                 </ul>
             })

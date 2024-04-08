@@ -39,6 +39,8 @@ const Room = () => {
   const [round, setRound] = useState<number>(0) 
   const maxRounds = useRef<number>(0)
 
+  const canvasParentRef = useRef<HTMLDivElement | null>(null)
+
   useEffect(() => {
 
     const checkIfGameStarted = async (): Promise<void> => {
@@ -97,19 +99,25 @@ const Room = () => {
     <>
       {socket &&
         <SocketContext.Provider value={socket}>
-          <div className="room"> 
+
+          <div className="room">
+
             <div className="room-grid-container">
               <TopRoom time={time} round={round} maxRounds={maxRounds.current} painter={currentPainter} />
               <Players players={players} setPlayers={setPlayers} />
-              <CanvasContainer players={players} setTime={setTime} roundTime={roundTime} currentPainter={currentPainter} />
+              <div className="center-room" ref={canvasParentRef}>
+               <ScreenMsgs players={players} painter={currentPainter} setRound={setRound} setTime={setTime}
+                  round={round} maxRounds={maxRounds.current} roundTime={roundTime} setPlayers={setPlayers} /> 
+                <CanvasContainer players={players} setTime={setTime} roundTime={roundTime} currentPainter={currentPainter} canvasParentRef={canvasParentRef} />
+              </div>
               <Chat messages={messages} setMessages={setMessages} currentWord={currentWord} painter={currentPainter} />
             </div>
             
-            <ScreenMsgs players={players} painter={currentPainter} setRound={setRound} setTime={setTime}
-              round={round} maxRounds={maxRounds.current} roundTime={roundTime} setPlayers={setPlayers} /> 
             {startBtn && <StartButton players={players} setMessages={setMessages} />}
             <LeaveRoom painter={currentPainter} />
+          
           </div>
+          
         </SocketContext.Provider>
       }
     </>

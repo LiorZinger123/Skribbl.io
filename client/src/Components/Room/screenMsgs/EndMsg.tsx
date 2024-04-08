@@ -11,7 +11,6 @@ type Props = {
     setPlayers: React.Dispatch<React.SetStateAction<PlayerType[]>>,
     setScreenCurrentMsg: React.Dispatch<React.SetStateAction<ScreenCurrentMsgType>>,
     setTime: React.Dispatch<React.SetStateAction<number>>,
-    // time: number
 }
 
 const EndMsg = (props: Props) => {

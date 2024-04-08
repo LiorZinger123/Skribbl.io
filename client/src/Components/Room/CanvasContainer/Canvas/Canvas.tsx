@@ -16,12 +16,13 @@ type Props = {
     setCurrentWidth: React.Dispatch<React.SetStateAction<number>>,
     deleteAll: boolean,
     undo: boolean,
-    setDeleteAll: React.Dispatch<React.SetStateAction<boolean>>
+    setDeleteAll: React.Dispatch<React.SetStateAction<boolean>>,
+    canvasParentRef: React.MutableRefObject<HTMLDivElement | null>
 }
 
 const Canvas = (props: Props) => {
     
-    const parentRef = useRef<HTMLDivElement | null>(null)
+    // const parentRef = useRef<HTMLDivElement | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const contextRef = useRef<CanvasRenderingContext2D | null>(null)
 
@@ -32,9 +33,9 @@ const Canvas = (props: Props) => {
     useEffect(() => {
         
         const resize = (): void => {
-            if(parentRef.current && canvasRef.current && contextRef.current){
-                canvasRef.current.width = parentRef.current.clientWidth
-                canvasRef.current.height = parentRef.current.clientHeight
+            if(props.canvasParentRef.current && canvasRef.current && contextRef.current){
+                canvasRef.current.width = props.canvasParentRef.current.clientWidth
+                canvasRef.current.height = props.canvasParentRef.current.clientHeight
                 contextRef.current.fillStyle = 'white'
                 contextRef.current.fillRect(0 , 0, canvasRef.current.width, canvasRef.current.height)
             }
@@ -50,10 +51,8 @@ const Canvas = (props: Props) => {
     }, [])
 
     return (
-        <>
-            <div className="canvas-container" ref={parentRef}>
-                <canvas ref={canvasRef} /> 
-            </div>
+        <div className="canvas">
+            <canvas ref={canvasRef} /> 
             <TurnFunctions setTime={props.setTime} roundTime={props.roundTime} canvasRef={canvasRef} contextRef={contextRef} 
                 previusDrawings={previusDrawings} canDraw={canDraw} />
             <DrawingFunctions previusDrawings={previusDrawings} canvasRef={canvasRef} setDrawing={setDrawing} contextRef={contextRef} 
@@ -61,7 +60,7 @@ const Canvas = (props: Props) => {
             <UpdateDrawing drawing={drawing} contextRef={contextRef} />
             <DeleteAll canvasRef={canvasRef} contextRef={contextRef} deleteAll={props.deleteAll} /> 
             <Undo previusDrawings={previusDrawings} setDrawing={setDrawing} undo={props.undo} setDeleteAll={props.setDeleteAll} />
-        </>
+        </div>
     ) 
 }
 

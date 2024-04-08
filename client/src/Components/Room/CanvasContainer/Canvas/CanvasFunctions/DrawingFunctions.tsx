@@ -24,7 +24,6 @@ const DrawingFunctions = (props: Props) => {
 
     const isDrawing  = useRef<boolean>(false)
     const prevPoint = useRef<Point | null>(null)
-    // const canDraw = useRef<boolean>(false)
 
     useEffect(() => { // drawing functions
 

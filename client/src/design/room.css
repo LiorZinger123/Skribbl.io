@@ -10,11 +10,13 @@
     left: 50%;
     transform: translateX(-50%);
     display: grid;
-    grid-template-columns: 23% 48% 27%;
-    grid-template-rows: 8% 90%;
+    grid-template-columns: 22% 50% 26%;
+    grid-template-rows: 7% 90%;
     column-gap: 1%;
     row-gap: 3%;
 }
+
+/* top room design */
 
 .top-room{
     background-color: rgb(231, 229, 229);
@@ -32,6 +34,8 @@
 .top-room-round{
     margin-right: 31%;
 }
+
+/* players list design */
 
 .players{
     background-color: white;
@@ -75,11 +79,50 @@
     align-items: center;
 }
 
-.canvas-container{
-    position: relative;
-    width: 100%;
-    height: 100%;
+/* center room div */
+
+.center-room{
+    grid-area: 2 / 2;
 }
+
+/* canvas design */
+
+.canvas{
+    z-index: -1;
+}
+
+/* msgs between turns */
+
+.screen-msgs{
+    background-color: rgb(119, 38, 38);
+    /* filter: brightness(30%); */
+    position: absolute;
+    width: 50%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    word-break: keep-all;
+    font-size: xx-large;
+    color: white;
+    z-index: 1;
+}
+
+.random-word{
+    cursor: pointer;
+    list-style-type: none;
+}
+
+.zero-score{
+    color: lightcoral
+}
+
+.got-score{
+    color: lightgreen;
+}
+
+/* chat */
 
 .chat{
     background-color: rgb(231, 229, 229);
@@ -114,7 +157,11 @@
     border: none;
 }
 
+/* toolbar */
+
 .toolbar{
+    position: relative;
+    top: 3%;
     width: 100%;
     height: 10%;
     display: flex;
@@ -180,11 +227,4 @@
 .delete-icon{
     color: red;
     cursor: pointer;
-}
-
-
-.screen-msgs{
-    position: absolute;
-    bottom: 50%;
-    left: 20px;
 }

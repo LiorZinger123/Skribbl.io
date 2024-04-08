@@ -37,7 +37,7 @@ const StartRoundMsgs = (props: Props) => {
                                 <p>Please choose one word</p>
                                 <ul>
                                     {newWords.map(word => (
-                                        <li key={word.word} onClick={() => chooseWord(word)}>{word.word}</li>
+                                        <li key={word.word} className="random-word" onClick={() => chooseWord(word)}>{word.word}</li>
                                     ))}
                                 </ul>
                             </> 

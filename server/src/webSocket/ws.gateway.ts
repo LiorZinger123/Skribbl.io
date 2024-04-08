@@ -27,8 +27,10 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         socket.join(data.room)
         const connectedPlayers = this.roomsService.getPlayers(data.room)
         const RoomDetails = this.roomsService.getRoomDetails(data.room)
+        const locations = this.roomsService.updatePlayersLocations(data.room)
         this.server.to(socket.id).emit('players', connectedPlayers)
         this.server.to(socket.id).emit('room_details', RoomDetails)
+        this.server.to(data.room).emit('locations', {locations: locations})
         this.server.to(data.room).emit('message', {msg: `${data.username} joined the room`, color: 'blue'})
         this.server.to(data.room).except(socket.id).emit('players', connectedPlayers.slice(-1))
     }
@@ -85,7 +87,9 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         const updatedPainter = this.roomsService.updatePainter(data.room, increase)
         const scores = this.roomsService.getTurnScores(data.room)
         const owner = this.roomsService.getOwner(data.room)
+        const locations = this.roomsService.updatePlayersLocations(data.room)
         this.server.to(data.room).emit('end_turn', {scores: scores, painter: updatedPainter, owner: owner})
+        this.server.to(data.room).emit('locations', {locations: locations})
     }
 
     @SubscribeMessage('leave_Room')

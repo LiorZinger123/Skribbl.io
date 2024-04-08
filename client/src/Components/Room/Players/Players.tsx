@@ -1,7 +1,7 @@
-import { useEffect, useContext } from "react"
+import { useEffect, useContext, useState } from "react"
 import { StableNavigateContext } from "../../../App"
 import { SocketContext } from "../Room"
-import { PlayerType, SetConnectedPlayersType } from "../../../types/RoomTypes/types"
+import { LocationsType, PlayerType, SetConnectedPlayersType } from "../../../types/RoomTypes/types"
 import Player from "./Player"
 
 type Props = {
@@ -13,13 +13,7 @@ const Players = (props: Props) => {
 
   const nav = useContext(StableNavigateContext)
   const socket = useContext(SocketContext)
-  
-  let sortedPlayers = [...props.players].sort((a, b) => a.score - b.score) // sort players by score
-  const sortedPlayersWithScoreZero = sortedPlayers.filter(player => player.score === 0) //check how much players has score 0
-  sortedPlayers = sortedPlayers.length !== sortedPlayersWithScoreZero.length ? sortedPlayers.reverse() : sortedPlayers // reverse if all players has score 0
-  const locations = (props.players.map(player => { // updated locations of players
-    return sortedPlayers.findIndex(p => player.id === p.id) + 1
-  }))
+  const [locations, setLocations] = useState<number[]>([])  
 
   useEffect(() => {
 
@@ -30,6 +24,10 @@ const Players = (props: Props) => {
         props.setPlayers(currentPlayers => [...currentPlayers, data])
     }
 
+    const updateLocations = (data: LocationsType): void => {
+      setLocations(data.locations)
+    } 
+    
     const removePlayer = (updatedPlayers: PlayerType[]): void => {
       props.setPlayers(updatedPlayers)
     }
@@ -40,11 +38,13 @@ const Players = (props: Props) => {
     }
 
     socket.on('players', setConnectedPlayers)
+    socket.on('locations', updateLocations)
     socket.on('player_left', removePlayer)
     socket.on('room_closed', leave)
 
     return (): void => {
       socket.off('players', setConnectedPlayers)
+      socket.off('locations', updateLocations)
       socket.off('player_left', removePlayer)
       socket.off('closed_room', leave)
     }

@@ -225,6 +225,17 @@ export class RoomsService{
     })
   }
 
+  updatePlayersLocations(id: string): number[]{
+    const room = this.rooms.find(room => room.id === id)
+    let sortedPlayers = [...room.connectedPlayers].sort((a, b) => a.score - b.score) // sort players by score
+    const sortedPlayersWithScoreZero = sortedPlayers.filter(player => player.score === 0) //check how much players has score 0
+    sortedPlayers = sortedPlayers.length !== sortedPlayersWithScoreZero.length ? sortedPlayers.reverse() : sortedPlayers // reverse if all players has score 0
+    const locations = (room.connectedPlayers.map(player => { // updated locations of players
+      return sortedPlayers.findIndex(p => player.id === p.id) + 1
+    }))
+    return locations
+  }
+
   getTurnScores(roomID: string): playerTurnScore[]{
     const room = this.rooms.find(room => room.id === roomID)
     room.turnScores.sort((a, b) => b.score - a.score)

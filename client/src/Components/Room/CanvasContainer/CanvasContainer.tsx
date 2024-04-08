@@ -1,6 +1,5 @@
-import { useState } from "react"
-import { useAppSelector } from "../../../store/hooks"
-import { RootState } from "../../../store/store"
+import { useEffect, useState, useContext } from "react"
+import { SocketContext } from "../Room"
 import Canvas from "./Canvas/Canvas"
 import ToolBar from "./ToolBar/ToolBar"
 import { PlayerType } from "../../../types/RoomTypes/types"
@@ -9,27 +8,49 @@ type Props = {
     players: PlayerType[],
     setTime: React.Dispatch<React.SetStateAction<number>>,
     roundTime: React.MutableRefObject<number>,
-    currentPainter: React.MutableRefObject<string>
+    currentPainter: React.MutableRefObject<string>,
+    canvasParentRef: React.MutableRefObject<HTMLDivElement | null>
 }
 
 const CanvasContainer = (props: Props) => {
   
-    const username = useAppSelector((state: RootState) => state.username)
+    const socket = useContext(SocketContext)
+    const [showTools, setShowTools] = useState<boolean>(false)
     const [currentColor, setCurrentColor] = useState<string>('#000000')
     const [drawLine, setDrawLine] = useState<boolean>(true)
     const [currentWidth, setCurrentWidth] = useState<number>(5)
     const [undo, setUndo] = useState<boolean>(false)
     const [deleteAll, setDeleteAll] = useState<boolean>(false)
 
+    useEffect(() => {
+
+        const showToolBar = (): void => {
+            setShowTools(true)
+        }
+
+        const closeToolBar = (): void => {
+            setShowTools(false)
+        }
+
+        socket.on('start_draw', showToolBar)
+        socket.on('end_turn', closeToolBar)
+
+        return (): void => {
+            socket.off('start_draw', showToolBar)
+            socket.off('end_turn', closeToolBar)
+        }
+    })
+
     return (
-        <div>
+        <>
             <Canvas players={props.players} setTime={props.setTime} roundTime={props.roundTime} currentColor={currentColor} drawLine={drawLine}
-                currentWidth={currentWidth} setCurrentWidth={setCurrentWidth} deleteAll={deleteAll} undo={undo} setDeleteAll={setDeleteAll} />
-            {props.currentPainter.current === username && 
+                currentWidth={currentWidth} setCurrentWidth={setCurrentWidth} deleteAll={deleteAll} undo={undo} setDeleteAll={setDeleteAll} 
+                canvasParentRef={props.canvasParentRef} />
+            {showTools && 
                 <ToolBar currentColor={currentColor} setCurrentColor={setCurrentColor} setDrawLine={setDrawLine}
                 setCurrentWidth={setCurrentWidth} setDeleteAll={setDeleteAll} drawLine={drawLine} deleteAll={deleteAll} setUndo={setUndo} />
             }
-        </div>
+        </>
     )
 }
 

@@ -1,4 +1,5 @@
 import React from "react"
+import { number } from "zod"
 
 export type drawStarightLineType = {
     e: MouseEvent,
@@ -32,6 +33,10 @@ export type PlayerType = {
     username: string,
     score: number,
     roomOwner: boolean
+}
+
+export type LocationsType = {
+    locations: number[]
 }
 
 export type GetTurnWordsType = {

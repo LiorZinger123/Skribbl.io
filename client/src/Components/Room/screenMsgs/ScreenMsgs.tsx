@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react"
+import React, { useState } from "react"
 import { PlayerType, ScreenCurrentMsgType } from "../../../types/RoomTypes/types"
 import StartMsg from "./StartMsg"
 import StartRoundMsgs from "./StartRoundMsgs"
@@ -21,7 +21,7 @@ const ScreenMsgs = (props: Props) => {
   const [screenCurrentMsg, setScreenCurrentMsg] = useState<ScreenCurrentMsgType>({show: false, msg: ''}) //change type any in types
 
   return (
-    <div className="screen-msgs">
+    <div className={screenCurrentMsg.show ? "screen-msgs" : ""}> 
       {screenCurrentMsg.show && screenCurrentMsg.msg}
       <StartMsg players={props.players} painter={props.painter} setScreenCurrentMsg={setScreenCurrentMsg} />
       <StartRoundMsgs players={props.players} painter={props.painter} setRound={props.setRound} setTime={props.setTime} roundTime={props.roundTime} setScreenCurrentMsg={setScreenCurrentMsg} />
