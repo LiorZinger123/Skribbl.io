@@ -20,6 +20,7 @@ const Home = () => {
     const [showSearchError, setShowSearchError] = useState<boolean>(false)
     const [refreshTime, setRefreshTime] = useState<number>(0)
     const [showTokenError, setShowTokenError] = useState<boolean>(false)
+    const [showRefreshError, setShowRefreshError] = useState<boolean>(false)
 
     useEffect(() => {
 
@@ -35,7 +36,7 @@ const Home = () => {
               setShowTokenError(true)
           }
           catch(e){
-            throw e //check
+            throw e 
           }
         }
       }
@@ -55,9 +56,13 @@ const Home = () => {
           setRooms(await res.json())
           if(showError)
             setShowError(false)
+          if(showRefreshError)
+            setShowRefreshError(false)
         }
         else if(res.status === 401)
           setShowTokenError(true)
+        else if(res.status === 429)
+          setShowRefreshError(true)
         else
           setShowError(true)
       }
@@ -69,7 +74,7 @@ const Home = () => {
   return (
     <>
       <div className={`home ${showTokenError ? 'home-when-error' : null}`}>
-        <h1 className="title">WELCOME TO SKRIBBLE.IO</h1>
+        <h1 className="title">WELCOME TO SKRIBBL.IO</h1>
           
           <div className="disconnect-div">
             <p>Welcome {username}</p>
@@ -82,10 +87,13 @@ const Home = () => {
             <Refresh getRoomsFromApi={getRoomsFromApi} setRefreshTime={setRefreshTime} />
           </div>
           
-          {!showError
+          {!showError && !showRefreshError
             ? <Rooms search={search} rooms={rooms} searchRooms={searchRooms} showSearchError={showSearchError} 
                 setShowTokenError={setShowTokenError} refreshTime={refreshTime} />
-            : <p>An error has occurred while loading game rooms. Please try again later.</p>
+            : (showError
+                ? <p>An error has occurred while loading game rooms. Please try again later.</p>
+                : <p>Too many refreshes, try again later.</p>
+              ) 
           }
 
           <CreateButton setShowTokenError={setShowTokenError} />

@@ -33,7 +33,8 @@ const TurnFunctions = (props: Props) => {
             
             intervalRef.current = setInterval(() => {
                 props.setTime(time => time - 1)
-                socket.emit('tick', {room: room})
+                if(props.canDraw.current)
+                    socket.emit('tick', {room: room})
             }, 1000)
             timeoutRef.current = setTimeout(() => {
                 endTurn()

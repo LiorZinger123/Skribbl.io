@@ -5,14 +5,10 @@ import { RootState } from "../../store/store"
 import { createContext } from "react"
 // import { StableNavigateContext } from "../../App"
 // import { useContext } from "react"
-import { fetchToApi } from "../../Api/fetch"
 import { ChatMessage, PlayerType, RoomDetails, Word } from "../../types/RoomTypes/types"
 import Chat from "./Chat"
-// import Canvas from "./Canvas/Canvas"
 import Players from "./Players/Players"
-import StartButton from "./StartButton"
 import ScreenMsgs from "./ScreenMsgs/ScreenMsgs"
-import { LeaveRoom } from "./LeaveRoom"
 import TopRoom from "./TopRoom"
 import CanvasContainer from "./CanvasContainer/CanvasContainer"
 
@@ -24,9 +20,10 @@ const Room = () => {
   const room = useAppSelector((state: RootState) => state.room)
   const username = useAppSelector((state: RootState) => state.username)
 
-  const [startBtn, setStartBtn] = useState<boolean>(true)
-
   const [socket, setSocket] = useState<Socket>(null!)
+  const api = import.meta.env.VITE_API
+  const port = import.meta.env.VITE_API_PORT
+
   const [players, setPlayers] = useState<PlayerType[]>([])
   const [messages, setMessages] = useState<ChatMessage[]>([])
 
@@ -43,54 +40,35 @@ const Room = () => {
 
   useEffect(() => {
 
-    const checkIfGameStarted = async (): Promise<void> => {
-      try{
-          const res = await fetchToApi('rooms/ifgamestarted', {room: room})
-          const ifStarted = await res.json()
-          if(ifStarted)
-              setStartBtn(false)
-          else
-              setStartBtn(true)
-      }
-      catch{
-        //popup error        
-      }
-    }
-
     const handleDetails = (roomDetails: RoomDetails): void => {
       roundTime.current = roomDetails.time
       maxRounds.current = roomDetails.rounds
-    }
-
-    const hideBtn = (): void => {
-      setStartBtn(false)
     }
     
     const handleWord = (word: Word): void => {
       setCurrentWord(word)
     }
 
-    // const leaveOnRefresh = (e: BeforeUnloadEvent) => {
+    // const leaveMsg = (e: BeforeUnloadEvent) => {
       // e.preventDefault()  
+      // console.log('dddd')
       // newSocket.emit('leaveRoom', {username: username})
       // nav('/home')
-      // e.returnValue = 'dd'
     // }
 
-    const newSocket = io('http://127.0.0.1:8080')
+    const newSocket = io(`${api}:${port}`)
     setSocket(newSocket)
     newSocket.emit('join', {room: room, username: username})
     newSocket.on('room_details', handleDetails)
-    newSocket.on('hide_start_btn', hideBtn)
     newSocket.on('start_turn', handleWord)
-    // window.addEventListener('beforeunload', leaveOnRefresh)
-    checkIfGameStarted()
+    // window.addEventListener('beforeunload', leaveMsg)
+    // window.addEventListener('popstate', leaveMsg)
 
     return (): void => {
       newSocket.off('room_details', handleDetails)
-      newSocket.off('hide_start_btn', hideBtn)
       newSocket.off('start_turn', handleWord)
-      // window.removeEventListener('beforeunload', leaveOnRefresh)
+      // window.removeEventListener('beforeunload', leaveMsg)
+      // window.removeEventListener('popstate', leaveMsg)
       newSocket.disconnect()
     }
   }, [])
@@ -103,19 +81,16 @@ const Room = () => {
           <div className="room">
 
             <div className="room-grid-container">
-              <TopRoom time={time} round={round} maxRounds={maxRounds.current} painter={currentPainter} />
+              <TopRoom time={time} round={round} maxRounds={maxRounds.current} painter={currentPainter} players={players} setMessages={setMessages} />
               <Players players={players} setPlayers={setPlayers} />
               <div className="center-room" ref={canvasParentRef}>
                <ScreenMsgs players={players} painter={currentPainter} setRound={setRound} setTime={setTime}
-                  round={round} maxRounds={maxRounds.current} roundTime={roundTime} setPlayers={setPlayers} /> 
+                  round={round} maxRounds={maxRounds.current} roundTime={roundTime} setPlayers={setPlayers} currentWord={currentWord} /> 
                 <CanvasContainer players={players} setTime={setTime} roundTime={roundTime} currentPainter={currentPainter} canvasParentRef={canvasParentRef} />
               </div>
               <Chat messages={messages} setMessages={setMessages} currentWord={currentWord} painter={currentPainter} />
             </div>
-            
-            {startBtn && <StartButton players={players} setMessages={setMessages} />}
-            <LeaveRoom painter={currentPainter} />
-          
+                      
           </div>
           
         </SocketContext.Provider>

@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useContext } from "react"
+import { SocketContext } from "../../Room"
 import { Drawings, PlayerType } from "../../../../types/RoomTypes/types"
 import Undo from "./CanvasFunctions/Undo"
 import DeleteAll from "./CanvasFunctions/DeleteAll"
@@ -22,13 +23,14 @@ type Props = {
 
 const Canvas = (props: Props) => {
     
-    // const parentRef = useRef<HTMLDivElement | null>(null)
+    const socket = useContext(SocketContext)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const contextRef = useRef<CanvasRenderingContext2D | null>(null)
 
     const [drawing, setDrawing] = useState<string>('')
     const previusDrawings = useRef<Drawings[]>([])
     const canDraw = useRef<boolean>(false)
+    const [roomClosed, setRoomClosed] = useState<boolean>(false)
 
     useEffect(() => {
         
@@ -41,25 +43,35 @@ const Canvas = (props: Props) => {
             }
         }
 
+        const stopCanvasFunctions = (): void => {
+            setRoomClosed(true)
+        }
+
         resize()
         window.addEventListener('resize', resize)
+        socket.on('room_closed', stopCanvasFunctions)
 
         return (): void => {
             window.removeEventListener('resize', resize)
+            socket.off('room_closed', stopCanvasFunctions)
         }
         
     }, [])
 
     return (
         <div className="canvas">
-            <canvas ref={canvasRef} /> 
-            <TurnFunctions setTime={props.setTime} roundTime={props.roundTime} canvasRef={canvasRef} contextRef={contextRef} 
-                previusDrawings={previusDrawings} canDraw={canDraw} />
-            <DrawingFunctions previusDrawings={previusDrawings} canvasRef={canvasRef} setDrawing={setDrawing} contextRef={contextRef} 
-                drawLine={props.drawLine} currentColor={props.currentColor} currentWidth={props.currentWidth} players={props.players} canDraw={canDraw} />
-            <UpdateDrawing drawing={drawing} contextRef={contextRef} />
-            <DeleteAll canvasRef={canvasRef} contextRef={contextRef} deleteAll={props.deleteAll} /> 
-            <Undo previusDrawings={previusDrawings} setDrawing={setDrawing} undo={props.undo} setDeleteAll={props.setDeleteAll} />
+            <canvas ref={canvasRef} />
+            {!roomClosed &&
+                <>
+                    <TurnFunctions setTime={props.setTime} roundTime={props.roundTime} canvasRef={canvasRef} contextRef={contextRef} 
+                        previusDrawings={previusDrawings} canDraw={canDraw} />
+                    <DrawingFunctions previusDrawings={previusDrawings} canvasRef={canvasRef} setDrawing={setDrawing} contextRef={contextRef} 
+                        drawLine={props.drawLine} currentColor={props.currentColor} currentWidth={props.currentWidth} players={props.players} canDraw={canDraw} />
+                    <UpdateDrawing drawing={drawing} contextRef={contextRef} />
+                    <DeleteAll canvasRef={canvasRef} contextRef={contextRef} deleteAll={props.deleteAll} /> 
+                    <Undo previusDrawings={previusDrawings} setDrawing={setDrawing} undo={props.undo} setDeleteAll={props.setDeleteAll} />
+                </>
+            }
         </div>
     ) 
 }

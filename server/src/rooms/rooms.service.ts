@@ -42,7 +42,7 @@ export class RoomsService{
 
   searchRooms(search: string): RoomToList[] {
     const rooms = this.rooms.map(room => {
-      if(room.name.includes(search))
+      if(room.name.includes(search) || room.id.includes(search))
         return room
     })
     if(rooms[0] !== undefined)
@@ -52,6 +52,8 @@ export class RoomsService{
   
   joinRoom(data: JoinRoomDto): string {
     const existingRoom = this.rooms.find(room => room.id === data.room)
+    if(existingRoom === undefined)
+      return undefined
     if(data.password.length === 0 || data.password === existingRoom.password){
       this.rooms = this.rooms.map(room => {
         if(room.id === data.room){
@@ -99,10 +101,6 @@ export class RoomsService{
     if(room != undefined)
       return {time: room.seconds, rounds: room.rounds}
     return {time: 0, rounds: 0}
-  }
-
-  checkIfGameStarted(id: string): boolean{
-    return this.rooms.find(room => room.id === id).startPlaying
   }
   
   startPlaying(id: string): void {
@@ -180,13 +178,13 @@ export class RoomsService{
     })
   }
 
-  addNewTurnScore(roomID: string, username: string, currentPainter: string): void{
+  addNewTurnScore(roomID: string, username: string): void{
     this.rooms = this.rooms.map(room => {
       if(room.id === roomID){
-        let newScores = [{username: username, score: room.connectedPlayers.length * room.currentTime * 3}]
-        if(room.turnScores.length === 0)
-          newScores.push({ username: currentPainter, score: 75 })
-        return {...room, turnScores: [...room.turnScores, ...newScores]}
+        console.log(room.connectedPlayers.length - room.turnScores.length)
+        console.log(room.currentTime)
+        const newScore = {username: username, score: 50 * (room.connectedPlayers.length - room.turnScores.length) * room.currentTime / 5}
+        return {...room, turnScores: [...room.turnScores, newScore]}
       }
       return room
     })
@@ -194,7 +192,7 @@ export class RoomsService{
 
   checkIfAllPlayersGuested(roomID: string): boolean{
     const room = this.rooms.find(room => room.id === roomID)
-    if(room.connectedPlayers.length === room.turnScores.length)
+    if(room.connectedPlayers.length - 1 === room.turnScores.length)
       return true
     return false
   }
@@ -210,16 +208,19 @@ export class RoomsService{
   updateScoreAfterTurn(roomID: string): void{
     this.rooms = this.rooms.map(room => {
       if(room.id === roomID){
-        const turnScoresNames = room.turnScores.map(player => player.username)
-        const turnScoresValues = room.turnScores.map(player => player.score)
-        const updatedConnectedPlayers = room.connectedPlayers.map(player => {
-          if(turnScoresNames.includes(player.username)){
-            const new_score = turnScoresValues[turnScoresNames.indexOf(player.username)]
-            return {...player, score: player.score + new_score}
-          }
-          return player
-        })
-        return {...room, connectedPlayers: updatedConnectedPlayers}
+        if(room.turnScores.length > 0){
+          room.turnScores.push({ username: room.connectedPlayers[room.currentPlayerPos].username, score: 50 })
+          const turnScoresNames = room.turnScores.map(player => player.username)
+          const turnScoresValues = room.turnScores.map(player => player.score)
+          const updatedConnectedPlayers = room.connectedPlayers.map(player => {
+            if(turnScoresNames.includes(player.username)){
+              const new_score = turnScoresValues[turnScoresNames.indexOf(player.username)]
+              return {...player, score: player.score + new_score}
+            }
+            return player
+          })
+          return {...room, connectedPlayers: updatedConnectedPlayers}
+        }
       }
       return room
     })
@@ -295,8 +296,8 @@ export class RoomsService{
   getWinner(id: string): string[] | null{
     const room = this.rooms.find(room => room.id === id)
     if(room){
-      room.connectedPlayers.sort((a, b) => b.score - a.score)
-      let maxScore = room.connectedPlayers[0].score
+      const sortedPlayers = [...room.connectedPlayers].sort((a, b) => b.score - a.score)
+      let maxScore = sortedPlayers[0].score
       const winners = room.connectedPlayers.filter(player => player.score === maxScore)
       const winnersNames = winners.map(player => player.username)
       return winnersNames
@@ -310,8 +311,12 @@ export class RoomsService{
 
   restartGame(id: string): void{
     this.rooms = this.rooms.map(room => {
-      if(room.id === id)
-        return {...room, currentRound: 0, currentPlayerPos: 0, currentDrawing: ''}
+      if(room.id === id){
+        const updatedConnectedPlayers = room.connectedPlayers.map(player => {
+          return {...player, score: 0}
+        })
+        return {...room, connectedPlayers: updatedConnectedPlayers, currentRound: 0, currentPlayerPos: 0, currentDrawing: ''}
+      }
       return room
     })
   }

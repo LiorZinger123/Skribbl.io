@@ -295,6 +295,10 @@
     0%{ visibility: visible; }
 }
 
+.non-existing-room-error{
+    color: pink;
+}
+
 /* Create Room Button */
 .create-btn-div{
     width: 190px;
@@ -356,36 +360,18 @@
 
 /* Token Error */
 .token-error{
-    aspect-ratio: 1;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     border: 1px solid white;
-    border-radius: 5px;
-    color: white;
     backdrop-filter: blur(10px);
-    text-align: center;
-    animation: slide 1.5s ease-in-out;
 }
 
-@keyframes slide{
-    0% { top: 0 }
-    100% { top: 50% }
+.token-error-icon{
+    margin: 11% 0 9% 0;
 }
 
 .token-error p{
     width: 80%;
     word-break: keep-all;
 }
-
-.token--error-icon{
-    transform: scale(2);
-    margin: 10% 0;
-}   
 
 .token-error-btn{
     background: transparent;

@@ -19,11 +19,12 @@ import { RoomsModule } from './rooms/rooms.module';
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('DATABASE'),
       })
-    }), 
+    }),
     AuthModule,
     UsersModule,
     RoomsModule,
     WsModule
   ]
 })
+
 export class AppModule {}

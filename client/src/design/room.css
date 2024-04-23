@@ -1,3 +1,47 @@
+@media screen and (min-width: 1400px){
+    .top-room{
+        padding: 0 5% 0 7%;
+    }    
+}
+
+@media screen and (max-width: 1400px){
+    .top-room{
+        padding: 0 5%;
+    }
+}
+
+@media screen and (min-width: 1200px){
+    .player-location{
+        font-size: large;
+    }
+}
+
+@media screen and (max-width: 1200px){
+    .player-location{
+        font-size: medium;
+    }
+    
+    .player-details{
+        font-size: 14px;
+    }
+}
+
+@media screen and (min-width: 1000px) {
+    .player{
+        padding: 0 5%;
+    }
+}
+
+@media screen and (max-width: 1000px){
+    .top-room{
+        padding: 0 5% 0 3%;
+    }
+    
+    .player{
+        padding: 0 2%;
+    }
+}
+
 .room{
     height: 100vh;
 }
@@ -22,17 +66,57 @@
     background-color: rgb(231, 229, 229);
     display: flex;
     align-items: center;
-    padding-left: 5%;
+    justify-content: space-between;
+    /* padding: 0 5% 0 7%; */
     grid-row: 1 / 2;
     grid-column: 1 / 4;
 }
 
-.top-room-clock{
-    margin-right: 3%;
+.top-room-left-side{
+    width: 120px;
+    display: flex;
+    justify-content: space-between;
 }
 
-.top-room-round{
-    margin-right: 31%;
+.top-room-right-side{
+    /* background-color: aqua; */
+    width: 20%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* start button */
+
+.start-button{
+    background-color: #53E583;
+    width: 200%;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-bottom: 4px solid #179e43;
+    transition: 0.3s;
+    box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+}
+
+.start-button:hover {
+    box-shadow: 0 0 rgba(0, 0, 0, 0.4);
+    border-bottom-width: 2px;
+}
+
+/* leave room button */
+
+.leave-room{
+    color: red;
+}
+
+.leave-room-button{
+    cursor: pointer;
+}
+
+.leave-room-button:hover{
+    text-decoration: underline;
 }
 
 /* players list design */
@@ -50,11 +134,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 5%;
 }
 
 .player-location{
-    font-size: large;
     font-weight: bold;
 }
 
@@ -79,6 +161,10 @@
     align-items: center;
 }
 
+.correct-answer{
+    background-color: aquamarine;
+}
+
 /* center room div */
 
 .center-room{
@@ -94,8 +180,7 @@
 /* msgs between turns */
 
 .screen-msgs{
-    background-color: rgb(119, 38, 38);
-    /* filter: brightness(30%); */
+    background-color: rgb(62, 63, 63);
     position: absolute;
     width: 50%;
     height: 90%;
@@ -103,10 +188,19 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
     word-break: keep-all;
     font-size: xx-large;
     color: white;
     z-index: 1;
+}
+
+.screen-msgs li{
+    list-style-type: none;
+}
+
+.random-words{
+    width: 90%;
 }
 
 .random-word{
@@ -122,6 +216,19 @@
     color: lightgreen;
 }
 
+.end-msg{
+    font-size: x-large;
+}
+
+.restart-game{
+    font-weight: bold;
+}
+
+.restart-game:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 /* chat */
 
 .chat{
@@ -132,9 +239,11 @@
 }
 
 .chat-msgs{
+    width: 97%;
     height: 93%;
     padding-left: 10px;
-    overflow-y: hidden;
+    word-break: break-all;
+    overflow: hidden;
     scroll-behavior: smooth;
 }
 
@@ -191,6 +300,75 @@
     cursor: pointer;
 }
 
+/* thicknesses */
+
+.choose-thickness{
+    height: 400%;
+    position: relative;
+    bottom: 300%;
+    display: flex;
+    flex-direction: column;
+}
+
+.current-thickness{
+    background-color: rgb(184, 181, 181);
+    height: 98%;
+    aspect-ratio: .25;
+    cursor: pointer;
+}
+
+.thickness-circle{
+    background-color: black;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+
+.thicknesses{
+    background-color: rgb(207, 204, 204);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.show-thicknesses{
+    visibility: visible;
+}
+
+.hide-thicknesses{
+    visibility: hidden;
+}
+
+.thickness-item{
+    height: 100%;
+    aspect-ratio: 1;
+}
+
+.thickness-item:hover{
+    background-color: rgb(148, 146, 146);
+}
+
+.thickness-item{
+    border-bottom: 1px solid white;
+}
+
+.small{
+    width: 30%;
+}
+
+.medium{
+    width: 50%;
+}
+
+.large{
+    width: 70%;
+}
+
+/* modes */
+
 .modes{
     display: flex;
 }
@@ -227,4 +405,72 @@
 .delete-icon{
     color: red;
     cursor: pointer;
+}
+
+/* room msg */
+
+.msg{
+    background-color: rgb(155, 58, 193);
+    z-index: 2;
+}
+
+.msg button{
+    background: transparent;
+    color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform .5s;
+}
+
+.msg button:hover{
+    transform: scale(1.1);
+}
+
+/* leave */
+.leave-room-msg{
+    width: 23%;
+}
+
+.leave-room-icon{
+    margin: 13% 0;
+}
+
+.leave-room-p{
+    width: 90%;
+    word-break: keep-all;
+}
+
+.leave-room-buttons{
+    width: 90%;
+    height: 10%;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 13%;
+}
+
+.leave-room-msg button{
+    width: 40%;
+}
+
+/* close */
+.close-room-msg{
+    width: 25%;
+}
+
+.close-room-icon{
+    margin: 11% 0;
+}
+
+.return-back-home{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.back-home-button{
+    margin-top: 9%;
+    width: 40%;
+    aspect-ratio: 3;
 }

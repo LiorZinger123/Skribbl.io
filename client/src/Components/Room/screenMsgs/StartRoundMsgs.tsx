@@ -33,25 +33,26 @@ const StartRoundMsgs = (props: Props) => {
                         const newWords: Word[] = await res.json()
                         setGetTurnWords({ getWords: true, words: newWords })
                         props.setScreenCurrentMsg({show: true , msg: 
-                            <>
+                            <div className="random-words">
                                 <p>Please choose one word</p>
                                 <ul>
                                     {newWords.map(word => (
                                         <li key={word.word} className="random-word" onClick={() => chooseWord(word)}>{word.word}</li>
                                     ))}
                                 </ul>
-                            </> 
+                            </div> 
                         })
                     }
                     else{
                         props.setScreenCurrentMsg({show: true, msg:<p>{props.painter.current} is choosing a word</p>})
                         setGetTurnWords({ getWords: true })
                     }
-                  
+                    
+                    console.log(props.painter.current, props.players[0].username)
                     if(props.painter.current === props.players[0].username){
+                        props.setRound(round => round + 1)
                         if(props.painter.current === username)
                             fetchToApi('rooms/currentround', {room: room})
-                        props.setRound(round => round + 1)
                     }
                 }                  
             }

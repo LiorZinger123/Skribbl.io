@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { SocketContext } from "../Room";
 import { useAppSelector } from "../../../store/hooks";
 import { RootState } from "../../../store/store";
-import { PlayerType } from "../../../types/RoomTypes/types"
+import { CorrectAnswerData, PlayerType } from "../../../types/RoomTypes/types"
 import FaceIcon from '@mui/icons-material/Face';
 import Face2Icon from '@mui/icons-material/Face2';
 import Face3Icon from '@mui/icons-material/Face3';
@@ -18,13 +19,35 @@ type Props = {
 
 const Player = (props: Props) => {
   
+    const socket = useContext(SocketContext)
     const username = useAppSelector((state: RootState) => state.username)
+    const [correctAnswer, setCorrectAnswer] = useState<boolean>(false)
     const faces = [<FaceIcon />, <Face2Icon />, <Face3Icon />, <Face4Icon />, <Face5Icon />, <Face6Icon />]
     const face =  useMemo(() => faces[Math.floor(Math.random() * faces.length)], [])
     const isOwner = props.player.username === username
 
+    useEffect(() => {
+        const changeColor = (data: CorrectAnswerData): void => {
+            if(props.player.username === data.username)
+                setCorrectAnswer(true)
+        }
+
+        const removeColor = (): void => {
+            if(correctAnswer)
+                setCorrectAnswer(false)
+        }
+
+        socket.on('correct', changeColor)
+        socket.on('remove_color', removeColor)
+
+        return (): void => {
+            socket.off('correct', changeColor)
+            socket.off('remove_color', removeColor)
+        }
+    })
+
     return (
-        <li className={`player ${props.index % 2 === 0 && 'player-dark'}`}>
+        <li className={`player ${props.index % 2 === 0 && 'player-dark'} ${correctAnswer && 'correct-answer'}`}>
 
             <p className='player-location'>#{props.location}</p>
             

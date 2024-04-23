@@ -18,9 +18,10 @@ const CanvasContainer = (props: Props) => {
     const [showTools, setShowTools] = useState<boolean>(false)
     const [currentColor, setCurrentColor] = useState<string>('#000000')
     const [drawLine, setDrawLine] = useState<boolean>(true)
-    const [currentWidth, setCurrentWidth] = useState<number>(5)
+    const [currentWidth, setCurrentWidth] = useState<number>(2)
     const [undo, setUndo] = useState<boolean>(false)
     const [deleteAll, setDeleteAll] = useState<boolean>(false)
+    const [roomClosed, setRoomClosed] = useState<boolean>(false)
 
     useEffect(() => {
 
@@ -32,12 +33,18 @@ const CanvasContainer = (props: Props) => {
             setShowTools(false)
         }
 
+        const disableTools = (): void => {
+            setRoomClosed(true)
+        }
+
         socket.on('start_draw', showToolBar)
         socket.on('end_turn', closeToolBar)
+        socket.on('room_closed', disableTools)
 
         return (): void => {
             socket.off('start_draw', showToolBar)
             socket.off('end_turn', closeToolBar)
+            socket.off('room_closed', disableTools)
         }
     })
 
@@ -46,9 +53,9 @@ const CanvasContainer = (props: Props) => {
             <Canvas players={props.players} setTime={props.setTime} roundTime={props.roundTime} currentColor={currentColor} drawLine={drawLine}
                 currentWidth={currentWidth} setCurrentWidth={setCurrentWidth} deleteAll={deleteAll} undo={undo} setDeleteAll={setDeleteAll} 
                 canvasParentRef={props.canvasParentRef} />
-            {showTools && 
+            {true &&
                 <ToolBar currentColor={currentColor} setCurrentColor={setCurrentColor} setDrawLine={setDrawLine}
-                setCurrentWidth={setCurrentWidth} setDeleteAll={setDeleteAll} drawLine={drawLine} deleteAll={deleteAll} setUndo={setUndo} />
+                setCurrentWidth={setCurrentWidth} setDeleteAll={setDeleteAll} drawLine={drawLine} setUndo={setUndo} />
             }
         </>
     )

@@ -21,6 +21,7 @@ const RoomInList = (props: Props) => {
   const disable = props.room.hasPassword && password.length < 3
   const [errorAnimations, setErrorAnimations] = useState<boolean>(false)
   const [showErrorMsg, setShowErrorMsg] = useState<boolean>(false)
+  const [nonExisting, setNonExisting] = useState<boolean>(false)
   const passwordRef = useRef<HTMLInputElement | null>(null)
   const errorRef = useRef<HTMLInputElement | null>(null)
 
@@ -56,6 +57,8 @@ const RoomInList = (props: Props) => {
           else
             props.setShowTokenError(true)
         }
+        else if(res.status === 404)
+          setNonExisting(true)
         else
           setShowErrorMsg(true)
     }
@@ -82,7 +85,9 @@ const RoomInList = (props: Props) => {
           onClick={() => joinRoom(props.room.id)}>Join Room</button>
   
       </li>
+
       {showErrorMsg && <p ref={errorRef} className="room-join-error">Join room {props.room.id} failed, please try again later</p>}
+      {nonExisting && <p className="non-existing-room-error">Room {props.room.id} does not exist anymore. Please refresh rooms.</p>}
     </div>
   )
 }

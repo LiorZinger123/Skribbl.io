@@ -19,6 +19,7 @@ const Chat = (props: Props) => {
   const socket = useContext(SocketContext)
   const [msg, setMsg] = useState<string>('')
   const msgsRef = useRef<HTMLDivElement>(null!)
+  const [roomClosed, setRoomClosed] = useState<boolean>(false)
 
   useEffect(() => {
 
@@ -26,12 +27,18 @@ const Chat = (props: Props) => {
       props.setMessages(messages => [...messages, { id: messages.length + 1, msg: data.msg, color: data.color}])
     }
 
+    const disableInput = (): void => {
+      setRoomClosed(true)
+    }
+
     socket.on('message', handleMsg)
     socket.on('leave_room', handleMsg)
+    socket.on('room_closed', disableInput)
 
     return (): void => {
       socket.off('message', handleMsg)
       socket.off('leave_room', handleMsg)
+      socket.off('room_closed', disableInput)
     }
 
   }, [])
@@ -46,7 +53,7 @@ const Chat = (props: Props) => {
     if(msg.toLowerCase() === props.currentWord.word.toLowerCase()){
       let newMsg = {id: props.messages.length + 1, msg: `${data.username}: ${data.msg}`, color: 'black'} //local msg to add to user's chat
       if(props.painter.current !== username){
-        socket.emit('correct', {msgData: data, currentPainter: props.painter.current, room: room}) // send msg to all the other users if not the drawer
+        socket.emit('correct', {msgData: data, room: room}) // send msg to all the other users if not the drawer
         newMsg = {...newMsg, color: 'green'} // add green color to user msg
       } 
       props.setMessages(msgs => [...msgs, newMsg]) // add msg locally
@@ -66,7 +73,8 @@ const Chat = (props: Props) => {
       </div>
 
       <form onSubmit={sendMsg}>
-        <input type="text" value={msg} onChange={e => setMsg(e.target.value)} required placeholder="Type your message here" />
+        <input type="text" value={msg} onChange={e => setMsg(e.target.value)} required placeholder="Type your message here" 
+          disabled={roomClosed} />
       </form>
 
     </div>

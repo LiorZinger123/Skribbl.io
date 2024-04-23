@@ -1,8 +1,8 @@
 import { useEffect, useContext, useState } from "react"
-import { StableNavigateContext } from "../../../App"
 import { SocketContext } from "../Room"
 import { LocationsType, PlayerType, SetConnectedPlayersType } from "../../../types/RoomTypes/types"
 import Player from "./Player"
+import RoomMsg from "../RoomMsg"
 
 type Props = {
   players: PlayerType[],
@@ -11,9 +11,10 @@ type Props = {
 
 const Players = (props: Props) => {
 
-  const nav = useContext(StableNavigateContext)
   const socket = useContext(SocketContext)
-  const [locations, setLocations] = useState<number[]>([])  
+  const [locations, setLocations] = useState<number[]>([]) 
+  const [showMsg, setShowMsg] = useState<boolean>(false)
+  const msg = 'All the players left the room.'
 
   useEffect(() => {
 
@@ -33,8 +34,7 @@ const Players = (props: Props) => {
     }
 
     const leave = (): void => {
-      //send msg to client befaore leaving
-      nav('/home')
+      setShowMsg(true)
     }
 
     socket.on('players', setConnectedPlayers)
@@ -52,11 +52,14 @@ const Players = (props: Props) => {
   }, [])
 
   return (
-    <ul className="players">
-      {props.players.map((player, i) => (
-        <Player key={player.id} player={player} index={i} location={locations[i]} />
-      ))}
-    </ul>
+    <>
+      <ul className="players">
+        {props.players.map((player, i) => (
+          <Player key={player.id} player={player} index={i} location={locations[i]} />
+        ))}
+      </ul>
+      {showMsg && <RoomMsg msg={msg} msgType="close" setShowMsg={setShowMsg} />}
+    </>
   )
 }
 

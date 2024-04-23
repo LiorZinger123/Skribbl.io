@@ -5,10 +5,8 @@ import UndoIcon from '@mui/icons-material/Undo';
 
 type Props = {
     setDrawLine: React.Dispatch<React.SetStateAction<boolean>>,
-    setCurrentWidth: React.Dispatch<React.SetStateAction<number>>,
     setDeleteAll: React.Dispatch<React.SetStateAction<boolean>>,
     drawLine: boolean,
-    deleteAll: boolean,
     setUndo: React.Dispatch<React.SetStateAction<boolean>>
 }
 

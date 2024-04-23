@@ -35,9 +35,7 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 # env
-.env.DATABASE
-.env.PORT
-.env.COOKIES_SECRET
-.env.JWT_SECRET
-.env.COOKIE_EXPIRATION_TIME
-.env.JWT_EXPIRATION_TIME
+.env
+
+# txt
+.txt

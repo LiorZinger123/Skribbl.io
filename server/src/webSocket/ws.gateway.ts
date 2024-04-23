@@ -28,11 +28,14 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         const connectedPlayers = this.roomsService.getPlayers(data.room)
         const RoomDetails = this.roomsService.getRoomDetails(data.room)
         const locations = this.roomsService.updatePlayersLocations(data.room)
+        const isOwner = this.roomsService.getOwner(data.room)
         this.server.to(socket.id).emit('players', connectedPlayers)
         this.server.to(socket.id).emit('room_details', RoomDetails)
         this.server.to(data.room).emit('locations', {locations: locations})
         this.server.to(data.room).emit('message', {msg: `${data.username} joined the room`, color: 'blue'})
         this.server.to(data.room).except(socket.id).emit('players', connectedPlayers.slice(-1))
+        if(isOwner === data.username)
+            this.server.to(socket.id).emit('show_start_button')
     }
 
     @SubscribeMessage('message')
@@ -44,7 +47,6 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     @SubscribeMessage('start_game')
     startGame(@MessageBody() data: { room: string }): void{
         this.roomsService.startPlaying(data.room)
-        this.server.to(data.room).emit('hide_start_btn')
         this.server.to(data.room).emit('start_game')
     }   
 
@@ -72,9 +74,10 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     }
     
     @SubscribeMessage('correct')
-    correctAnswer(@MessageBody() data: { msgData: msgData, currentPainter: string, room: string}, @ConnectedSocket() socket: Socket): void{
-        this.roomsService.addNewTurnScore(data.room, data.msgData.username, data.currentPainter)
+    correctAnswer(@MessageBody() data: { msgData: msgData, room: string}, @ConnectedSocket() socket: Socket): void{
+        this.roomsService.addNewTurnScore(data.room, data.msgData.username)
         this.server.to(data.room).except(socket.id).emit('message', {msg: `${data.msgData.username} guessed the word!`, color: 'green'})
+        this.server.to(data.room).emit('correct', { username: data.msgData.username })
         if(this.roomsService.checkIfAllPlayersGuested(data.room))
             this.server.to(data.room).emit('end_turn_now')
     }
@@ -90,6 +93,7 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         const locations = this.roomsService.updatePlayersLocations(data.room)
         this.server.to(data.room).emit('end_turn', {scores: scores, painter: updatedPainter, owner: owner})
         this.server.to(data.room).emit('locations', {locations: locations})
+        this.server.to(data.room).emit('remove_color')
     }
 
     @SubscribeMessage('leave_Room')
@@ -138,7 +142,9 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     restart(@MessageBody() data: {room: string}): void{
         this.roomsService.restartGame(data.room)
         const owner = this.roomsService.getOwner(data.room)
+        const locations = this.roomsService.updatePlayersLocations(data.room)
         this.server.to(data.room).emit('restart', owner)
+        this.server.to(data.room).emit('locations', {locations: locations})
     }
 
     @SubscribeMessage('start_new_game')

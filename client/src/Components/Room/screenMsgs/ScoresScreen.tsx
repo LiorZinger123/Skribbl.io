@@ -2,7 +2,7 @@ import React, { useEffect, useContext } from "react"
 import { SocketContext } from "../Room"
 import { useAppSelector } from "../../../store/hooks"
 import { RootState } from "../../../store/store"
-import { PlayerType, ScreenCurrentMsgType, ShowScoresType } from "../../../types/RoomTypes/types"
+import { PlayerType, ScreenCurrentMsgType, ShowScoresType, Word } from "../../../types/RoomTypes/types"
 
 type Props = {
     players: PlayerType[],
@@ -10,7 +10,8 @@ type Props = {
     painter: React.MutableRefObject<string>,
     round: number,
     maxRounds: number,
-    setScreenCurrentMsg: React.Dispatch<React.SetStateAction<ScreenCurrentMsgType>>
+    setScreenCurrentMsg: React.Dispatch<React.SetStateAction<ScreenCurrentMsgType>>,
+    currentWord: Word
 }
 
 const ScoresScreen = (props: Props) => {
@@ -23,12 +24,15 @@ const ScoresScreen = (props: Props) => {
         
         const showScores = (data: ShowScoresType): void => {
             props.setScreenCurrentMsg({show: true, msg:
-                <ul className="screen-msg">       
-                    {data.scores.map(playerScore => (
-                        <li key={playerScore.username} className={playerScore.score > 0 ? 'got-score' : 'zero-score'}>
-                            {playerScore.username}: {playerScore.score}</li>
-                    ))}
-                </ul>
+                <>
+                    <p>The word was: {props.currentWord.word}</p>
+                    <ul className="screen-msg">       
+                        {data.scores.map(playerScore => (
+                            <li key={playerScore.username} className={playerScore.score > 0 ? 'got-score' : 'zero-score'}>
+                                {playerScore.username}: {playerScore.score > 0 && '+'}{playerScore.score}</li>
+                        ))}
+                    </ul>
+                </>
             })
 
             props.setPlayers(players => {
@@ -41,15 +45,16 @@ const ScoresScreen = (props: Props) => {
             })
 
             setTimeout(() => {
-                if(data.painter === null){
+                if(data.painter !== null){
+                    props.painter.current = data.painter
+                    console.log("new painter", props.painter.current)
+                    if(username === data.painter)
+                        socket.emit('choose_word', {room:room})
+                }
+                else{
                     if(username === data.owner){
                         socket.emit('end_game', {room: room})
                     }
-                }
-                else{
-                    props.painter.current = data.painter
-                    if(username === data.painter)
-                        socket.emit('choose_word', {room:room})
                 }
             }, 3000)
         }   
@@ -59,7 +64,7 @@ const ScoresScreen = (props: Props) => {
         return (): void => {
             socket.off('end_turn', showScores)
         }
-    }, [])
+    }, [props.currentWord])
 
     return (
     <></>

@@ -39,6 +39,10 @@ export type LocationsType = {
     locations: number[]
 }
 
+export type CorrectAnswerData = {
+    username: string
+}
+
 export type GetTurnWordsType = {
     getWords: boolean, 
     words?: Word[]

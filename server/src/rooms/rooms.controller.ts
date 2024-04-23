@@ -4,22 +4,25 @@ import { RoomsService } from "./rooms.service";
 import { JoinRoomDto } from './dtos/joinRoom.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { NewRoomDto } from './dtos/newRoom.dto';
-// import { Throttle } from "@nestjs/throttler";
+import { SkipThrottle, Throttle } from "@nestjs/throttler";
 
+@SkipThrottle()
 @Controller('rooms')
 export class RoomsController{
+
     constructor(
         private readonly roomsService: RoomsService
     ){}
 
     @UseGuards(JwtAuthGuard)
-    // @Throttle(3, 60)
+    @SkipThrottle({ default: false })
     @Get('getrooms')
     getRooms(@Res() res: Response): void {
         res.send(this.roomsService.getRooms())
     }
 
     @UseGuards(JwtAuthGuard)
+    @SkipThrottle({ default: false })
     @Post('get_more_rooms')
     getMoreRooms(@Res() res: Response, @Body() data: { roomsLength: number }): void{
         res.send(this.roomsService.getMoreRooms(data.roomsLength))
@@ -37,19 +40,16 @@ export class RoomsController{
         const id = this.roomsService.joinRoom(data)
         if(id)
             res.status(HttpStatus.OK).send(id)
-        else
+        else if(id === null)
             res.status(HttpStatus.UNAUTHORIZED).send({message: 'wrong_password'})
+        else
+            res.sendStatus(HttpStatus.NOT_FOUND)
     }
 
     @UseGuards(JwtAuthGuard)
     @Post('createroom')
     createRoom(@Res() res: Response, @Body() data: NewRoomDto): void {
         res.status(HttpStatus.CREATED).send(this.roomsService.createRoom(data))
-    }
-
-    @Post('ifgamestarted')
-    checkIfStarted(@Res() res: Response, @Body() data: {room: string}): void{
-        res.send(this.roomsService.checkIfGameStarted(data.room))
     }
     
     @Get('words')

@@ -1,4 +1,4 @@
-import RoomInList from "../RoomInList/RoomInList"
+import RoomInList from "./RoomInList"
 import Room from "../../types/room"
 
 type Props = {

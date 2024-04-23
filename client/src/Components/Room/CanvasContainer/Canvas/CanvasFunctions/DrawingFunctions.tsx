@@ -80,7 +80,7 @@ const DrawingFunctions = (props: Props) => {
             props.canvasRef.current?.removeEventListener('click', canvasFill)
         }
     
-    }, [props.players, props.currentColor, props.drawLine])
+    }, [props.players, props.currentColor, props.drawLine, props.currentWidth])
 
   return (
     <></>
