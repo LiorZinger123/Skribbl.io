@@ -1,12 +1,97 @@
-@media screen and (min-width: 1400px){
+@media screen and (width >= 1400px){
+    .toolbar{
+        width: 100%;
+        height: 10%;
+        top: 3%;        
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .toolbar-cell{
+        height: 100%;
+    }
+
+    .colors-container{
+        width: 50%;
+    }
+
+    .choose-thickness{
+        height: 400%;
+        bottom: 300%;
+    }
+
+    .current-thickness{
+        height: 98%;
+        aspect-ratio: .25;
+    }
+}
+
+@media screen and (width <= 1400px){
+    .toolbar{
+        width: 100%;
+        height: 15%;
+        display: grid;
+        grid-template-rows: repeat(2, 47.5%);
+        grid-template-columns: repeat(2, 50%);
+        row-gap: 5%;
+    }
+
+    .toolbar-cell{
+        height: 100%;
+    }
+
+    .colors-container{
+        width: 140%;
+        margin-left: 10%;
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .modes{
+        width: 100%;
+        justify-content: center;
+        grid-column: 1 / 3;
+        grid-row: 1;
+    }       
+
+    .choose-thickness{
+        height: 200px;
+        width: 50px;
+        left: 60%;
+        bottom: 166px;
+    }
+
+    .current-thickness{
+        width: 100%;
+        aspect-ratio: 1;
+    }
+}
+
+@media screen and (width >= 1400px){
     .top-room{
         padding: 0 5% 0 7%;
     }    
+
+    .leave-room-msg{
+        width: 23%;
+    }
+
+    .close-room-msg{
+        width: 25%;
+    }
 }
 
-@media screen and (max-width: 1400px){
+@media screen and (width < 1400px){
     .top-room{
         padding: 0 5%;
+    }
+
+    .leave-room-msg{
+        width: 275px;
+    }
+
+    .close-room-msg{
+        width: 300px;
     }
 }
 
@@ -67,7 +152,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* padding: 0 5% 0 7%; */
     grid-row: 1 / 2;
     grid-column: 1 / 4;
 }
@@ -79,44 +163,49 @@
 }
 
 .top-room-right-side{
-    /* background-color: aqua; */
     width: 20%;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
-/* start button */
+/* top room buttons */
 
-.start-button{
-    background-color: #53E583;
-    width: 200%;
+.top-room-button{
+    width: 45%;
     color: white;
     font-weight: bold;
     border: none;
-    border-bottom: 4px solid #179e43;
     transition: 0.3s;
     box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.4);
-    cursor: pointer;
 }
 
-.start-button:hover {
+.top-room-buttons:hover { 
     box-shadow: 0 0 rgba(0, 0, 0, 0.4);
     border-bottom-width: 2px;
 }
 
-/* leave room button */
-
-.leave-room{
-    color: red;
-}
-
-.leave-room-button{
+.start-button{
+    background-color: #53E583;
+    border-bottom: 4px solid #179e43;
     cursor: pointer;
 }
 
-.leave-room-button:hover{
-    text-decoration: underline;
+.leave-button{
+    background-color: red;
+    border-bottom: 4px solid rgb(144, 0, 0);
+}
+
+.leave-button-enabled{
+    cursor: pointer;
+}
+
+.leave-button-disabled{
+    opacity: .3;
+}
+
+.leave-button-without-start{
+    position: relative;
+    left: 55%;
 }
 
 /* players list design */
@@ -239,7 +328,7 @@
 }
 
 .chat-msgs{
-    width: 97%;
+    width: 95%;
     height: 93%;
     padding-left: 10px;
     word-break: break-all;
@@ -270,20 +359,15 @@
 
 .toolbar{
     position: relative;
-    top: 3%;
-    width: 100%;
-    height: 10%;
-    display: flex;
-    justify-content: space-around;
 }
 
 .toolbar-cell{
-    height: 100%;
     aspect-ratio: 1;
 }
 
+/* colors */
+
 .colors-container{
-    width: 50%;
     display: flex;
     justify-content: space-between;
 }
@@ -303,17 +387,13 @@
 /* thicknesses */
 
 .choose-thickness{
-    height: 400%;
     position: relative;
-    bottom: 300%;
     display: flex;
     flex-direction: column;
 }
 
 .current-thickness{
     background-color: rgb(184, 181, 181);
-    height: 98%;
-    aspect-ratio: .25;
     cursor: pointer;
 }
 
@@ -428,9 +508,6 @@
 }
 
 /* leave */
-.leave-room-msg{
-    width: 23%;
-}
 
 .leave-room-icon{
     margin: 13% 0;
@@ -454,9 +531,6 @@
 }
 
 /* close */
-.close-room-msg{
-    width: 25%;
-}
 
 .close-room-icon{
     margin: 11% 0;

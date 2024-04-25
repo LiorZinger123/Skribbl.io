@@ -70,13 +70,11 @@ const TopRoom = (props: Props) => {
             </div>
         </div>
 
-        {/* <div> */}
-           {screenWord.word} {screenWord.length != '0' && `(${screenWord.length})`}
-        {/* </div> */}
+        {screenWord.word} {screenWord.length != '0' && `(${screenWord.length})`}
 
-        <div className={showStartButton ? "top-room-right-side" : ''}>
+        <div className={showStartButton ? "top-room-right-side" : 'top-room-right-side'}>
             {showStartButton && <StartButton setShowStartButton={setShowStartButton} players={props.players} setMessages={props.setMessages} />}
-            <LeaveRoom painter={props.painter} />
+            <LeaveRoom painter={props.painter} showStartButton={showStartButton} />
         </div>
     </div>
   )

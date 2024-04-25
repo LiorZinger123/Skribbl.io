@@ -1,5 +1,5 @@
 import React from "react"
-import ThicknessItem from "./thicknessItem"
+import ThicknessItem from "./ThicknessItem"
 
 type Props = {
   showThicknesses: boolean,
@@ -12,7 +12,7 @@ const CanvasThicknesses = (props: Props) => {
     const listThiclnesses = ['large', 'medium', 'small']
 
   return (
-    <div className={`thicknesses ${props.showThicknesses ? 'show-thicknesses' : 'hide-thicknesses'}`} onMouseEnter={() => props.setShowThicknesses(true)} onMouseLeave={() => props.setShowThicknesses(false)}>
+    <div className={`thicknesses ${props.showThicknesses ? 'show-thicknesses' : 'hide-thicknesses'}`} onClick={() => props.setShowThicknesses(false)} onMouseEnter={() => props.setShowThicknesses(true)} onMouseLeave={() => props.setShowThicknesses(false)}>
       {listThiclnesses.map(item => (
         <ThicknessItem key={item} size={item} setCurrentThickness={props.setCurrentThickness} />
       ))}

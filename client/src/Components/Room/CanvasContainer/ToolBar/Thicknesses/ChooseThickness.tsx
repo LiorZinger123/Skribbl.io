@@ -14,8 +14,7 @@ const ChooseThickness = (props: Props) => {
   return (
     <div className="choose-thickness">
         {<CanvasThicknesses showThicknesses={showThicknesses} setShowThicknesses={setShowThicknesses} setCurrentThickness={setCurrentThickness} />}
-        <CurrentThickness currentThickness={currentThickness} setShowThicknesses={setShowThicknesses} 
-          setCurrentWidth={props.setCurrentWidth} />
+        <CurrentThickness currentThickness={currentThickness} setShowThicknesses={setShowThicknesses} setCurrentWidth={props.setCurrentWidth} />
     </div>
   )
 }

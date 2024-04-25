@@ -53,7 +53,7 @@ const CanvasContainer = (props: Props) => {
             <Canvas players={props.players} setTime={props.setTime} roundTime={props.roundTime} currentColor={currentColor} drawLine={drawLine}
                 currentWidth={currentWidth} setCurrentWidth={setCurrentWidth} deleteAll={deleteAll} undo={undo} setDeleteAll={setDeleteAll} 
                 canvasParentRef={props.canvasParentRef} />
-            {true &&
+            {showTools && !roomClosed &&
                 <ToolBar currentColor={currentColor} setCurrentColor={setCurrentColor} setDrawLine={setDrawLine}
                 setCurrentWidth={setCurrentWidth} setDeleteAll={setDeleteAll} drawLine={drawLine} setUndo={setUndo} />
             }

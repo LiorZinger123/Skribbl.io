@@ -25,9 +25,7 @@ const StartButton = (props: Props) => {
     }
 
   return (
-    <div className="start-button-div">
-        <button className="start-button" onClick={startGame}>START</button>
-    </div>
+    <button className="top-room-button start-button top-room-buttons" onClick={startGame}>START</button>
   )
 }
 

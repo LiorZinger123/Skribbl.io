@@ -3,7 +3,8 @@ import { SocketContext } from "./Room"
 import RoomMsg from "./RoomMsg"
 
 type Props = {
-    painter: React.MutableRefObject<string>
+    painter: React.MutableRefObject<string>,
+    showStartButton: boolean
 }
 
 const LeaveRoom = (props: Props) => {
@@ -25,18 +26,15 @@ const LeaveRoom = (props: Props) => {
       }
     }, [])
 
-    console.log('before', showMsg)
     const handleClick = (): void => {
-      console.log('out', showMsg)
-      if(!showMsg && !roomClosed){
-        console.log('in', showMsg)
-        setShowMsg(true)    
-      }
+      if(!roomClosed)
+        setShowMsg(true)
     }
 
   return (
     <>
-        <p className={`leave-room ${!showMsg && !roomClosed && 'leave-room-button'}`} onClick={handleClick}>Leave Room</p>
+        <button className={`top-room-button leave-button ${!showMsg ? 'top-room-buttons leave-button-enabled' : 'leave-button-disabled'} 
+          ${!props.showStartButton && 'leave-button-without-start'}`} onClick={handleClick} disabled={showMsg}>Leave</button>
         {showMsg && <RoomMsg msg={msg} msgType='leave' setShowMsg={setShowMsg} painter={props.painter} />}
     </>
   )
