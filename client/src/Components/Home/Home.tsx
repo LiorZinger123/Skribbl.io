@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import Room from "../../types/room"
+import { useState, useEffect, useRef } from "react"
+import { Room } from "../../types/HomeTypes/homeTypes"
 import { fetchToApi, getFromApi } from "../../Api/fetch"
 import Rooms from "./Rooms"
 import { useAppSelector } from "../../store/hooks"
@@ -14,6 +14,8 @@ const Home = () => {
 
     const username = useAppSelector((state: RootState) => state.username)
     const [rooms, setRooms] = useState<Room[]>([])
+    const roomsLength = useRef<number>(0)
+    const homeRef = useRef<HTMLDivElement | null>(null)
     const [showError, setShowError] = useState<boolean>(false)
     const [search, setSearch] = useState<string>('')
     const [searchRooms, setSearchRooms] = useState<Room[]>([])
@@ -21,26 +23,31 @@ const Home = () => {
     const [refreshTime, setRefreshTime] = useState<number>(0)
     const [showTokenError, setShowTokenError] = useState<boolean>(false)
     const [showRefreshError, setShowRefreshError] = useState<boolean>(false)
-
+    const [lazyLoadingError, setLazyLoadingError] = useState<boolean>(false)
+    
     useEffect(() => {
-
-      const onScroll = async (e: any): Promise<void> => { //change type
-        if(e.currentTarget.scrollHeight - e.currentTarget.scrollTop === e.currentTarget.clientHeight){
+      
+      const onScroll = async (): Promise<void> => {
+        if(window.scrollY + window.innerHeight === homeRef.current?.scrollHeight){
           try{
-            const res = await fetchToApi('rooms/get_more_room', {roomsLength: rooms.length})
+            const res = await fetchToApi('rooms/get_more_rooms', {roomsLength: roomsLength.current})
             if(res.ok){
-              const moreRooms = await res.json()
-              setRooms(rooms => [...rooms, ...moreRooms])
+              const data = await res.json()
+              setRooms(rooms => [...rooms, ...data.rooms])
+              roomsLength.current += data.count
+              setLazyLoadingError(false)
             }
             else if(res.status === 401)
               setShowTokenError(true)
+            else
+              setLazyLoadingError(true)
           }
-          catch(e){
-            throw e 
+          catch{
+            setLazyLoadingError(true)
           }
         }
       }
-
+  
       getRoomsFromApi()
       window.addEventListener('scroll', onScroll)
 
@@ -54,6 +61,7 @@ const Home = () => {
         const res = await getFromApi('rooms/getrooms')
         if(res.ok){
           setRooms(await res.json())
+          roomsLength.current = 10
           if(showError)
             setShowError(false)
           if(showRefreshError)
@@ -73,7 +81,7 @@ const Home = () => {
 
   return (
     <>
-      <div className={`home ${showTokenError ? 'home-when-error' : null}`}>
+      <div className={`home ${showTokenError ? 'home-when-error' : null}`} ref={homeRef}>
         <h1 className="title">WELCOME TO SKRIBBL.IO</h1>
           
           <div className="disconnect-div">
@@ -95,6 +103,8 @@ const Home = () => {
                 : <p>Too many refreshes, try again later.</p>
               ) 
           }
+
+          {lazyLoadingError && <p className="lazy-loading-error">An error has occurred while loading more rooms. Please try again later.</p>}
 
           <CreateButton setShowTokenError={setShowTokenError} />
       </div>

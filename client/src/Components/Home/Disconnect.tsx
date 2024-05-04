@@ -12,9 +12,7 @@ const Disconnect = () => {
     }
 
     return (
-        <>
-            <a className='disconnect-link' onClick={handleDisconnect}>Disconnect</a>
-        </>
+        <a className='disconnect-link' onClick={handleDisconnect}>Disconnect</a>
     )
 }
 

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useContext } from "react"
 import { SocketContext } from "../../Room"
-import { Drawings, PlayerType } from "../../../../types/RoomTypes/types"
+import { Drawings } from "../../../../types/RoomTypes/types"
 import Undo from "./CanvasFunctions/Undo"
 import DeleteAll from "./CanvasFunctions/DeleteAll"
 import UpdateDrawing from "./CanvasFunctions/UpdateDrawing"
@@ -8,7 +8,6 @@ import DrawingFunctions from "./CanvasFunctions/DrawingFunctions"
 import TurnFunctions from "./CanvasFunctions/TurnFunctions"
 
 type Props = {
-    players: PlayerType[],
     setTime: React.Dispatch<React.SetStateAction<number>>,
     roundTime: React.MutableRefObject<number>,
     currentColor: string,
@@ -47,13 +46,19 @@ const Canvas = (props: Props) => {
             setRoomClosed(true)
         }
 
+        const updateDrawing = (drawing: string): void => {
+            setDrawing(drawing)
+        }
+
         resize()
         window.addEventListener('resize', resize)
         socket.on('room_closed', stopCanvasFunctions)
+        socket.on("update_drawing", updateDrawing)
 
         return (): void => {
             window.removeEventListener('resize', resize)
             socket.off('room_closed', stopCanvasFunctions)
+            socket.off("update_drawing", updateDrawing)
         }
         
     }, [])
@@ -66,7 +71,7 @@ const Canvas = (props: Props) => {
                     <TurnFunctions setTime={props.setTime} roundTime={props.roundTime} canvasRef={canvasRef} contextRef={contextRef} 
                         previusDrawings={previusDrawings} canDraw={canDraw} />
                     <DrawingFunctions previusDrawings={previusDrawings} canvasRef={canvasRef} setDrawing={setDrawing} contextRef={contextRef} 
-                        drawLine={props.drawLine} currentColor={props.currentColor} currentWidth={props.currentWidth} players={props.players} canDraw={canDraw} />
+                        drawLine={props.drawLine} currentColor={props.currentColor} currentWidth={props.currentWidth} canDraw={canDraw} />
                     <UpdateDrawing drawing={drawing} contextRef={contextRef} />
                     <DeleteAll canvasRef={canvasRef} contextRef={contextRef} deleteAll={props.deleteAll} /> 
                     <Undo previusDrawings={previusDrawings} setDrawing={setDrawing} undo={props.undo} setDeleteAll={props.setDeleteAll} />

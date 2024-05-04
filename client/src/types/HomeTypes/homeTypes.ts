@@ -1,11 +1,9 @@
-import PlayerType from "./RoomTypes/playerType"
+import { PlayerType } from "../RoomTypes/types"
 
-type Room = {
+export type Room = {
     id: string,
     name: string
     hasPassword: boolean,
     connectedPlayers: PlayerType[],
     maxPlayers: number
 }
-
-export default Room

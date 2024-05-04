@@ -1,3 +1,5 @@
+import { Word } from "src/schemas/words.schema"
+
 type Room = {
     id: string,
     name: string,
@@ -11,7 +13,9 @@ type Room = {
     currentPlayerPos: number,
     startPlaying: boolean,
     turnScores: playerTurnScore[]
-    currentDrawing: string
+    currentDrawing: string,
+    currentWord: Word,
+    currentPainter: string
 }
 
 export type ConnectedPlayersType = {

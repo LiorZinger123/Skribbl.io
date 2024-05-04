@@ -2,7 +2,7 @@ import { useEffect, useContext, useState } from "react"
 import { SocketContext } from "../Room"
 import { LocationsType, PlayerType, SetConnectedPlayersType } from "../../../types/RoomTypes/types"
 import Player from "./Player"
-import RoomMsg from "../RoomMsg"
+import RoomMsg from "../RoomMsg/RoomMsg"
 
 type Props = {
   players: PlayerType[],
@@ -58,7 +58,7 @@ const Players = (props: Props) => {
           <Player key={player.id} player={player} index={i} location={locations[i]} />
         ))}
       </ul>
-      {showMsg && <RoomMsg msg={msg} msgType="close" setShowMsg={setShowMsg} />}
+      {showMsg && <RoomMsg msg={msg} msgType="close" />}
     </>
   )
 }

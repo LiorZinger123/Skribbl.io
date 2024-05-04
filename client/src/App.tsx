@@ -7,6 +7,7 @@ import Home from "./Components/Home/Home";
 import Room from "./Components/Room/Room";
 import CreateRoom from "./Components/CreateRoom/CreateRoom";
 import './design/css'
+import './App.css'
 
 export const StableNavigateContext = createContext<NavigateFunction>(null!)
 

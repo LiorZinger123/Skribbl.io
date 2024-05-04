@@ -22,7 +22,7 @@ type Props = {
 const ScreenMsgs = (props: Props) => {
 
   const socket = useContext(SocketContext)
-  const [screenCurrentMsg, setScreenCurrentMsg] = useState<ScreenCurrentMsgType>({show: false, msg: ''}) //change type any in types
+  const [screenCurrentMsg, setScreenCurrentMsg] = useState<ScreenCurrentMsgType>({show: false, msg: ''})
   const [roomClosed, setRoomClosed] = useState<boolean>(false)
 
   useEffect(() => {

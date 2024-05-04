@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react"
-import { SocketContext } from "./Room"
-import { Word, PlayerType, ChatMessage } from "../../types/RoomTypes/types"
-import { useAppSelector } from "../../store/hooks"
-import { RootState } from "../../store/store"
+import { SocketContext } from "../Room"
+import { Word, PlayerType, ChatMessage } from "../../../types/RoomTypes/types"
+import { useAppSelector } from "../../../store/hooks"
+import { RootState } from "../../../store/store"
 import StartButton from "./StartButton"
 import LeaveRoom from "./LeaveRoom"
 
@@ -28,6 +28,11 @@ const TopRoom = (props: Props) => {
             setShowStartButton(true)
         }
 
+        const ownerLeft = (newOwner: string): void => {
+            if(newOwner === username)
+                setShowStartButton(true)
+        }
+
         const setToWaiting = (): void => {
             setScreenWord({word: 'Waiting', length: '0'})
         }
@@ -37,7 +42,7 @@ const TopRoom = (props: Props) => {
                 setScreenWord({word: currentWord.word, length: currentWord.length})
             else{
                 const wordArray = [...currentWord.word].map(char => {
-                    if(char != ' ' && char != '-')
+                    if(char != ' ' && char != '-' && char != '.')
                         return '_'
                     return char
                 })
@@ -46,14 +51,18 @@ const TopRoom = (props: Props) => {
         }
 
         socket.on('show_start_button', showButton)
+        socket.on('owner_left', ownerLeft)
         socket.on('choose_word', setToWaiting)
         socket.on('start_turn', setWord)
+        socket.on('join_turn', setWord)
         socket.on('restart', setToWaiting)
 
         return (): void => {
             socket.off('show_start_button', showButton)
+            socket.off('owner_left', ownerLeft)
             socket.off('choose_word', setToWaiting)
             socket.off('start_turn', setWord)
+            socket.off('join_turn', setWord)
             socket.off('restart', setToWaiting)
         } 
     }, [])

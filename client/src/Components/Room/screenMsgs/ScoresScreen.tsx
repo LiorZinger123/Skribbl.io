@@ -47,7 +47,7 @@ const ScoresScreen = (props: Props) => {
             setTimeout(() => {
                 if(data.painter !== null){
                     props.painter.current = data.painter
-                    console.log("new painter", props.painter.current)
+                    props.currentWord.word = ''
                     if(username === data.painter)
                         socket.emit('choose_word', {room:room})
                 }

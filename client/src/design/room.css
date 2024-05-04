@@ -536,14 +536,14 @@
     margin: 11% 0;
 }
 
-.return-back-home{
+.return-back{
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.back-home-button{
+.return-back-button{
     margin-top: 9%;
     width: 40%;
     aspect-ratio: 3;

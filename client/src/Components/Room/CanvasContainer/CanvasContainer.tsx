@@ -2,10 +2,8 @@ import { useEffect, useState, useContext } from "react"
 import { SocketContext } from "../Room"
 import Canvas from "./Canvas/Canvas"
 import ToolBar from "./ToolBar/ToolBar"
-import { PlayerType } from "../../../types/RoomTypes/types"
 
 type Props = {
-    players: PlayerType[],
     setTime: React.Dispatch<React.SetStateAction<number>>,
     roundTime: React.MutableRefObject<number>,
     currentPainter: React.MutableRefObject<string>,
@@ -50,7 +48,7 @@ const CanvasContainer = (props: Props) => {
 
     return (
         <>
-            <Canvas players={props.players} setTime={props.setTime} roundTime={props.roundTime} currentColor={currentColor} drawLine={drawLine}
+            <Canvas setTime={props.setTime} roundTime={props.roundTime} currentColor={currentColor} drawLine={drawLine}
                 currentWidth={currentWidth} setCurrentWidth={setCurrentWidth} deleteAll={deleteAll} undo={undo} setDeleteAll={setDeleteAll} 
                 canvasParentRef={props.canvasParentRef} />
             {showTools && !roomClosed &&

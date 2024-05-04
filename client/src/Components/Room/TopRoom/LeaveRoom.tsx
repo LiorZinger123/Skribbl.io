@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react"
-import { SocketContext } from "./Room"
-import RoomMsg from "./RoomMsg"
+import { SocketContext } from "../Room"
+import RoomMsg from "../RoomMsg/RoomMsg"
 
 type Props = {
     painter: React.MutableRefObject<string>,

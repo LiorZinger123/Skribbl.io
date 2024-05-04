@@ -1,14 +1,14 @@
 import { useEffect, useState, useContext, useRef } from 'react';
-import { SocketContext } from "./Room"
-import { useAppSelector } from "../../store/hooks"
-import { RootState } from "../../store/store"
-import { StableNavigateContext } from '../../App';
+import { SocketContext } from "../Room"
+import { useAppSelector } from "../../../store/hooks"
+import { RootState } from "../../../store/store"
+import { StableNavigateContext } from '../../../App';
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 
 type Props = {
     msg: string,
     msgType: string,
-    setShowMsg: React.Dispatch<React.SetStateAction<boolean>>,
+    setShowMsg?: React.Dispatch<React.SetStateAction<boolean>>,
     painter?: React.MutableRefObject<string>
 }
 
@@ -26,17 +26,19 @@ const RoomMsg = (props: Props) => {
 
     useEffect(() => {
         const handleClick = (e: MouseEvent): void => {
-            if(!msgRef.current?.contains(e.target as Node))
+            if(!msgRef.current?.contains(e.target as Node) && props.setShowMsg)
                 props.setShowMsg(false)
         }
 
-        if(props.msgType === 'close'){
+        if(props.msgType !== 'leave'){
+            const navUrl = props.msgType === 'close' ? '/home' : '/'
+
             intervalRef.current = setInterval(() => {
                 setTime(t => t - 1)
             }, 1000)
             
             timeoutRef.current = setTimeout(() => {
-                nav('/home')
+                nav(navUrl)
             }, 1000 * time)    
         }  
         else{
@@ -64,16 +66,24 @@ const RoomMsg = (props: Props) => {
     <div className={`sliding-msg msg ${props.msgType === 'leave' ? 'leave-room-msg' : 'close-room-msg'}`} ref={msgRef}>
         <SentimentVeryDissatisfiedIcon className={`sliding-msg-icon ${props.msgType === 'leave' ? 'leave-room-icon' : 'close-room-icon'}`} fontSize='large' />
         <p className='leave-room-p'>{props.msg}</p>
+
         {props.msgType === 'leave'
             ? <div className='leave-room-buttons'>
                 <button onClick={leaveRoom}>Yes</button>
-                <button onClick={() => props.setShowMsg(false)}>No</button>
-            </div>
+                <button onClick={() => props.setShowMsg && props.setShowMsg(false)}>No</button>
+            </div> :
 
-            : <div className='return-back-home'>
-                <p>Your will return to home in {time} seconds</p>
-                <button className='back-home-button' onClick={() => nav('/home')}>Back Home</button>
+            props.msgType === 'close' ?
+            <div className='return-back'>
+                <p>Your will return to home page in {time} seconds</p>
+                <button className='return-back-button' onClick={() => nav('/home')}>Back Home</button>
+            </div> :
+
+            <div className='return-back'>
+                <p>Your will return to login page in {time} seconds</p>
+                <button className='return-back-button' onClick={() => nav('/')}>Back to login</button>
             </div>
+            
         }
     </div>
   )

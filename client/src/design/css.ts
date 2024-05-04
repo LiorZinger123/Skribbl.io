@@ -1,4 +1,3 @@
-import '../App.css'
 import './authorization.css';
 import './login.css';
 import './signin.css';

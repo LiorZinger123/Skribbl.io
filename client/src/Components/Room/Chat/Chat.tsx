@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useContext, useRef } from "react"
-import { SocketContext } from "./Room"
-import { ChatMessage, CorrectMsgFromServer } from "../../types/RoomTypes/types"
-import { useAppSelector } from "../../store/hooks"
-import { RootState } from "../../store/store"
-import { Word } from "../../types/RoomTypes/types"
+import { SocketContext } from "../Room" 
+import { ChatMessage, CorrectMsgFromServer } from "../../../types/RoomTypes/types"
+import { useAppSelector } from "../../../store/hooks"
+import { RootState } from "../../../store/store"
+import { Word } from "../../../types/RoomTypes/types"
 
 type Props = {
     messages: ChatMessage[],
@@ -24,7 +24,7 @@ const Chat = (props: Props) => {
   useEffect(() => {
 
     const handleMsg = (data: CorrectMsgFromServer): void => {
-      props.setMessages(messages => [...messages, { id: messages.length + 1, msg: data.msg, color: data.color}])
+      props.setMessages(messages => [...messages, { id: Date.now(), msg: data.msg, color: data.color}])
     }
 
     const disableInput = (): void => {
@@ -51,7 +51,7 @@ const Chat = (props: Props) => {
     e.preventDefault()
     const data = {msg: msg, username: username}
     if(msg.toLowerCase() === props.currentWord.word.toLowerCase()){
-      let newMsg = {id: props.messages.length + 1, msg: `${data.username}: ${data.msg}`, color: 'black'} //local msg to add to user's chat
+      let newMsg = {id: Date.now(), msg: `${data.username}: ${data.msg}`, color: 'black'} //local msg to add to user's chat
       if(props.painter.current !== username){
         socket.emit('correct', {msgData: data, room: room}) // send msg to all the other users if not the drawer
         newMsg = {...newMsg, color: 'green'} // add green color to user msg
@@ -73,7 +73,7 @@ const Chat = (props: Props) => {
       </div>
 
       <form onSubmit={sendMsg}>
-        <input type="text" value={msg} onChange={e => setMsg(e.target.value)} required placeholder="Type your message here" 
+        <input id='chat' type="text" value={msg} onChange={e => setMsg(e.target.value)} required placeholder="Type your message here" 
           disabled={roomClosed} />
       </form>
 

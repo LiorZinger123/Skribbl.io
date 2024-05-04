@@ -1,4 +1,4 @@
-import React from "react"
+import React, { JSXElementConstructor, ReactElement } from "react"
 import { number } from "zod"
 
 export type drawStarightLineType = {
@@ -67,7 +67,7 @@ export type RoomDetails = {
 
 export type ScreenCurrentMsgType = {
     show: boolean,
-    msg: any //change
+    msg: ReactElement | string
 }
 
 export type ShowScoresType = {
@@ -79,4 +79,10 @@ export type ShowScoresType = {
 export type EndMsgInfoType = {
     winnerMsg: string,
     owner: string
+}
+
+export type WhileDrawing = {
+    time: number,
+    round: number,
+    word: Word
 }

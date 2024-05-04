@@ -76,7 +76,7 @@ const CreateRoom = () => {
         
         <div className='room-setting'>
           <label htmlFor="password">Set Password:</label>
-          <input {...register('password')} id='pass' className={disablePass ? 'password-disabled' : 'password-enabled'}
+          <input {...register('password')} id='password' className={disablePass ? 'password-disabled' : 'password-enabled'}
             placeholder="Enter Password" disabled={disablePass} type='password' required />
           {errors.password && <div className='create-room-error'>Password must contain 3 characters!</div>}
         </div>

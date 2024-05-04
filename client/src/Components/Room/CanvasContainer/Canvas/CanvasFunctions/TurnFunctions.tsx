@@ -20,7 +20,7 @@ const TurnFunctions = (props: Props) => {
 
     const intervalRef = useRef<NodeJS.Timeout>(null!)
     const timeoutRef = useRef<NodeJS.Timeout>(null!)
-
+    
     useEffect(() => { // turn functions
 
         const startTurn = (): void => {
@@ -30,12 +30,14 @@ const TurnFunctions = (props: Props) => {
                 props.contextRef.current.fillStyle = 'white'
                 props.contextRef.current.fillRect(0 , 0, props.canvasRef.current?.width!, props.canvasRef.current?.height!)
             }
-            
+
             intervalRef.current = setInterval(() => {
-                props.setTime(time => time - 1)
-                if(props.canDraw.current)
+                if(props.canDraw.current){
+                    props.setTime(time => time - 1)
                     socket.emit('tick', {room: room})
+                }
             }, 1000)
+
             timeoutRef.current = setTimeout(() => {
                 endTurn()
             }, props.roundTime.current * 1000)
@@ -55,18 +57,26 @@ const TurnFunctions = (props: Props) => {
             props.canDraw.current = true
         }
 
+        const tick = (time: number): void => {
+            props.setTime(time)
+        }
+
         const endTurnNow = (): void =>{
             clearTimeout(timeoutRef.current)
             endTurn()
         }
 
         socket.on('start_turn', startTurn)
+        socket.on('join_turn', startTurn)
         socket.on('start_draw', enableDrawing)
+        socket.on('tick', tick)
         socket.on('end_turn_now', endTurnNow)
 
         return (): void => {
             socket.off('start_turn', startTurn)
+            socket.off('join_turn', startTurn)
             socket.off('start_draw', enableDrawing)
+            socket.off('tick', tick)
             socket.off('end_turn_now', endTurn)
             clearInterval(intervalRef.current)
             clearTimeout(timeoutRef.current)

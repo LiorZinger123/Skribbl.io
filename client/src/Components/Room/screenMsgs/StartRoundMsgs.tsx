@@ -48,7 +48,6 @@ const StartRoundMsgs = (props: Props) => {
                         setGetTurnWords({ getWords: true })
                     }
                     
-                    console.log(props.painter.current, props.players[0].username)
                     if(props.painter.current === props.players[0].username){
                         props.setRound(round => round + 1)
                         if(props.painter.current === username)
@@ -56,8 +55,8 @@ const StartRoundMsgs = (props: Props) => {
                     }
                 }                  
             }
-            catch{
-                //fill error
+            catch(e){
+                throw e
             }
         }
 

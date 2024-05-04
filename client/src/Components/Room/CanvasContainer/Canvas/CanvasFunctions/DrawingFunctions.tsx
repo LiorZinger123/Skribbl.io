@@ -2,7 +2,7 @@ import { useRef, useEffect, useContext } from "react"
 import { useAppSelector } from "../../../../../store/hooks"
 import { SocketContext } from "../../../Room"
 import { RootState } from "../../../../../store/store"
-import { Drawings, PlayerType, Point } from "../../../../../types/RoomTypes/types"
+import { Drawings, Point } from "../../../../../types/RoomTypes/types"
 import DrawStarightLine from "./DrawStraightLine.ts"
 
 type Props = {
@@ -13,7 +13,6 @@ type Props = {
     drawLine: boolean,
     currentColor: string,
     currentWidth: number,
-    players: PlayerType[],
     canDraw: React.MutableRefObject<boolean>
 }
 
@@ -80,7 +79,7 @@ const DrawingFunctions = (props: Props) => {
             props.canvasRef.current?.removeEventListener('click', canvasFill)
         }
     
-    }, [props.players, props.currentColor, props.drawLine, props.currentWidth])
+    }, [props.currentColor, props.drawLine, props.currentWidth])
 
   return (
     <></>

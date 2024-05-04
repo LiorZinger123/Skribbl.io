@@ -44,7 +44,7 @@ const Player = (props: Props) => {
             socket.off('correct', changeColor)
             socket.off('remove_color', removeColor)
         }
-    })
+    }, [correctAnswer])
 
     return (
         <li className={`player ${props.index % 2 === 0 && 'player-dark'} ${correctAnswer && 'correct-answer'}`}>

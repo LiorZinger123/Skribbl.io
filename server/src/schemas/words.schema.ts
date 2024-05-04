@@ -12,8 +12,6 @@ export class Word{
     @Prop({ required: true })
     length: string
 
-    @Prop({ required: true })
-    id: number
 }
 
 export const WordSchema = SchemaFactory.createForClass(Word)

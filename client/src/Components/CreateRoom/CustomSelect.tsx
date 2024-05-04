@@ -74,7 +74,7 @@ const CustomSelect = (props: Props) => {
         })
     }
 
-    const handleSelectChange = (e: SingleValue<{ value: string | number, label: string | number }>, id: string): void => {
+    const handleSelectChange = (e: SingleValue<{ value: string | number, label: string | number }>): void => {
         if(typeof e?.value === 'number')
             props.updateRoomSettings(props.setting.id, e.value)
         else{
@@ -88,7 +88,7 @@ const CustomSelect = (props: Props) => {
   return (
     <div className="select-container">
         <Select options={options} className="select-box" styles={colourStyles}
-            defaultValue={options[0]} onChange={e => handleSelectChange(e, props.setting.id)} isSearchable={false} />
+            defaultValue={options[0]} onChange={handleSelectChange} isSearchable={false} />
     </div>
   )
 }

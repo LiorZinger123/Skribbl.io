@@ -31,9 +31,7 @@ const Search = (props: Props) => {
     }
 
     return (
-        <>
-            <input className="search-bar" type="text" value={props.search} onChange={handleChange} placeholder="Search Room" />
-        </>
+        <input id='search' className="search-bar" type="text" value={props.search} onChange={handleChange} placeholder="Search Room" />
     )
 }
 

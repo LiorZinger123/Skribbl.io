@@ -19,9 +19,10 @@ const Undo = (props: Props) => {
     useEffect(() => {
         const prevDrawing = props.previusDrawings.current.pop()
         if(props.previusDrawings.current.length > 0){
-            if(typeof prevDrawing === 'string')
+            if(typeof prevDrawing === 'string'){
                 props.setDrawing(prevDrawing)
-                socket.emit('drawing', {drawing: prevDrawing, room: room})                
+                socket.emit('drawing', {drawing: prevDrawing, room: room})
+            }                
         }
         else
             props.setDeleteAll(del => !del)

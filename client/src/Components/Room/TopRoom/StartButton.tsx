@@ -1,8 +1,8 @@
 import React, { useContext } from "react"
-import { SocketContext } from "./Room"
-import { useAppSelector } from "../../store/hooks"
-import { RootState } from "../../store/store"
-import { PlayerType, ChatMessage } from "../../types/RoomTypes/types"
+import { SocketContext } from "../Room"
+import { useAppSelector } from "../../../store/hooks"
+import { RootState } from "../../../store/store"
+import { PlayerType, ChatMessage } from "../../../types/RoomTypes/types"
 
 type Props = {
     setShowStartButton: React.Dispatch<React.SetStateAction<boolean>>,
