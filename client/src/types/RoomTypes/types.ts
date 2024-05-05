@@ -1,5 +1,4 @@
-import React, { JSXElementConstructor, ReactElement } from "react"
-import { number } from "zod"
+import React, { ReactElement } from "react"
 
 export type drawStarightLineType = {
     e: MouseEvent,
@@ -67,7 +66,19 @@ export type RoomDetails = {
 
 export type ScreenCurrentMsgType = {
     show: boolean,
-    msg: ReactElement | string
+    msg: ReactElement | null
+}
+
+export type JoinWhileScreenMsg = {
+    msg: string,
+    time: number
+}
+
+export type SerializedElement = {
+    type: string,
+    props: {
+      children?: (SerializedElement | string)[]
+    }
 }
 
 export type ShowScoresType = {

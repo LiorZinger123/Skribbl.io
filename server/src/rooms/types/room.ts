@@ -15,7 +15,9 @@ type Room = {
     turnScores: playerTurnScore[]
     currentDrawing: string,
     currentWord: Word,
-    currentPainter: string
+    currentPainter: string,
+    screenStatus: string,
+    currentMsg: string
 }
 
 export type ConnectedPlayersType = {

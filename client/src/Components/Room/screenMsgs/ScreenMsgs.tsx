@@ -1,10 +1,7 @@
-import React, { useEffect, useState, useContext } from "react"
+import React, { useEffect, useState, useContext, createElement } from "react"
 import { SocketContext } from "../Room"
-import { PlayerType, ScreenCurrentMsgType } from "../../../types/RoomTypes/types"
-import StartMsg from "./StartMsg"
-import StartRoundMsgs from "./StartRoundMsgs"
-import ScoresScreen from "./ScoresScreen"
-import EndMsg from "./EndMsg"
+import { JoinWhileScreenMsg, PlayerType, ScreenCurrentMsgType, SerializedElement } from "../../../types/RoomTypes/types"
+import ScreenMsgsFunctions from "./ScreenMsgsFunctions/ScreenMsgsFunctions"
 import { Word } from "../../../types/RoomTypes/types"
 
 type Props = {
@@ -22,17 +19,38 @@ type Props = {
 const ScreenMsgs = (props: Props) => {
 
   const socket = useContext(SocketContext)
-  const [screenCurrentMsg, setScreenCurrentMsg] = useState<ScreenCurrentMsgType>({show: false, msg: ''})
+  const [screenCurrentMsg, setScreenCurrentMsg] = useState<ScreenCurrentMsgType>({show: false, msg: null})
   const [roomClosed, setRoomClosed] = useState<boolean>(false)
 
   useEffect(() => {
+    const createJSXFromSerialized = (serializedElement: string | SerializedElement): JSX.Element => {
+      const {type, props} = typeof serializedElement === 'string' ? JSON.parse(serializedElement) : serializedElement
+      const children = props ? props.children.map((child: string | SerializedElement) => {
+        if(typeof child === 'string' || typeof child === 'number')
+          return child
+        else
+          return createJSXFromSerialized(child)
+      })
+      : undefined
+      return createElement(type, {...props, children})
+    }
+    
+    const setCurrentScreenStatus = (data: JoinWhileScreenMsg): void => {
+      const jsxElement = createJSXFromSerialized(data.msg)
+      setScreenCurrentMsg({show: true, msg: jsxElement})
+      if(data.time !== props.roundTime.current)
+        props.setTime(data.time)
+    }
+
     const disableScreen = (): void => {
       setRoomClosed(true)
     }
 
+    socket.on('join_while_msg', setCurrentScreenStatus)
     socket.on('room_closed', disableScreen)
 
     return (): void => {
+      socket.off('join_while_msg', setCurrentScreenStatus)  
       socket.off('room_closed', disableScreen)
     }
   }, [])
@@ -42,10 +60,7 @@ const ScreenMsgs = (props: Props) => {
       {!roomClosed && 
         <div className={screenCurrentMsg.show ? "screen-msgs" : ""}> 
           {screenCurrentMsg.show && screenCurrentMsg.msg}
-          <StartMsg players={props.players} painter={props.painter} setScreenCurrentMsg={setScreenCurrentMsg} />
-          <StartRoundMsgs players={props.players} painter={props.painter} setRound={props.setRound} setTime={props.setTime} roundTime={props.roundTime} setScreenCurrentMsg={setScreenCurrentMsg} />
-          <ScoresScreen players={props.players} painter={props.painter} setPlayers={props.setPlayers} round={props.round} maxRounds={props.maxRounds} setScreenCurrentMsg={setScreenCurrentMsg} currentWord={props.currentWord} />
-          <EndMsg setRound={props.setRound} setPlayers={props.setPlayers} setScreenCurrentMsg={setScreenCurrentMsg} />
+          {<ScreenMsgsFunctions {...props} setScreenCurrentMsg={setScreenCurrentMsg} />}
         </div>
       }
     </>

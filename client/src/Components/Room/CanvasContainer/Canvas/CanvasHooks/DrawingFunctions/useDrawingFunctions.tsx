@@ -1,9 +1,9 @@
 import { useRef, useEffect, useContext } from "react"
-import { useAppSelector } from "../../../../../store/hooks"
-import { SocketContext } from "../../../Room"
-import { RootState } from "../../../../../store/store"
-import { Drawings, Point } from "../../../../../types/RoomTypes/types"
-import DrawStarightLine from "./DrawStraightLine.ts"
+import { useAppSelector } from "../../../../../../store/hooks.ts"
+import { SocketContext } from "../../../../Room.tsx"
+import { RootState } from "../../../../../../store/store.ts"
+import { Drawings, Point } from "../../../../../../types/RoomTypes/types.ts"
+import DrawStarightLine from "./DrawStraightLine.ts.ts"
 
 type Props = {
     previusDrawings: React.MutableRefObject<Drawings[]>,
@@ -16,7 +16,7 @@ type Props = {
     canDraw: React.MutableRefObject<boolean>
 }
 
-const DrawingFunctions = (props: Props) => {
+const useDrawingFunctions = (props: Props) => {
 
     const room = useAppSelector((state: RootState) => state.room)
     const socket = useContext(SocketContext)
@@ -80,10 +80,7 @@ const DrawingFunctions = (props: Props) => {
         }
     
     }, [props.currentColor, props.drawLine, props.currentWidth])
-
-  return (
-    <></>
-  )
+    
 }
 
-export default DrawingFunctions
+export default useDrawingFunctions

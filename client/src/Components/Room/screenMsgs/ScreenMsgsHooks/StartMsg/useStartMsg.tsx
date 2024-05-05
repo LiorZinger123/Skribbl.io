@@ -1,8 +1,8 @@
 import { useEffect, useRef, useContext } from "react"
-import { SocketContext } from "../Room"
-import { useAppSelector } from "../../../store/hooks"
-import { RootState } from "../../../store/store"
-import { PlayerType, ScreenCurrentMsgType } from "../../../types/RoomTypes/types"
+import { SocketContext } from "../../../Room"
+import { useAppSelector } from "../../../../../store/hooks"
+import { RootState } from "../../../../../store/store"
+import { PlayerType, ScreenCurrentMsgType } from "../../../../../types/RoomTypes/types"
 
 type Props = {
   players: PlayerType[],
@@ -10,7 +10,7 @@ type Props = {
   setScreenCurrentMsg: React.Dispatch<React.SetStateAction<ScreenCurrentMsgType>>
 }
 
-const StartMsg = (props: Props) => {
+const useStartMsg = (props: Props) => {
 
   const room = useAppSelector((state: RootState) => state.room)
   const socket = useContext(SocketContext)
@@ -35,9 +35,6 @@ const StartMsg = (props: Props) => {
     }
   }, [props.players])
 
-  return (
-    <></>
-  )
 }
 
-export default StartMsg
+export default useStartMsg

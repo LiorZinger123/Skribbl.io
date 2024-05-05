@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useRef } from "react"
-import { useAppSelector } from "../../../../../store/hooks"
-import { SocketContext } from "../../../Room"
-import { RootState } from "../../../../../store/store"
+import { useAppSelector } from "../../../../../../store/hooks"
+import { SocketContext } from "../../../../Room"
+import { RootState } from "../../../../../../store/store"
 
 type Props = {
     canvasRef: React.MutableRefObject<HTMLCanvasElement | null>,
@@ -9,7 +9,7 @@ type Props = {
     deleteAll: boolean
 }
 
-const DeleteAll = (props: Props) => {
+const useDeleteAll = (props: Props) => {
 
     const room = useAppSelector((state: RootState) => state.room)
     const socket = useContext(SocketContext)
@@ -34,10 +34,7 @@ const DeleteAll = (props: Props) => {
         }
 
     }, [props.deleteAll])
-
-  return (
-    <></>
-  )
+    
 }
 
-export default DeleteAll
+export default useDeleteAll

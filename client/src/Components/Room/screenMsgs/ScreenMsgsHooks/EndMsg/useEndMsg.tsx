@@ -1,10 +1,10 @@
 import React, { useEffect, useContext, useRef, useState } from "react"
-import { EndMsgInfoType, ScreenCurrentMsgType } from "../../../types/RoomTypes/types"
-import { useAppSelector } from "../../../store/hooks"
-import { RootState } from "../../../store/store"
-import { SocketContext } from "../Room"
-import { StableNavigateContext } from "../../../App"
-import { PlayerType } from "../../../types/RoomTypes/types"
+import { EndMsgInfoType, ScreenCurrentMsgType } from "../../../../../types/RoomTypes/types"
+import { useAppSelector } from "../../../../../store/hooks"
+import { RootState } from "../../../../../store/store"
+import { SocketContext } from "../../../Room"
+import { StableNavigateContext } from "../../../../../App"
+import { PlayerType } from "../../../../../types/RoomTypes/types"
 
 type Props = {
     setRound: React.Dispatch<React.SetStateAction<number>>,
@@ -12,7 +12,7 @@ type Props = {
     setScreenCurrentMsg: React.Dispatch<React.SetStateAction<ScreenCurrentMsgType>>
 }
 
-const EndMsg = (props: Props) => {
+const useEndMsg = (props: Props) => {
 
     const nav = useContext(StableNavigateContext)   
     const room = useAppSelector((state: RootState) => state.room)
@@ -85,9 +85,6 @@ const EndMsg = (props: Props) => {
         }
     }, [time])
 
-  return (
-    <></>
-  )
 }
 
-export default EndMsg
+export default useEndMsg

@@ -1,8 +1,8 @@
 import { useRef, useEffect, useContext } from "react"
-import { SocketContext } from "../../../Room"
-import { useAppSelector } from "../../../../../store/hooks"
-import { RootState } from "../../../../../store/store"
-import { Drawings } from "../../../../../types/RoomTypes/types"
+import { SocketContext } from "../../../../Room"
+import { useAppSelector } from "../../../../../../store/hooks"
+import { RootState } from "../../../../../../store/store"
+import { Drawings } from "../../../../../../types/RoomTypes/types"
 
 type Props = {
     setTime: React.Dispatch<React.SetStateAction<number>>,
@@ -13,7 +13,7 @@ type Props = {
     canDraw: React.MutableRefObject<boolean>
 }
 
-const TurnFunctions = (props: Props) => {
+const useTurnFunctions = (props: Props) => {
     
     const room = useAppSelector((state: RootState) => state.room)
     const socket = useContext(SocketContext)
@@ -82,10 +82,7 @@ const TurnFunctions = (props: Props) => {
             clearTimeout(timeoutRef.current)
         }
     }, [])
-  
-    return (
-        <></>
-    )
+    
 }
 
-export default TurnFunctions
+export default useTurnFunctions

@@ -7,3 +7,8 @@ export type msgData = {
     msg: string, 
     username: string 
 }
+
+export type RoomMsgStatus = {
+    msg: string, 
+    time: number
+}

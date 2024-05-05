@@ -28,7 +28,7 @@ const Home = () => {
     useEffect(() => {
       
       const onScroll = async (): Promise<void> => {
-        if(window.scrollY + window.innerHeight === homeRef.current?.scrollHeight){
+        if(Math.ceil(window.scrollY + window.innerHeight) === homeRef.current?.scrollHeight){
           try{
             const res = await fetchToApi('rooms/get_more_rooms', {roomsLength: roomsLength.current})
             if(res.ok){

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { useContext } from 'react'
 import { StableNavigateContext } from '../../App'
 import { fetchToApi } from "../../Api/fetch"
-import Room from "../../types/room"
+import { Room } from "../../types/HomeTypes/homeTypes"
 import { useAppDispatch, useAppSelector } from "../../store/hooks"
 import { setRoomId } from "../../store/counterSlice"
 import { RootState } from "../../store/store"
@@ -18,7 +18,7 @@ const RoomInList = (props: Props) => {
   const [password, setPassward] = useState<string>('')
   const nav = useContext(StableNavigateContext)
   const username = useAppSelector((state: RootState) => state.username)
-  const disable = props.room.hasPassword && password.length < 3
+  const disable = (props.room.hasPassword && password.length < 3) || props.room.connectedPlayers.length === props.room.maxPlayers
   const [errorAnimations, setErrorAnimations] = useState<boolean>(false)
   const [showErrorMsg, setShowErrorMsg] = useState<boolean>(false)
   const [nonExisting, setNonExisting] = useState<boolean>(false)

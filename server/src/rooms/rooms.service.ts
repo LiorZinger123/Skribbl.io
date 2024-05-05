@@ -9,6 +9,7 @@ import { Model } from "mongoose";
 import { RoomDetails } from "./types/RoomDetails";
 import { MoreRooms } from "./types/MoreRooms";
 import { JoinWhileDrawing } from "./types/JoinWhileDrawing";
+import { RoomMsgStatus } from "src/webSocket/types/types";
 
 @Injectable()
 export class RoomsService{
@@ -21,12 +22,12 @@ export class RoomsService{
   private rooms: Room[] = []
 
   getRooms(): RoomToList[] {
-    const rooms = this.rooms.slice(-10)
+    const rooms = this.rooms.slice(-10).reverse()
     return this.sendRoomsDetails(rooms)
   }
 
   getMoreRooms(roomsLength: number): MoreRooms {
-    const rooms = this.rooms.slice( -roomsLength - 10, -roomsLength)
+    const rooms = this.rooms.slice( -roomsLength - 10, -roomsLength).reverse()
     const detailedRooms = this.sendRoomsDetails(rooms)
     return { rooms: detailedRooms, count: detailedRooms.length }
   }
@@ -77,7 +78,7 @@ export class RoomsService{
     const newPlayer = {id: 1, username: username, score: 0, roomOwner: true}
     this.rooms.push({...roomData, id: newId, startPlaying: false, connectedPlayers: [newPlayer],
       currentTime: data.seconds, currentPlayerPos: 0, currentRound: 0, turnScores: [], currentDrawing: '',
-      currentWord: { word: '', length: '' }, currentPainter: ''})
+      currentWord: { word: '', length: '' }, currentPainter: '', screenStatus: '', currentMsg: ''})
     return newId
   }
 
@@ -117,6 +118,32 @@ export class RoomsService{
   checkIfGameStarted(id: string): boolean {
     const room = this.rooms.find(room => room.id === id)
     return room.startPlaying
+  }
+
+  screenmsgsSetTime(id: string): void {
+    const room = this.rooms.find(room => room.id === id)
+    room.currentTime = 15
+  }
+
+  newScreenMsg(id: string, msg: string): void {
+    const room = this.rooms.find(room => room.id === id)
+    room.screenStatus = 'msg'
+    room.currentMsg = msg
+  }
+
+  startTurn(id: string): void {
+    const room = this.rooms.find(room => room.id === id)
+    room.screenStatus = 'turn'
+  }
+
+  roomDrawingStatus(id: string): string {
+    const room = this.rooms.find(room => room.id === id)
+    return room.screenStatus
+  }
+
+  roomMsgStatus(id: string): RoomMsgStatus {
+    const room = this.rooms.find(room => room.id === id)
+    return { msg: room.currentMsg, time: room.currentTime }
   }
 
   tick(id: string): number{
@@ -311,5 +338,7 @@ export class RoomsService{
     room.currentDrawing = ''
     room.currentWord = { word: '', length: '' },
     room.currentPainter = room.connectedPlayers[0].username
+    room.screenStatus = ''
+    room.currentMsg = ''
   }
 }

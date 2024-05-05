@@ -1,11 +1,7 @@
 import { useState, useRef, useEffect, useContext } from "react"
 import { SocketContext } from "../../Room"
 import { Drawings } from "../../../../types/RoomTypes/types"
-import Undo from "./CanvasFunctions/Undo"
-import DeleteAll from "./CanvasFunctions/DeleteAll"
-import UpdateDrawing from "./CanvasFunctions/UpdateDrawing"
-import DrawingFunctions from "./CanvasFunctions/DrawingFunctions"
-import TurnFunctions from "./CanvasFunctions/TurnFunctions"
+import CanvasFunctions from "./CanvasFunctions/CanvasFunctions"
 
 type Props = {
     setTime: React.Dispatch<React.SetStateAction<number>>,
@@ -66,17 +62,8 @@ const Canvas = (props: Props) => {
     return (
         <div className="canvas">
             <canvas ref={canvasRef} />
-            {!roomClosed &&
-                <>
-                    <TurnFunctions setTime={props.setTime} roundTime={props.roundTime} canvasRef={canvasRef} contextRef={contextRef} 
-                        previusDrawings={previusDrawings} canDraw={canDraw} />
-                    <DrawingFunctions previusDrawings={previusDrawings} canvasRef={canvasRef} setDrawing={setDrawing} contextRef={contextRef} 
-                        drawLine={props.drawLine} currentColor={props.currentColor} currentWidth={props.currentWidth} canDraw={canDraw} />
-                    <UpdateDrawing drawing={drawing} contextRef={contextRef} />
-                    <DeleteAll canvasRef={canvasRef} contextRef={contextRef} deleteAll={props.deleteAll} /> 
-                    <Undo previusDrawings={previusDrawings} setDrawing={setDrawing} undo={props.undo} setDeleteAll={props.setDeleteAll} />
-                </>
-            }
+            {!roomClosed && <CanvasFunctions {...props} canvasRef={canvasRef} contextRef={contextRef} previusDrawings={previusDrawings}
+                canDraw={canDraw} drawing={drawing} setDrawing={setDrawing} />}
         </div>
     ) 
 }

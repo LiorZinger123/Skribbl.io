@@ -1,8 +1,8 @@
 import React, { useEffect, useContext } from "react"
-import { SocketContext } from "../Room"
-import { useAppSelector } from "../../../store/hooks"
-import { RootState } from "../../../store/store"
-import { PlayerType, ScreenCurrentMsgType, ShowScoresType, Word } from "../../../types/RoomTypes/types"
+import { SocketContext } from "../../../Room"
+import { useAppSelector } from "../../../../../store/hooks"
+import { RootState } from "../../../../../store/store"
+import { PlayerType, ScreenCurrentMsgType, ShowScoresType, Word } from "../../../../../types/RoomTypes/types"
 
 type Props = {
     players: PlayerType[],
@@ -14,7 +14,7 @@ type Props = {
     currentWord: Word
 }
 
-const ScoresScreen = (props: Props) => {
+const useScoresMsg = (props: Props) => {
   
     const room = useAppSelector((state: RootState) => state.room)
     const socket = useContext(SocketContext)
@@ -23,17 +23,19 @@ const ScoresScreen = (props: Props) => {
     useEffect(() => {
         
         const showScores = (data: ShowScoresType): void => {
-            props.setScreenCurrentMsg({show: true, msg:
-                <>
-                    <p>The word was: {props.currentWord.word}</p>
-                    <ul className="screen-msg">       
-                        {data.scores.map(playerScore => (
-                            <li key={playerScore.username} className={playerScore.score > 0 ? 'got-score' : 'zero-score'}>
-                                {playerScore.username}: {playerScore.score > 0 && '+'}{playerScore.score}</li>
-                        ))}
-                    </ul>
-                </>
-            })
+            const screenCurrentMsg = 
+            <div>
+                <p>The word was: {props.currentWord.word}</p>
+                <ul className="screen-msg">       
+                    {data.scores.map(playerScore => (
+                        <li key={playerScore.username} className={playerScore.score > 0 ? 'got-score' : 'zero-score'}>
+                            {playerScore.username}: {playerScore.score > 0 && '+'}{playerScore.score}</li>
+                    ))}
+                </ul>
+            </div>
+            
+            props.setScreenCurrentMsg({show: true, msg: screenCurrentMsg})
+            socket.emit('new_screen_msg', {room: room, msg: JSON.stringify(screenCurrentMsg)})
 
             props.setPlayers(players => {
                 return players.map(player => {
@@ -65,10 +67,7 @@ const ScoresScreen = (props: Props) => {
             socket.off('end_turn', showScores)
         }
     }, [props.currentWord])
-
-    return (
-    <></>
-  )
+    
 }
 
-export default ScoresScreen
+export default useScoresMsg

@@ -38,10 +38,17 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         if(isOwner === data.username)
             this.server.to(socket.id).emit('show_start_button')
         if(checkIfGameStarted){
-            const whileDrawing = this.roomsService.joinWhileDrawing(data.room)
-            this.server.to(socket.id).emit("while_drawing", whileDrawing.turnData)
-            this.server.to(socket.id).emit('join_turn', whileDrawing.turnData.word)
-            this.server.to(socket.id).emit('update_drawing', whileDrawing.currentDrawing)
+            const status = this.roomsService.roomDrawingStatus(data.room)
+            if(status === 'turn'){
+                const whileDrawing = this.roomsService.joinWhileDrawing(data.room)
+                this.server.to(socket.id).emit("while_drawing", whileDrawing.turnData)
+                this.server.to(socket.id).emit('join_turn', whileDrawing.turnData.word)
+                this.server.to(socket.id).emit('update_drawing', whileDrawing.currentDrawing)
+            }
+            else{
+                const msgStatus = this.roomsService.roomMsgStatus(data.room)
+                this.server.to(socket.id).emit('join_while_msg', msgStatus)
+            }
         }
     }
 
@@ -61,10 +68,28 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     chooseWord(@MessageBody() data: { room: string }): void {
         this.server.to(data.room).emit('choose_word')
     }
-    
-    @SubscribeMessage('turn')
+
+    @SubscribeMessage('screen_msgs_set_time')
+    setTime(@MessageBody() data: { room: string }, @ConnectedSocket() socket: Socket): void{
+        this.roomsService.screenmsgsSetTime(data.room)
+        this.server.to(data.room).except(socket.id).emit('screen_msgs_set_time', 15)
+    }
+
+    @SubscribeMessage('screen_msgs_tick')
+    chooseWordTick(@MessageBody() data: { room: string }, @ConnectedSocket() socket: Socket): void{
+        this.roomsService.tick(data.room)
+        this.server.to(data.room).except(socket.id).emit('screen_msgs_tick')
+    }
+
+    @SubscribeMessage('new_screen_msg')
+    updateMsg(@MessageBody() data: { room: string, msg: string }): void {
+        this.roomsService.newScreenMsg(data.room, data.msg)
+    }
+
+    @SubscribeMessage('start_turn')
     startTurn(@MessageBody() data: {word: Word, currentPainter: string, room: string}, @ConnectedSocket() socket: Socket): void {
         this.roomsService.updateCurrentWord(data.room, data.word)
+        this.roomsService.startTurn(data.room)
         this.server.to(data.room).emit('start_turn', data.word)
         this.server.to(socket.id).emit('start_draw')
         this.server.to(data.room).emit('message', {msg: `${data.currentPainter} is drawing now!`, color: 'orange'})

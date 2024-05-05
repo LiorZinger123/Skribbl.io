@@ -1,8 +1,8 @@
 import React, { useEffect, useContext } from "react"
-import { useAppSelector } from "../../../../../store/hooks"
-import { SocketContext } from "../../../Room"
-import { RootState } from "../../../../../store/store"
-import { Drawings } from "../../../../../types/RoomTypes/types"
+import { useAppSelector } from "../../../../../../store/hooks"
+import { SocketContext } from "../../../../Room"
+import { RootState } from "../../../../../../store/store"
+import { Drawings } from "../../../../../../types/RoomTypes/types"
 
 type Props = {
     previusDrawings: React.MutableRefObject<Drawings[]>, 
@@ -11,7 +11,7 @@ type Props = {
     setDeleteAll: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const Undo = (props: Props) => {
+const useUndo = (props: Props) => {
 
     const room = useAppSelector((state: RootState) => state.room)
     const socket = useContext(SocketContext)
@@ -28,9 +28,6 @@ const Undo = (props: Props) => {
             props.setDeleteAll(del => !del)
     }, [props.undo])
 
-  return (
-    <></>
-  )
 }
 
-export default Undo
+export default useUndo

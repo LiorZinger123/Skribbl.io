@@ -5,7 +5,7 @@ type Props = {
     contextRef: React.MutableRefObject<CanvasRenderingContext2D | null>
 }
 
-const UpdateDrawing = (props: Props) => {
+const useUpdateDrawing = (props: Props) => {
 
     useEffect(() => {
       const img = new Image()
@@ -15,9 +15,6 @@ const UpdateDrawing = (props: Props) => {
       }
     }, [props.drawing])
 
-  return (
-    <></>
-  )
 }
 
-export default UpdateDrawing
+export default useUpdateDrawing
