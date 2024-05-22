@@ -1,5 +1,5 @@
 import RoomInList from "./RoomInList"
-import Room from "../../types/room"
+import { Room } from "../../../types/HomeTypes/homeTypes"
 
 type Props = {
     search: string,

@@ -11,7 +11,7 @@ import { APP_GUARD } from "@nestjs/core";
         MongooseModule.forFeature([{name: Word.name, schema: WordSchema}]),
         ThrottlerModule.forRoot([{
             ttl: seconds(10),
-            limit: 8
+            limit: 100
         }])
     ],
     controllers: [RoomsController],

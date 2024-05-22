@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 import { useContext } from 'react'
-import { StableNavigateContext } from '../../App'
-import { fetchToApi } from "../../Api/fetch"
-import { Room } from "../../types/HomeTypes/homeTypes"
-import { useAppDispatch, useAppSelector } from "../../store/hooks"
-import { setRoomId } from "../../store/counterSlice"
-import { RootState } from "../../store/store"
+import { StableNavigateContext } from '../../../App'
+import { fetchToApi } from "../../../Api/fetch"
+import { Room } from "../../../types/HomeTypes/homeTypes"
+import { useAppDispatch, useAppSelector } from "../../../store/hooks"
+import { setRoomId } from "../../../store/counterSlice"
+import { RootState } from "../../../store/store"
 
 type Props = {
   room: Room,

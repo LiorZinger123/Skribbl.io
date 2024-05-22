@@ -1,6 +1,6 @@
 import React from "react"
-import { fetchToApi } from "../../Api/fetch"
-import Room from "../../types/room"
+import { fetchToApi } from "../../../Api/fetch"
+import { Room } from "../../../types/HomeTypes/homeTypes"
 
 type Props = {
     search: string,

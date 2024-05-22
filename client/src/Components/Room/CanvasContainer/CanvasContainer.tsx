@@ -1,18 +1,21 @@
-import { useEffect, useState, useContext } from "react"
-import { SocketContext } from "../Room"
+import { useEffect, useState, useContext, createContext } from "react"
+import { RoomContext } from "../Room"
 import Canvas from "./Canvas/Canvas"
 import ToolBar from "./ToolBar/ToolBar"
+import { CanvasContextType, ToolBarContextType } from "../../../types/RoomTypes/contextsTypes"
 
 type Props = {
     setTime: React.Dispatch<React.SetStateAction<number>>,
-    roundTime: React.MutableRefObject<number>,
-    currentPainter: React.MutableRefObject<string>,
+    turnTime: React.MutableRefObject<number>,
     canvasParentRef: React.MutableRefObject<HTMLDivElement | null>
 }
 
+export const CanvasContext = createContext<CanvasContextType>(null!)
+export const ToolBarContext = createContext<ToolBarContextType>(null!)
+
 const CanvasContainer = (props: Props) => {
   
-    const socket = useContext(SocketContext)
+    const socket = useContext(RoomContext).socket
     const [showTools, setShowTools] = useState<boolean>(false)
     const [currentColor, setCurrentColor] = useState<string>('#000000')
     const [drawLine, setDrawLine] = useState<boolean>(true)
@@ -20,6 +23,12 @@ const CanvasContainer = (props: Props) => {
     const [undo, setUndo] = useState<boolean>(false)
     const [deleteAll, setDeleteAll] = useState<boolean>(false)
     const [roomClosed, setRoomClosed] = useState<boolean>(false)
+
+    const canvasContextValues = {...props, currentColor: currentColor, drawLine: drawLine, currentWidth: currentWidth, 
+        setCurrentWidth: setCurrentWidth, deleteAll: deleteAll, setDeleteAll: setDeleteAll, undo: undo}
+    const toolbarValues = {currentColor: currentColor, setCurrentColor: setCurrentColor, drawLine: drawLine, setDrawLine: setDrawLine,
+        setCurrentWidth: setCurrentWidth, setDeleteAll: setDeleteAll, setUndo: setUndo
+    }
 
     useEffect(() => {
 
@@ -48,12 +57,13 @@ const CanvasContainer = (props: Props) => {
 
     return (
         <>
-            <Canvas setTime={props.setTime} roundTime={props.roundTime} currentColor={currentColor} drawLine={drawLine}
-                currentWidth={currentWidth} setCurrentWidth={setCurrentWidth} deleteAll={deleteAll} undo={undo} setDeleteAll={setDeleteAll} 
-                canvasParentRef={props.canvasParentRef} />
-            {showTools && !roomClosed &&
-                <ToolBar currentColor={currentColor} setCurrentColor={setCurrentColor} setDrawLine={setDrawLine}
-                setCurrentWidth={setCurrentWidth} setDeleteAll={setDeleteAll} drawLine={drawLine} setUndo={setUndo} />
+            <CanvasContext.Provider value={canvasContextValues}>
+                <Canvas />
+            </CanvasContext.Provider>
+            {true &&
+                <ToolBarContext.Provider value={toolbarValues}>
+                    <ToolBar />
+                </ToolBarContext.Provider>
             }
         </>
     )

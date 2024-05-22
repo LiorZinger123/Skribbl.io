@@ -1,4 +1,4 @@
-import { drawStarightLineType } from "../../../../../types/RoomTypes/types"
+import { drawStarightLineType } from "../../../../../../../types/RoomTypes/types"
 
 const DrawStarightLine = ({e, canvasRect, ctx, prevPoint, width, color}: drawStarightLineType) => {
     const end = {x: e.clientX - canvasRect.left, y: e.clientY - canvasRect.top}

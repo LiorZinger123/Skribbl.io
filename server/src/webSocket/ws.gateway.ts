@@ -30,11 +30,12 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         const locations = this.roomsService.updatePlayersLocations(data.room)
         const isOwner = this.roomsService.getOwner(data.room)
         const checkIfGameStarted = this.roomsService.checkIfGameStarted(data.room)
+        this.server.to(socket.id).emit('join')
         this.server.to(socket.id).emit('players', connectedPlayers)
         this.server.to(socket.id).emit('room_details', RoomDetails)
         this.server.to(data.room).emit('locations', {locations: locations})
         this.server.to(data.room).emit('message', {msg: `${data.username} joined the room`, color: 'blue'})
-        this.server.to(data.room).except(socket.id).emit('players', connectedPlayers.slice(-1))
+        this.server.to(data.room).except(socket.id).emit('players', connectedPlayers[connectedPlayers.length-1])
         if(isOwner === data.username)
             this.server.to(socket.id).emit('show_start_button')
         if(checkIfGameStarted){
@@ -45,9 +46,13 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
                 this.server.to(socket.id).emit('join_turn', whileDrawing.turnData.word)
                 this.server.to(socket.id).emit('update_drawing', whileDrawing.currentDrawing)
             }
-            else{
+            else if(status === 'msg'){
                 const msgStatus = this.roomsService.roomMsgStatus(data.room)
                 this.server.to(socket.id).emit('join_while_msg', msgStatus)
+            }
+            else{
+                const msgStatus = this.roomsService.getEndScreenStatus(data.room)
+                this.server.to(socket.id).emit('join_while_end_msg', msgStatus)
             }
         }
     }
@@ -83,7 +88,7 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
     @SubscribeMessage('new_screen_msg')
     updateMsg(@MessageBody() data: { room: string, msg: string }): void {
-        this.roomsService.newScreenMsg(data.room, data.msg)
+        this.roomsService.newScreenMsg(data.room, data.msg, 'msg')
     }
 
     @SubscribeMessage('start_turn')
@@ -95,6 +100,11 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         this.server.to(data.room).emit('message', {msg: `${data.currentPainter} is drawing now!`, color: 'orange'})
     }
 
+    @SubscribeMessage('set_turn_time')
+    setTurnTime(@MessageBody() data: {room: string}): void {
+        this.roomsService.setTurnTime(data.room)
+    }
+
     @SubscribeMessage('tick')
     tick(@MessageBody() data: {room: string}, @ConnectedSocket() socket: Socket): void{
         const currentTime = this.roomsService.tick(data.room)
@@ -104,7 +114,7 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     @SubscribeMessage('drawing')
     sendDrawing(@MessageBody() data: {drawing: string, room: string}, @ConnectedSocket() socket: Socket): void{
         this.roomsService.updateDrawing(data.room, data.drawing)
-        this.server.to(data.room).except(socket.id).emit('update_drawing', data.drawing)   
+        this.server.to(data.room).except(socket.id).emit('update_drawing', data.drawing)
     }
     
     @SubscribeMessage('correct')
@@ -136,15 +146,20 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     leaveRoom(@MessageBody() data: {username: string, room: string, currentPainter: string}, @ConnectedSocket() socket: Socket): void {
         const ownerLeftBeofreStarting = this.roomsService.checkIfOwnerLeftBeforeStarting(data.room, data.username)
         const ownerLeftAfterStarting = this.roomsService.checkIfOwnerLeftAfterStarting(data.room, data.username)
+        const ownerLeftInEndScreen = this.roomsService.checkIfOwnerLeftInEndScreen(data.room, data.username)
         const updatedPlayers = this.roomsService.leaveRoom(data.room, data.username)
         this.server.to(data.room).emit('message', {msg: `${data.username} has left the room`, color: 'red'})
 
-        if(ownerLeftBeofreStarting){
+        if(ownerLeftBeofreStarting && updatedPlayers !== null){
+            this.server.to(data.room).emit('player_left', updatedPlayers)
             this.server.to(data.room).emit('owner_left', updatedPlayers[0].username)
             this.server.to(data.room).emit('message', {msg: `${updatedPlayers[0].username} is the new owner of the room!`, color: 'fuchsia'})
         }
+    
+        else if(ownerLeftInEndScreen)
+            this.server.to(data.room).emit('room_closed', 'The owner left the room.')
 
-        if(updatedPlayers != null){
+        else if(updatedPlayers != null){
             this.server.to(data.room).emit('player_left', updatedPlayers)
 
             if(ownerLeftAfterStarting)
@@ -156,8 +171,10 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
                 this.endTurn({room: data.room}, false)
             }
         }
+
         else
-            this.server.to(data.room).emit('room_closed')
+            this.server.to(data.room).emit('room_closed', 'All the players left the room.')
+        
         socket.disconnect(true)
     }
 
@@ -178,12 +195,25 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect{
             })
         }
         const owner = this.roomsService.getOwner(data.room)
+        this.roomsService.setEndStatus(data.room, winnerMsg)
         this.server.to(data.room).emit('end_game', {winnerMsg: winnerMsg, owner: owner})
     }
 
+    @SubscribeMessage('end_msg_tick')
+    newEndScreenMsg(@MessageBody() data: {room: string}, @ConnectedSocket() socket: Socket): void{
+        this.roomsService.tick(data.room)
+        this.server.to(data.room).except(socket.id).emit('end_msg_tick')
+    }
+    
     @SubscribeMessage('close_room')
     closeRoom(@MessageBody() data: {room: string}): void{
         this.roomsService.closeRoom(data.room)
+    }
+
+    @SubscribeMessage('end_room')
+    endRoom(@MessageBody() data: {room: string}): void{
+        this.roomsService.closeRoom(data.room)
+        this.server.to(data.room).emit('end_room')
     }
 
     @SubscribeMessage('restart')

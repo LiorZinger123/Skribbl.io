@@ -1,25 +1,19 @@
 import { useRef, useEffect, useContext } from "react"
-import { useAppSelector } from "../../../../../../store/hooks.ts"
-import { SocketContext } from "../../../../Room.tsx"
-import { RootState } from "../../../../../../store/store.ts"
-import { Drawings, Point } from "../../../../../../types/RoomTypes/types.ts"
+import { useAppSelector } from "../../../../../../../store/hooks.ts"
+import { RoomContext } from "../../../../../Room.tsx"
+import { CanvasContext } from "../../../../CanvasContainer.tsx"
+import { CanvasFunctionsContext } from "../../../Canvas.tsx"
+import { RootState } from "../../../../../../../store/store.ts"
+import { Point } from "../../../../../../../types/RoomTypes/types.ts"
 import DrawStarightLine from "./DrawStraightLine.ts.ts"
 
-type Props = {
-    previusDrawings: React.MutableRefObject<Drawings[]>,
-    canvasRef: React.MutableRefObject<HTMLCanvasElement | null>,
-    setDrawing: React.Dispatch<React.SetStateAction<string>>,
-    contextRef: React.MutableRefObject<CanvasRenderingContext2D | null>,
-    drawLine: boolean,
-    currentColor: string,
-    currentWidth: number,
-    canDraw: React.MutableRefObject<boolean>
-}
-
-const useDrawingFunctions = (props: Props) => {
+const useDrawingFunctions = () => {
 
     const room = useAppSelector((state: RootState) => state.room)
-    const socket = useContext(SocketContext)
+    const socket = useContext(RoomContext).socket
+    const canvasProps = useContext(CanvasContext)
+    const canvasFunctionsProps = useContext(CanvasFunctionsContext)
+    const props = {...canvasProps, ...canvasFunctionsProps}
 
     const isDrawing  = useRef<boolean>(false)
     const prevPoint = useRef<Point | null>(null)
@@ -42,7 +36,7 @@ const useDrawingFunctions = (props: Props) => {
         }
     
         const draw = (e: MouseEvent): void => {
-            if(props.canDraw.current){
+            if(true){
                 if(props.contextRef.current && isDrawing.current){
                     const canvasRect = props.canvasRef.current?.getBoundingClientRect()
                     if(canvasRect && props.drawLine){

@@ -1,4 +1,5 @@
 export type RoomDetails = {
     time: number,
-    rounds: number
+    rounds: number,
+    currentRound: number
 }

@@ -1,24 +1,20 @@
-import React, { useState, useRef, useEffect, useContext } from "react"
-import { SocketContext } from "../../../Room"
+import { useState, useRef, useEffect, useContext } from "react"
+import { RoomContext, ScreenMsgsContext } from "../../../Room"
+import { ScreenMsgsFunctionsContext } from "../../ScreenMsgs"
 import { useAppSelector } from "../../../../../store/hooks"
 import { RootState } from "../../../../../store/store"
 import { fetchToApi, getFromApi } from "../../../../../Api/fetch"
-import { GetTurnWordsType, PlayerType, ScreenCurrentMsgType, Word } from "../../../../../types/RoomTypes/types"
+import { GetTurnWordsType, Word } from "../../../../../types/RoomTypes/types"
+import ReactDOMServer from 'react-dom/server'
 
-type Props = {
-    players: PlayerType[],
-    painter: React.MutableRefObject<string>,
-    setRound: React.Dispatch<React.SetStateAction<number>>,
-    setTime: React.Dispatch<React.SetStateAction<number>>,
-    roundTime: React.MutableRefObject<number>,
-    setScreenCurrentMsg: React.Dispatch<React.SetStateAction<ScreenCurrentMsgType>>
-}
-
-const useStartRoundMsgs = (props: Props) => {
+const useStartTurnMsgs = () => {
 
     const room = useAppSelector((state: RootState) => state.room)
     const username = useAppSelector((state: RootState) => state.username)
-    const socket = useContext(SocketContext)
+    const socket = useContext(RoomContext).socket
+    const painter = useContext(RoomContext).painter
+    const props = useContext(ScreenMsgsContext)
+    const setScreenCurrentMsg = useContext(ScreenMsgsFunctionsContext).setScreenCurrentMsg
     const [getTurnWords, setGetTurnWords] = useState<GetTurnWordsType>({ getWords: false })
     const wordsIntervalId = useRef<NodeJS.Timeout>(null!)
     const wordsTimeOutId = useRef<NodeJS.Timeout>(null!)
@@ -29,11 +25,11 @@ const useStartRoundMsgs = (props: Props) => {
             try{
                 const res = await getFromApi('rooms/words')
                 if(res.ok){
-                    const notPainterMsg = <p>{props.painter.current} is choosing a word</p>
-                    if(props.painter.current === username){
+                    const notPainterMsg = <p>{painter.current} is choosing a word</p>
+                    if(painter.current === username){
                         const newWords: Word[] = await res.json()
                         setGetTurnWords({ getWords: true, words: newWords })
-                        props.setScreenCurrentMsg({show: true , msg: 
+                        setScreenCurrentMsg( 
                             <div className="random-words">
                                 <p>Please choose one word</p>
                                 <ul>
@@ -42,17 +38,17 @@ const useStartRoundMsgs = (props: Props) => {
                                     ))}
                                 </ul>
                             </div> 
-                        })
-                        socket.emit('new_screen_msg', {room: room, msg: JSON.stringify(notPainterMsg)})
+                        )
+                        socket.emit('new_screen_msg', {room: room, msg: ReactDOMServer.renderToString(notPainterMsg)})
                     }
                     else{
-                        props.setScreenCurrentMsg({show: true, msg: notPainterMsg})
+                        setScreenCurrentMsg(notPainterMsg)
                         setGetTurnWords({ getWords: true })
                     }
                     
-                    if(props.painter.current === props.players[0].username){
+                    if(painter.current === props.players[0].username){
                         props.setRound(round => round + 1)
-                        if(props.painter.current === username)
+                        if(painter.current === username)
                             fetchToApi('rooms/currentround', {room: room})
                     }
                 }                  
@@ -63,14 +59,16 @@ const useStartRoundMsgs = (props: Props) => {
         }
 
         const chooseWord = (word: Word): void => { //after choosing a word
-            socket.emit('start_turn', {word: word, currentPainter: props.painter.current, room: room})
+            socket.emit('start_turn', {word: word, currentPainter: painter.current, room: room})
         }
 
         const startTurn = (): void => { //start play
             clearInterval(wordsIntervalId.current)
             clearTimeout(wordsTimeOutId.current)
-            props.setScreenCurrentMsg({show: false, msg: null})
-            props.setTime(props.roundTime.current)
+            setScreenCurrentMsg(null)
+            props.setTime(props.turnTime.current)
+            if(painter.current === username)
+                socket.emit('set_turn_time', { room: room })
         }
     
         socket.on('choose_word', getWords)
@@ -95,7 +93,7 @@ const useStartRoundMsgs = (props: Props) => {
             wordsTimeOutId.current = setTimeout(() => {
                 clearInterval(wordsIntervalId.current)
                 const word = getTurnWords.words![Math.floor(Math.random() * getTurnWords.words!.length)]
-                socket.emit('start_turn', {word: word, currentPainter: props.painter.current, room: room})
+                socket.emit('start_turn', {word: word, currentPainter: painter.current, room: room})
             }, 15 * 1000)
         }
 
@@ -120,4 +118,4 @@ const useStartRoundMsgs = (props: Props) => {
 
 }
 
-export default useStartRoundMsgs
+export default useStartTurnMsgs

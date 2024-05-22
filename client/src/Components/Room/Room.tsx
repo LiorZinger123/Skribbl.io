@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, createContext, useContext } from "react"
 import { Socket, io } from "socket.io-client"
 import { useAppSelector } from "../../store/hooks"
 import { RootState } from "../../store/store"
-import { createContext } from "react"
+import { StableNavigateContext } from "../../App"
+import { RoomContextType, ScreenMsgsContextType } from "../../types/RoomTypes/contextsTypes"
 import { ChatMessage, PlayerType, RoomDetails, WhileDrawing, Word } from "../../types/RoomTypes/types"
 import Chat from "./Chat/Chat"
 import Players from "./Players/Players"
@@ -11,12 +12,17 @@ import TopRoom from "./TopRoom/TopRoom"
 import CanvasContainer from "./CanvasContainer/CanvasContainer"
 import RoomMsg from "./RoomMsg/RoomMsg"
 
-export const SocketContext = createContext<Socket>(null!)
+export const RoomContext = createContext<RoomContextType>(null!)
+export const ScreenMsgsContext = createContext<ScreenMsgsContextType>(null!)
 
 const Room = () => {
  
   const room = useAppSelector((state: RootState) => state.room)
   const username = useAppSelector((state: RootState) => state.username)
+  // const nav = useContext(StableNavigateContext)
+  // const history = 
+  // const nav = useContext(StableNavigateContext)
+  // const { history } = 
 
   const [socket, setSocket] = useState<Socket>(null!)
   const api = import.meta.env.VITE_API
@@ -28,7 +34,7 @@ const Room = () => {
   const [currentWord, setCurrentWord] = useState<Word>({word: '', length: ''})
   const currentPainter = useRef<string>('')
 
-  const roundTime = useRef<number>(0)
+  const turnTime = useRef<number>(0)
   const [time, setTime] = useState<number>(0)
 
   const [round, setRound] = useState<number>(0) 
@@ -39,11 +45,15 @@ const Room = () => {
   const [socketError, setSocketError] = useState<boolean>(false)
   const socketErrorMsg = 'Lost connection to the game servers.'
 
+  const screenMsgsContextValues = {players: players, setPlayers: setPlayers, round: round, setRound: setRound, 
+    maxRounds: maxRounds.current, currentWord: currentWord, turnTime: turnTime, setTime: setTime}
+
   useEffect(() => {
 
     const handleDetails = (roomDetails: RoomDetails): void => {
-      roundTime.current = roomDetails.time
+      turnTime.current = roomDetails.time
       maxRounds.current = roomDetails.rounds
+      setRound(roomDetails.currentRound)
     }
     
     const handleWord = (word: Word): void => {
@@ -61,7 +71,9 @@ const Room = () => {
     }
 
     // const handleClick = (): void => {
-    //   window.history.pushState(null, "", window.location.href)
+      // console.log('s')
+      // nav(1)
+      // window.history.pushState(null, "", window.location.href)
     // }
 
     const newSocket = io(`${api}:${port}`)
@@ -71,8 +83,13 @@ const Room = () => {
     newSocket.on('start_turn', handleWord)
     newSocket.on("connect_error", lostConnection)
     newSocket.on("while_drawing", updateDetails)
+
     // window.history.pushState(null, "", window.location.href)
-    // window.addEventListener('popstate', handleClick)
+    // window.addEventListener('popstate', (e: any) => {
+    //   console.log('sss')
+    //   e.preventDefault()
+    //   setSocketError(true)
+    // })
 
     return (): void => {
       newSocket.off('room_details', handleDetails)
@@ -85,30 +102,33 @@ const Room = () => {
   }, [])
 
   return (
-    <>
+    <RoomContext.Provider value={{socket: socket, painter: currentPainter}}>
+
       {socket &&
-        <SocketContext.Provider value={socket}>
 
-          <div className="room">
+        <div className="room">
 
-            <div className="room-grid-container">
-              <TopRoom time={time} round={round} maxRounds={maxRounds.current} painter={currentPainter} players={players} setMessages={setMessages} />
-              <Players players={players} setPlayers={setPlayers} />
-              <div className="center-room" ref={canvasParentRef}>
-               <ScreenMsgs players={players} painter={currentPainter} setRound={setRound} setTime={setTime}
-                  round={round} maxRounds={maxRounds.current} roundTime={roundTime} setPlayers={setPlayers} currentWord={currentWord} /> 
-                <CanvasContainer setTime={setTime} roundTime={roundTime} currentPainter={currentPainter} canvasParentRef={canvasParentRef} />
-              </div>
-              <Chat messages={messages} setMessages={setMessages} currentWord={currentWord} painter={currentPainter} />
+          <div className="room-grid-container">
+            <TopRoom time={time} round={round} maxRounds={maxRounds.current} players={players} setMessages={setMessages} />
+            <Players players={players} setPlayers={setPlayers} />
+
+            <div className="center-room" ref={canvasParentRef}>
+              <ScreenMsgsContext.Provider value={screenMsgsContextValues}>
+                <ScreenMsgs /> 
+              </ScreenMsgsContext.Provider>
+              <CanvasContainer setTime={setTime} turnTime={turnTime} canvasParentRef={canvasParentRef} />
             </div>
 
-            {socketError && <RoomMsg msg={socketErrorMsg} msgType="socket" />}
-
+            <Chat messages={messages} setMessages={setMessages} currentWord={currentWord} />
           </div>
-          
-        </SocketContext.Provider>
+
+          {socketError && <RoomMsg msg={socketErrorMsg} msgType="socket" />}
+
+        </div>
+      
       }
-    </>
+      
+    </RoomContext.Provider>
   )
 }
 

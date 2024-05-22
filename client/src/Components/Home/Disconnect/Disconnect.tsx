@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { StableNavigateContext } from '../../App'
+import { StableNavigateContext } from '../../../App'
 import Cookies from 'js-cookie'
 
 const Disconnect = () => {

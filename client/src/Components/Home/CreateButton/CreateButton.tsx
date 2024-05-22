@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react"
-import { StableNavigateContext } from "../../App"
+import { StableNavigateContext } from "../../../App"
 import Cookies from "js-cookie"
 
 type Props = {

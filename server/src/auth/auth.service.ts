@@ -30,4 +30,11 @@ export class AuthService {
       accessToken: this.jwtService.sign(payload)
     }   
   }
+
+  reset(username: string): AccessTokenType{
+    const payload = { username: username }
+    return{
+      accessToken: this.jwtService.sign(payload)
+    }
+  }
 }

@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { WsModule } from './webSocket/ws.module';
 import { RoomsModule } from './rooms/rooms.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -17,13 +18,14 @@ import { RoomsModule } from './rooms/rooms.module';
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('DATABASE'),
+        uri: configService.get<string>('database'),
       })
     }),
     AuthModule,
     UsersModule,
     RoomsModule,
-    WsModule
+    WsModule,
+    MailModule
   ]
 })
 

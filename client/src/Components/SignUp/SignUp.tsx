@@ -31,12 +31,13 @@ const SignUp = () => {
             if(data.password !== data.submitPassword)
                 setError("submitPassword", { message: "Passwords do not match" })
             else{
-                const {submitPassword, ...userInfo} = data
-                const res = await fetchToApi('users/add', userInfo)
+                const res = await fetchToApi('users/add', data)
                 if(res.status === 201){
                     dispatch(setUsername(await res.text()))
                     nav('/home')
                 }
+                else if(res.status === 400)
+                    setError('root', {message: "Something went wrong, please check again your inputs"})
                 else if(res.status === 403)
                     setError("root", { message: await res.text() })
                 else

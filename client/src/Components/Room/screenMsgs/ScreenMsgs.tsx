@@ -1,47 +1,40 @@
-import React, { useEffect, useState, useContext, createElement } from "react"
-import { SocketContext } from "../Room"
-import { JoinWhileScreenMsg, PlayerType, ScreenCurrentMsgType, SerializedElement } from "../../../types/RoomTypes/types"
+import React, { useEffect, useState, useContext, ReactElement, createContext } from "react"
+import { RoomContext, ScreenMsgsContext } from "../Room"
+import { JoinWhileScreenMsg } from "../../../types/RoomTypes/types"
+import { ScreenMsgsFunctionsContextType } from "../../../types/RoomTypes/contextsTypes"
 import ScreenMsgsFunctions from "./ScreenMsgsFunctions/ScreenMsgsFunctions"
-import { Word } from "../../../types/RoomTypes/types"
 
-type Props = {
-  players: PlayerType[],
-  setPlayers: React.Dispatch<React.SetStateAction<PlayerType[]>>,
-  painter: React.MutableRefObject<string>,
-  setRound: React.Dispatch<React.SetStateAction<number>>,
-  setTime: React.Dispatch<React.SetStateAction<number>>,
-  roundTime: React.MutableRefObject<number>,
-  round: number,
-  maxRounds: number,
-  currentWord: Word
-}
+export const ScreenMsgsFunctionsContext = createContext<ScreenMsgsFunctionsContextType>(null!)
 
-const ScreenMsgs = (props: Props) => {
+const ScreenMsgs = () => {
 
-  const socket = useContext(SocketContext)
-  const [screenCurrentMsg, setScreenCurrentMsg] = useState<ScreenCurrentMsgType>({show: false, msg: null})
+  const socket = useContext(RoomContext).socket
+  const props = useContext(ScreenMsgsContext)
+  const [screenCurrentMsg, setScreenCurrentMsg] = useState<ReactElement | null>(null)
   const [roomClosed, setRoomClosed] = useState<boolean>(false)
 
   useEffect(() => {
-    const createJSXFromSerialized = (serializedElement: string | SerializedElement): JSX.Element => {
-      const {type, props} = typeof serializedElement === 'string' ? JSON.parse(serializedElement) : serializedElement
-      const children = props ? props.children.map((child: string | SerializedElement) => {
-        if(typeof child === 'string' || typeof child === 'number')
-          return child
-        else
-          return createJSXFromSerialized(child)
-      })
-      : undefined
-      return createElement(type, {...props, children})
+    const jsxStringToElement = (jsxString: string): JSX.Element | null => {
+      const container = document.createElement('div')
+      container.innerHTML = jsxString
+      const firstChild = container.firstChild
+      if(firstChild instanceof HTMLElement){
+        const reactElement = React.createElement(firstChild.tagName.toLowerCase(), {
+          dangerouslySetInnerHTML: { __html: firstChild.innerHTML }
+        })
+        return reactElement
+      }
+      else
+        return null
     }
     
     const setCurrentScreenStatus = (data: JoinWhileScreenMsg): void => {
-      const jsxElement = createJSXFromSerialized(data.msg)
-      setScreenCurrentMsg({show: true, msg: jsxElement})
-      if(data.time !== props.roundTime.current)
+      const jsxElement = jsxStringToElement(data.msg)
+      setScreenCurrentMsg(jsxElement)
+      if(data.time !== props.turnTime.current)
         props.setTime(data.time)
     }
-
+    
     const disableScreen = (): void => {
       setRoomClosed(true)
     }
@@ -50,20 +43,20 @@ const ScreenMsgs = (props: Props) => {
     socket.on('room_closed', disableScreen)
 
     return (): void => {
-      socket.off('join_while_msg', setCurrentScreenStatus)  
+      socket.off('join_while_msg', setCurrentScreenStatus) 
       socket.off('room_closed', disableScreen)
     }
   }, [])
 
   return (
-    <>
+    <ScreenMsgsFunctionsContext.Provider value={{setScreenCurrentMsg: setScreenCurrentMsg}}>
       {!roomClosed && 
-        <div className={screenCurrentMsg.show ? "screen-msgs" : ""}> 
-          {screenCurrentMsg.show && screenCurrentMsg.msg}
-          {<ScreenMsgsFunctions {...props} setScreenCurrentMsg={setScreenCurrentMsg} />}
+        <div className={screenCurrentMsg !== null ? "screen-msgs" : ""}> 
+          {screenCurrentMsg !== null && screenCurrentMsg}
+          <ScreenMsgsFunctions />
         </div>
       }
-    </>
+    </ScreenMsgsFunctionsContext.Provider>
   )
 }
 

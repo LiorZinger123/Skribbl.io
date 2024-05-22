@@ -1,23 +1,23 @@
 import React, { useContext, useEffect, useState } from "react"
-import { SocketContext } from "../Room"
+import { RoomContext } from "../Room"
 import { Word, PlayerType, ChatMessage } from "../../../types/RoomTypes/types"
 import { useAppSelector } from "../../../store/hooks"
 import { RootState } from "../../../store/store"
-import StartButton from "./StartButton"
-import LeaveRoom from "./LeaveRoom"
+import StartButton from "./Buttons/StartButton"
+import LeaveRoom from "./Buttons/LeaveRoom"
 
 type Props = {
     time: number,
     round: number,
     maxRounds: number,
-    painter: React.MutableRefObject<string>,
     players: PlayerType[],
     setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
 }
 
 const TopRoom = (props: Props) => {
 
-    const socket = useContext(SocketContext)
+    const socket = useContext(RoomContext).socket
+    const painter = useContext(RoomContext).painter
     const username = useAppSelector((state: RootState) => state.username)
     const [screenWord, setScreenWord] = useState<Word>({word: 'Waiting', length: '0'})
     const [showStartButton, setShowStartButton] = useState<boolean>(false)
@@ -38,13 +38,14 @@ const TopRoom = (props: Props) => {
         }
 
         const setWord = (currentWord: Word): void => {
-            if(props.painter.current === username)
+            const chars = [' ', '-', '.', '/']
+            if(painter.current === username)
                 setScreenWord({word: currentWord.word, length: currentWord.length})
             else{
                 const wordArray = [...currentWord.word].map(char => {
-                    if(char != ' ' && char != '-' && char != '.')
-                        return '_'
-                    return char
+                    if(chars.includes(char))
+                        return char
+                    return '_'
                 })
                 setScreenWord({word: wordArray.join(''), length: currentWord.length})
             }
@@ -83,7 +84,7 @@ const TopRoom = (props: Props) => {
 
         <div className={showStartButton ? "top-room-right-side" : 'top-room-right-side'}>
             {showStartButton && <StartButton setShowStartButton={setShowStartButton} players={props.players} setMessages={props.setMessages} />}
-            <LeaveRoom painter={props.painter} showStartButton={showStartButton} />
+            <LeaveRoom painter={painter} showStartButton={showStartButton} />
         </div>
     </div>
   )

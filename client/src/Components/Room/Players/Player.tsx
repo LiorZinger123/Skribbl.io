@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { SocketContext } from "../Room";
+import { RoomContext } from "../Room";
 import { useAppSelector } from "../../../store/hooks";
 import { RootState } from "../../../store/store";
 import { CorrectAnswerData, PlayerType } from "../../../types/RoomTypes/types"
@@ -19,7 +19,7 @@ type Props = {
 
 const Player = (props: Props) => {
   
-    const socket = useContext(SocketContext)
+    const socket = useContext(RoomContext).socket
     const username = useAppSelector((state: RootState) => state.username)
     const [correctAnswer, setCorrectAnswer] = useState<boolean>(false)
     const faces = [<FaceIcon />, <Face2Icon />, <Face3Icon />, <Face4Icon />, <Face5Icon />, <Face6Icon />]

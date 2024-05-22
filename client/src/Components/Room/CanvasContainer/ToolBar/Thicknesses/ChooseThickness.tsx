@@ -1,13 +1,12 @@
 import { useState } from "react"
-import CanvasThicknesses from "./CanvasThicknesses"
-import CurrentThickness from './CurrentThickness'
+import { useContext } from "react"
+import { ToolBarContext } from "../../CanvasContainer"
+import CanvasThicknesses from "./ThicknessesComponents/CanvasThicknesses"
+import CurrentThickness from "./ThicknessesComponents/CurrentThickness"
 
-type Props = {
-  setCurrentWidth: React.Dispatch<React.SetStateAction<number>>
-}
+const ChooseThickness = () => {
 
-const ChooseThickness = (props: Props) => {
-
+    const props = useContext(ToolBarContext)  
     const [showThicknesses, setShowThicknesses] = useState<boolean>(false)
     const [currentThickness, setCurrentThickness] = useState<string>('small')
 

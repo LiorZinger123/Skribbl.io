@@ -1,26 +1,28 @@
-import { useEffect, useContext, useState } from "react"
-import { SocketContext } from "../Room"
-import { LocationsType, PlayerType, SetConnectedPlayersType } from "../../../types/RoomTypes/types"
+import React, { useEffect, useContext, useState } from "react"
+import { RoomContext } from "../Room"
+import { LocationsType, PlayerType, RoomCloseType, SetConnectedPlayersType } from "../../../types/RoomTypes/types"
 import Player from "./Player"
 import RoomMsg from "../RoomMsg/RoomMsg"
 
 type Props = {
   players: PlayerType[],
-  setPlayers: React.Dispatch<React.SetStateAction<PlayerType[]>>
+  setPlayers: React.Dispatch<React.SetStateAction<PlayerType[]>>,
 }
 
 const Players = (props: Props) => {
 
-  const socket = useContext(SocketContext)
+  const socket = useContext(RoomContext).socket
+  const painter = useContext(RoomContext).painter
   const [locations, setLocations] = useState<number[]>([]) 
-  const [showMsg, setShowMsg] = useState<boolean>(false)
-  const msg = 'All the players left the room.'
+  const [roomCloseMsg, setRoomCloseMsg] = useState<RoomCloseType>({ show: false, msg: '' })
 
   useEffect(() => {
 
     const setConnectedPlayers = (data: SetConnectedPlayersType): void => {
-      if(Array.isArray(data)) //add player on entrance
+      if(Array.isArray(data)){ //add player on entrance
         props.setPlayers(currentPlayers => [...currentPlayers, ...data])
+        painter.current = data[0].username
+      }
       else //add new player
         props.setPlayers(currentPlayers => [...currentPlayers, data])
     }
@@ -33,8 +35,8 @@ const Players = (props: Props) => {
       props.setPlayers(updatedPlayers)
     }
 
-    const leave = (): void => {
-      setShowMsg(true)
+    const leave = (msg: string): void => {
+      setRoomCloseMsg({ show: true, msg: msg })
     }
 
     socket.on('players', setConnectedPlayers)
@@ -58,7 +60,7 @@ const Players = (props: Props) => {
           <Player key={player.id} player={player} index={i} location={locations[i]} />
         ))}
       </ul>
-      {showMsg && <RoomMsg msg={msg} msgType="close" />}
+      {roomCloseMsg.show && <RoomMsg msg={roomCloseMsg.msg} msgType="close" />}
     </>
   )
 }

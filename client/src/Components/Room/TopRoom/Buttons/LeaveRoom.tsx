@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react"
-import { SocketContext } from "../Room"
-import RoomMsg from "../RoomMsg/RoomMsg"
+import { RoomContext } from "../../Room"
+import RoomMsg from "../../RoomMsg/RoomMsg"
 
 type Props = {
     painter: React.MutableRefObject<string>,
@@ -9,7 +9,7 @@ type Props = {
 
 const LeaveRoom = (props: Props) => {
 
-    const socket = useContext(SocketContext)  
+    const socket = useContext(RoomContext).socket  
     const [showMsg, setShowMsg] = useState<boolean>(false)
     const msg = 'Are you sure you want to leave the room?'
     const [roomClosed, setRoomClosed] = useState<boolean>(false)
@@ -20,6 +20,11 @@ const LeaveRoom = (props: Props) => {
       }
 
       socket.on('room_closed', disableClick)
+      // window.addEventListener('popstate', (e: PopStateEvent) => {
+      //   console.log('sss')
+      //   e.preventDefault()
+      //   setShowMsg(true)
+      // })
 
       return (): void => {
         socket.off('room_closed', disableClick)

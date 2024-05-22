@@ -1,22 +1,17 @@
 import { useRef, useEffect, useContext } from "react"
-import { SocketContext } from "../../../../Room"
-import { useAppSelector } from "../../../../../../store/hooks"
-import { RootState } from "../../../../../../store/store"
-import { Drawings } from "../../../../../../types/RoomTypes/types"
+import { RoomContext } from "../../../../../Room"
+import { CanvasContext } from "../../../../CanvasContainer"
+import { CanvasFunctionsContext } from "../../../Canvas"
+import { useAppSelector } from "../../../../../../../store/hooks"
+import { RootState } from "../../../../../../../store/store"
 
-type Props = {
-    setTime: React.Dispatch<React.SetStateAction<number>>,
-    roundTime: React.MutableRefObject<number>,
-    canvasRef: React.MutableRefObject<HTMLCanvasElement | null>,
-    contextRef: React.MutableRefObject<CanvasRenderingContext2D | null>,
-    previusDrawings: React.MutableRefObject<Drawings[]>,
-    canDraw: React.MutableRefObject<boolean>
-}
-
-const useTurnFunctions = (props: Props) => {
+const useTurnFunctions = () => {
     
     const room = useAppSelector((state: RootState) => state.room)
-    const socket = useContext(SocketContext)
+    const socket = useContext(RoomContext).socket
+    const canvasProps = useContext(CanvasContext) 
+    const canvasFunctionsProps = useContext(CanvasFunctionsContext)
+    const props = {...canvasProps, ...canvasFunctionsProps}
 
     const intervalRef = useRef<NodeJS.Timeout>(null!)
     const timeoutRef = useRef<NodeJS.Timeout>(null!)
@@ -40,7 +35,7 @@ const useTurnFunctions = (props: Props) => {
 
             timeoutRef.current = setTimeout(() => {
                 endTurn()
-            }, props.roundTime.current * 1000)
+            }, props.turnTime.current * 1000)
         }
         
         const endTurn = (): void => {

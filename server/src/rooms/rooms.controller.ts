@@ -4,7 +4,7 @@ import { RoomsService } from "./rooms.service";
 import { JoinRoomDto } from './dtos/joinRoom.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { NewRoomDto } from './dtos/newRoom.dto';
-import { SkipThrottle, Throttle } from "@nestjs/throttler";
+import { SkipThrottle } from "@nestjs/throttler";
 
 @SkipThrottle()
 @Controller('rooms')
@@ -35,6 +35,7 @@ export class RoomsController{
     }
 
     @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
     @Post('join')
     joinRoom(@Res() res: Response, @Body() data: JoinRoomDto): void {
         const id = this.roomsService.joinRoom(data)
@@ -47,6 +48,7 @@ export class RoomsController{
     }
 
     @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
     @Post('createroom')
     createRoom(@Res() res: Response, @Body() data: NewRoomDto): void {
         res.status(HttpStatus.CREATED).send(this.roomsService.createRoom(data))

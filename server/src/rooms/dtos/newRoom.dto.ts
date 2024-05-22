@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator"
+import { IsNotEmpty, IsOptional, MinLength } from "class-validator"
 
 export class NewRoomDto{
 
@@ -6,6 +6,7 @@ export class NewRoomDto{
     username: string
 
     @IsNotEmpty()
+    @MinLength(3)
     name: string
 
     @IsNotEmpty()
@@ -17,6 +18,7 @@ export class NewRoomDto{
     @IsNotEmpty()
     rounds: number
 
-    @IsNotEmpty()
+    @IsOptional()
+    @MinLength(3)
     password?: string
 }

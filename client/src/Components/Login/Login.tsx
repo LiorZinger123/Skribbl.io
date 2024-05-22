@@ -73,9 +73,10 @@ const Login = () => {
             
             {errors.root && <div className='authorization-error login-error'>{errors.root.message}</div>}
             
-            <div className={!errors.root ? 'login-options' : 'login-options-with-error'}>
-                <FormControlLabel className='' control={<Checkbox {...register("rememberMe")} 
+            <div className={`login-options ${!errors.root ? 'login-options-without-errors' : 'login-options-with-error'}`}>
+                <FormControlLabel control={<Checkbox {...register("rememberMe")} 
                 sx={{ color: "white", "&.Mui-checked": {color: "#DA56EF"} }} />} label="Remember Me" />
+                <p className='forgot-password' onClick={() => nav('forgotpass')}>Forgot Password?</p>
             </div>
             
             <button className='authorization-btn login-btn' disabled={isSubmitting} type='submit'>

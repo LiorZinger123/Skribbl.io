@@ -13,6 +13,9 @@ export class CreateUserDto{
     password: string
 
     @IsString()
+    submitPassword?: string
+
+    @IsString()
     @IsEmail()
     email: string
 }

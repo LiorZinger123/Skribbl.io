@@ -1,24 +1,19 @@
-import React, { useEffect, useContext } from "react"
-import { SocketContext } from "../../../Room"
+import { useEffect, useContext } from "react"
+import { RoomContext, ScreenMsgsContext } from "../../../Room"
+import { ScreenMsgsFunctionsContext } from "../../ScreenMsgs"
 import { useAppSelector } from "../../../../../store/hooks"
 import { RootState } from "../../../../../store/store"
-import { PlayerType, ScreenCurrentMsgType, ShowScoresType, Word } from "../../../../../types/RoomTypes/types"
+import { ShowScoresType } from "../../../../../types/RoomTypes/types"
+import ReactDOMServer from 'react-dom/server'
 
-type Props = {
-    players: PlayerType[],
-    setPlayers: React.Dispatch<React.SetStateAction<PlayerType[]>>,
-    painter: React.MutableRefObject<string>,
-    round: number,
-    maxRounds: number,
-    setScreenCurrentMsg: React.Dispatch<React.SetStateAction<ScreenCurrentMsgType>>,
-    currentWord: Word
-}
-
-const useScoresMsg = (props: Props) => {
+const useScoresMsg = () => {
   
     const room = useAppSelector((state: RootState) => state.room)
-    const socket = useContext(SocketContext)
     const username = useAppSelector((state: RootState) => state.username)
+    const socket = useContext(RoomContext).socket
+    const painter = useContext(RoomContext).painter
+    const props = useContext(ScreenMsgsContext)
+    const setScreenCurrentMsg = useContext(ScreenMsgsFunctionsContext).setScreenCurrentMsg
 
     useEffect(() => {
         
@@ -34,8 +29,8 @@ const useScoresMsg = (props: Props) => {
                 </ul>
             </div>
             
-            props.setScreenCurrentMsg({show: true, msg: screenCurrentMsg})
-            socket.emit('new_screen_msg', {room: room, msg: JSON.stringify(screenCurrentMsg)})
+            setScreenCurrentMsg(screenCurrentMsg)
+            socket.emit('new_screen_msg', {room: room, msg: ReactDOMServer.renderToString(screenCurrentMsg)})
 
             props.setPlayers(players => {
                 return players.map(player => {
@@ -48,7 +43,7 @@ const useScoresMsg = (props: Props) => {
 
             setTimeout(() => {
                 if(data.painter !== null){
-                    props.painter.current = data.painter
+                    painter.current = data.painter
                     props.currentWord.word = ''
                     if(username === data.painter)
                         socket.emit('choose_word', {room:room})

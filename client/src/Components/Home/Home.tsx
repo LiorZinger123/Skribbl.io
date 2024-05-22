@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from "react"
 import { Room } from "../../types/HomeTypes/homeTypes"
 import { fetchToApi, getFromApi } from "../../Api/fetch"
-import Rooms from "./Rooms"
+import Rooms from "./Rooms/Rooms"
 import { useAppSelector } from "../../store/hooks"
 import { RootState } from "../../store/store"
-import Search from "./Search"
-import Refresh from "./Refresh"
-import Disconnect from "./Disconnect"
+import Search from "./Search/Search"
+import Refresh from "./Refresh/Refresh"
+import Disconnect from "./Disconnect/Disconnect"
 import TokenError from "../TokenError/TokenError"
-import CreateButton from "./CreateButton"
+import CreateButton from "./CreateButton/CreateButton"
 
 const Home = () => {
 
@@ -47,7 +47,7 @@ const Home = () => {
           }
         }
       }
-  
+      
       getRoomsFromApi()
       window.addEventListener('scroll', onScroll)
 

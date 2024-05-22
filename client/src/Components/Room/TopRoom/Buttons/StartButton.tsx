@@ -1,8 +1,8 @@
 import React, { useContext } from "react"
-import { SocketContext } from "../Room"
-import { useAppSelector } from "../../../store/hooks"
-import { RootState } from "../../../store/store"
-import { PlayerType, ChatMessage } from "../../../types/RoomTypes/types"
+import { RoomContext } from "../../Room"
+import { useAppSelector } from "../../../../store/hooks"
+import { RootState } from "../../../../store/store"
+import { PlayerType, ChatMessage } from "../../../../types/RoomTypes/types"
 
 type Props = {
     setShowStartButton: React.Dispatch<React.SetStateAction<boolean>>,
@@ -13,7 +13,7 @@ type Props = {
 const StartButton = (props: Props) => {
 
     const room = useAppSelector((state: RootState) => state.room)
-    const socket = useContext(SocketContext)
+    const socket = useContext(RoomContext).socket
 
     const startGame = (): void => {
         if(props.players.length > 1){
@@ -21,7 +21,7 @@ const StartButton = (props: Props) => {
             props.setShowStartButton(false)
         }
         else
-            props.setMessages(messages => [...messages, {id: messages.length + 1 ,msg: "You need at least 2 players to start the game!"}])
+            props.setMessages(messages => [...messages, {id: Date.now() ,msg: "You need at least 2 players to start the game!"}])
     }
 
   return (

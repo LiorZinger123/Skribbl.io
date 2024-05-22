@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useRef } from "react"
-import { SocketContext } from "../Room" 
+import { RoomContext } from "../Room" 
 import { ChatMessage, CorrectMsgFromServer } from "../../../types/RoomTypes/types"
 import { useAppSelector } from "../../../store/hooks"
 import { RootState } from "../../../store/store"
@@ -9,14 +9,14 @@ type Props = {
     messages: ChatMessage[],
     setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
     currentWord: Word,
-    painter: React.MutableRefObject<string>,
 }
 
 const Chat = (props: Props) => {
 
   const room = useAppSelector((state: RootState) => state.room)
   const username = useAppSelector((state: RootState) => state.username)
-  const socket = useContext(SocketContext)
+  const socket = useContext(RoomContext).socket
+  const painter = useContext(RoomContext).painter
   const [msg, setMsg] = useState<string>('')
   const msgsRef = useRef<HTMLDivElement>(null!)
   const [roomClosed, setRoomClosed] = useState<boolean>(false)
@@ -52,7 +52,7 @@ const Chat = (props: Props) => {
     const data = {msg: msg, username: username}
     if(msg.toLowerCase() === props.currentWord.word.toLowerCase()){
       let newMsg = {id: Date.now(), msg: `${data.username}: ${data.msg}`, color: 'black'} //local msg to add to user's chat
-      if(props.painter.current !== username){
+      if(painter.current !== username){
         socket.emit('correct', {msgData: data, room: room}) // send msg to all the other users if not the drawer
         newMsg = {...newMsg, color: 'green'} // add green color to user msg
       } 

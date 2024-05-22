@@ -6,6 +6,9 @@ import SignUp from './Components/SignUp/SignUp'
 import Home from "./Components/Home/Home";
 import Room from "./Components/Room/Room";
 import CreateRoom from "./Components/CreateRoom/CreateRoom";
+import UserValidation from "./Components/ResetPassword/UserValidation";
+import CodeValidation from "./Components/ResetPassword/CodeValidation";
+import ResetPassword from "./Components/ResetPassword/ResetPassword";
 import './design/css'
 import './App.css'
 
@@ -24,6 +27,9 @@ function App() {
             <Route path='home' element={<Home />} />
             <Route path='room' element={<Room />} />
             <Route path='createroom' element={<CreateRoom />} />
+            <Route path='forgotpass' element={<UserValidation />} />
+            <Route path='codevalidation' element={<CodeValidation />} />
+            <Route path='resetpassword' element={<ResetPassword />} />
         </Routes>
     </StableNavigateContext.Provider>  
   )

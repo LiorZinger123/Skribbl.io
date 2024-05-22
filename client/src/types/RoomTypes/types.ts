@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react"
+import React from "react"
 
 export type drawStarightLineType = {
     e: MouseEvent,
@@ -34,6 +34,11 @@ export type PlayerType = {
     roomOwner: boolean
 }
 
+export type RoomCloseType = {
+    show: boolean,
+    msg: string
+} 
+
 export type LocationsType = {
     locations: number[]
 }
@@ -61,24 +66,13 @@ export type SetConnectedPlayersType = PlayerType[] | PlayerType
 
 export type RoomDetails = {
     time: number, 
-    rounds: number
-}
-
-export type ScreenCurrentMsgType = {
-    show: boolean,
-    msg: ReactElement | null
+    rounds: number,
+    currentRound: number
 }
 
 export type JoinWhileScreenMsg = {
     msg: string,
     time: number
-}
-
-export type SerializedElement = {
-    type: string,
-    props: {
-      children?: (SerializedElement | string)[]
-    }
 }
 
 export type ShowScoresType = {
@@ -90,6 +84,11 @@ export type ShowScoresType = {
 export type EndMsgInfoType = {
     winnerMsg: string,
     owner: string
+}
+
+export type JoinWhileEndMsg = {
+    data: EndMsgInfoType,
+    time: number
 }
 
 export type WhileDrawing = {

@@ -1,17 +1,13 @@
+import { useContext } from "react"
+import { ToolBarContext } from "../CanvasContainer";
 import BrushIcon from '@mui/icons-material/Brush';
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 
-type Props = {
-    setDrawLine: React.Dispatch<React.SetStateAction<boolean>>,
-    setDeleteAll: React.Dispatch<React.SetStateAction<boolean>>,
-    drawLine: boolean,
-    setUndo: React.Dispatch<React.SetStateAction<boolean>>
-}
+const Modes = () => {
 
-const Modes = (props: Props) => {
-
+    const props = useContext(ToolBarContext)  
     const modes = [{ icon: <BrushIcon className='modes-icon' fontSize='large' />, classname: `pointer-modes-cell ${props.drawLine ? 'selected-icon' : 'unselected-icon'}`, click: () => props.setDrawLine(true), key: 'line'}, 
     { icon: <FormatColorFillIcon className='modes-icon' fontSize='large' />, classname: `pointer-modes-cell ${!props.drawLine ? 'selected-icon' : 'unselected-icon'}`, click: () => props.setDrawLine(false), key: 'fill'},
     { icon: <UndoIcon className='modes-icon undo-icon' fontSize='large' onClick={() => props.setUndo(undo => !undo)} />, key: 'undo' },

@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useRef } from 'react';
-import { SocketContext } from "../Room"
+import { RoomContext } from "../Room"
 import { useAppSelector } from "../../../store/hooks"
 import { RootState } from "../../../store/store"
 import { StableNavigateContext } from '../../../App';
@@ -17,7 +17,7 @@ const RoomMsg = (props: Props) => {
     const nav = useContext(StableNavigateContext)
     const room = useAppSelector((state: RootState) => state.room)
     const username = useAppSelector((state: RootState) => state.username)
-    const socket = useContext(SocketContext)
+    const socket = useContext(RoomContext).socket
     
     const [time, setTime] = useState<number>(10)
     const intervalRef = useRef<NodeJS.Timeout | null>(null!)

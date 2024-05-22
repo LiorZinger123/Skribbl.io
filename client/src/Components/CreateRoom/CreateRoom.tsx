@@ -42,6 +42,8 @@ const CreateRoom = () => {
         dispatch(setRoomId(await res.text()))
         nav('/room')
       }
+      else if(res.status === 400)
+        setError('root', {message: "Something went wrong, please check room name/password"})
       else if(res.status === 401)
         setShowTokenError(true)
 0    }
@@ -56,43 +58,47 @@ const CreateRoom = () => {
   }
   
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='create-room'>
-      <h1>Create Room</h1>
-      
-      <div className='room-settings'>
+    <>
+      {!showTokenError &&
+        <form onSubmit={handleSubmit(onSubmit)} className='create-room'>
+          <h1>Create Room</h1>
+          
+          <div className='room-settings'>
 
-        <div className='room-setting'>
-            <label htmlFor="name">Name:</label>
-            <input {...register('name')} id='name' className='name-input' type="text" placeholder="Room Name" />
-            {errors.name && <div className='create-room-error'>Name must contain 3 characters!</div>}
-        </div>
+            <div className='room-setting'>
+                <label htmlFor="name">Name:</label>
+                <input {...register('name')} id='name' className='name-input' type="text" placeholder="Room Name" />
+                {errors.name && <div className='create-room-error'>Name must contain 3 characters!</div>}
+            </div>
 
-        {createSettings.map(setting => (
-          <div key={setting.id} className='room-setting'>
-            <label htmlFor={setting.id}>{setting.label}:</label>
-            <CustomSelect setting={setting} updateRoomSettings={updateRoomSettings} setDisablePass={setDisablePass} />
+            {createSettings.map(setting => (
+              <div key={setting.id} className='room-setting'>
+                <label htmlFor={setting.id}>{setting.label}:</label>
+                <CustomSelect setting={setting} updateRoomSettings={updateRoomSettings} setDisablePass={setDisablePass} />
+              </div>
+            ))}
+            
+            <div className='room-setting'>
+              <label htmlFor="password">Set Password:</label>
+              <input {...register('password')} id='password' className={disablePass ? 'password-disabled' : 'password-enabled'}
+                placeholder="Enter Password" disabled={disablePass} type='password' required />
+              {errors.password && <div className='create-room-error'>Password must contain 3 characters!</div>}
+            </div>
+
           </div>
-        ))}
-        
-        <div className='room-setting'>
-          <label htmlFor="password">Set Password:</label>
-          <input {...register('password')} id='password' className={disablePass ? 'password-disabled' : 'password-enabled'}
-            placeholder="Enter Password" disabled={disablePass} type='password' required />
-          {errors.password && <div className='create-room-error'>Password must contain 3 characters!</div>}
-        </div>
+      
+          {errors.root && <div>{errors.root.message}</div>}
 
-      </div>
-  
-      {errors.root && <div>{errors.root.message}</div>}
+          <button type='submit' disabled={isSubmitting}>
+            {isSubmitting ? "Creating..." : "Create Room"}
+          </button>
 
-      <button type='submit' disabled={isSubmitting}>
-        {isSubmitting ? "Creating..." : "Create Room"}
-      </button>
+          <p>Dont want to create a room? <span className='link' onClick={() => nav('/home')}>JOIN ONE</span></p>
 
-      <p>Dont want to create a room? <span className='link' onClick={() => nav('/home')}>JOIN ONE</span></p>
-
+        </form>
+      }
       {showTokenError && <TokenError />}
-    </form>
+    </>
   )
 }
 

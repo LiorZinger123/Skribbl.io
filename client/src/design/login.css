@@ -32,6 +32,10 @@
         transform: scale(0.8);
     }
     
+    .login-options{
+        flex-direction: column;
+    }
+
     .login-error{
         font-size: smaller;
     }
@@ -46,9 +50,18 @@
 }
 
 .login-options{
+    display: flex;
+}
+
+.login-options-without-errors{
     margin: 15px 0;
 }
 
 .login-options-with-error{
     margin-bottom: 15px;
+}
+
+.forgot-password:hover{
+    cursor: pointer;
+    text-decoration: underline;
 }

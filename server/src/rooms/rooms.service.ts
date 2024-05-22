@@ -1,15 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import Room, { ConnectedPlayersType, playerTurnScore } from "./types/room";
-import { RoomToList } from "./types/RoomToList";
+import { RoomToList } from "./types/roomToList";
 import { JoinRoomDto } from "./dtos/joinRoom.dto";
 import { NewRoomDto } from "./dtos/newRoom.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Word, WordDocument } from "src/schemas/words.schema";
 import { Model } from "mongoose";
-import { RoomDetails } from "./types/RoomDetails";
-import { MoreRooms } from "./types/MoreRooms";
-import { JoinWhileDrawing } from "./types/JoinWhileDrawing";
+import { RoomDetails } from "./types/roomDetails";
+import { MoreRooms } from "./types/moreRooms";
+import { JoinWhileDrawing } from "./types/joinWhileDrawing";
 import { RoomMsgStatus } from "src/webSocket/types/types";
+import { EndScreenStatus } from "./types/endScreenStatus";
 
 @Injectable()
 export class RoomsService{
@@ -105,8 +106,8 @@ export class RoomsService{
   getRoomDetails(id: string): RoomDetails{
     const room = this.rooms.find(room => room.id === id)
     if(room != undefined)
-      return {time: room.seconds, rounds: room.rounds}
-    return {time: 0, rounds: 0}
+      return {time: room.seconds, rounds: room.rounds, currentRound: room.currentRound}
+    return {time: 0, rounds: 0, currentRound: 0}
   } 
   
   startPlaying(id: string): void {
@@ -125,9 +126,9 @@ export class RoomsService{
     room.currentTime = 15
   }
 
-  newScreenMsg(id: string, msg: string): void {
+  newScreenMsg(id: string, msg: string, status: string): void {
     const room = this.rooms.find(room => room.id === id)
-    room.screenStatus = 'msg'
+    room.screenStatus = status
     room.currentMsg = msg
   }
 
@@ -144,6 +145,24 @@ export class RoomsService{
   roomMsgStatus(id: string): RoomMsgStatus {
     const room = this.rooms.find(room => room.id === id)
     return { msg: room.currentMsg, time: room.currentTime }
+  }
+
+  setEndStatus(id: string, endMsg: string): void{
+    const room = this.rooms.find(room => room.id === id)
+    room.screenStatus = 'end'
+    room.currentMsg = endMsg
+    room.currentTime = 16
+  }
+
+  getEndScreenStatus(id: string): EndScreenStatus {
+    const room = this.rooms.find(room => room.id === id)
+    const data = { winnerMsg: room.currentMsg, owner: room.connectedPlayers[0].username }
+    return { data: data, time: room.currentTime }
+  }
+
+  setTurnTime(id: string): void {
+    const room = this.rooms.find(room => room.id === id)
+    room.currentTime = room.seconds
   }
 
   tick(id: string): number{
@@ -207,7 +226,7 @@ export class RoomsService{
 
   addNewTurnScore(id: string, username: string): void{
     const room = this.rooms.find(room => room.id === id)
-    const newScore = {username: username, score: 50 * (room.connectedPlayers.length - room.turnScores.length) * room.currentTime / 5}
+    const newScore = {username: username, score: 50 * (room.connectedPlayers.length - room.turnScores.length) * (room.currentTime / 5 + (parseInt(room.currentWord.length) / 3))}
     room.turnScores.push(newScore)
   }
 
@@ -308,6 +327,13 @@ export class RoomsService{
       if(room.connectedPlayers[0].username === username)
         return true
     }
+    return false
+  }
+
+  checkIfOwnerLeftInEndScreen(id: string, username: string): boolean{
+    const room = this.rooms.find(room => room.id === id)
+    if(room.screenStatus === 'end' && room.connectedPlayers[0].username === username)
+      return true
     return false
   }
 

@@ -1,29 +1,30 @@
 import { useEffect, useRef, useContext } from "react"
-import { SocketContext } from "../../../Room"
+import { RoomContext, ScreenMsgsContext } from "../../../Room"
 import { useAppSelector } from "../../../../../store/hooks"
 import { RootState } from "../../../../../store/store"
-import { PlayerType, ScreenCurrentMsgType } from "../../../../../types/RoomTypes/types"
+import ReactDOMServer from 'react-dom/server'
+import { ScreenMsgsFunctionsContext } from "../../ScreenMsgs"
 
-type Props = {
-  players: PlayerType[],
-  painter: React.MutableRefObject<string>,
-  setScreenCurrentMsg: React.Dispatch<React.SetStateAction<ScreenCurrentMsgType>>
-}
+const useStartMsg = () => {
 
-const useStartMsg = (props: Props) => {
-
-  const room = useAppSelector((state: RootState) => state.room)
-  const socket = useContext(SocketContext)
   const username = useAppSelector((state: RootState) => state.username)
+  const room = useAppSelector((state: RootState) => state.room)
+  const socket = useContext(RoomContext).socket
+  const painter = useContext(RoomContext).painter
+  const players = useContext(ScreenMsgsContext).players
+  const setScreenCurrentMsg = useContext(ScreenMsgsFunctionsContext).setScreenCurrentMsg
   const timeoutRef = useRef<NodeJS.Timeout>(null!)
 
   useEffect(() => {
 
     const startMsg = (): void => {
-      props.painter.current = props.players[0].username
-      props.setScreenCurrentMsg({show: true,  msg: <p>Starting Game!</p>})
+      const msg = <p>Starting Game!</p>
+      painter.current = players[0].username
+      setScreenCurrentMsg(msg)
+      if(painter.current === username)
+        socket.emit('new_screen_msg', {room: room, msg: ReactDOMServer.renderToString(msg)})
       timeoutRef.current = setTimeout(() => {
-        if(props.players[0].username === username)
+        if(painter.current === username)
           socket.emit('choose_word', {room: room})
       }, 3000)
     }
@@ -33,7 +34,8 @@ const useStartMsg = (props: Props) => {
     return (): void => {
       socket.off('start_game', startMsg)
     }
-  }, [props.players])
+
+  }, [players])
 
 }
 

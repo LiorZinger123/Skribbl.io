@@ -1,23 +1,19 @@
-import React, { useEffect, useContext, useRef, useState } from "react"
-import { EndMsgInfoType, ScreenCurrentMsgType } from "../../../../../types/RoomTypes/types"
+import { useEffect, useContext, useRef, useState } from "react"
+import { EndMsgInfoType, JoinWhileEndMsg } from "../../../../../types/RoomTypes/types"
 import { useAppSelector } from "../../../../../store/hooks"
 import { RootState } from "../../../../../store/store"
-import { SocketContext } from "../../../Room"
+import { RoomContext, ScreenMsgsContext } from "../../../Room"
+import { ScreenMsgsFunctionsContext } from "../../ScreenMsgs"
 import { StableNavigateContext } from "../../../../../App"
-import { PlayerType } from "../../../../../types/RoomTypes/types"
 
-type Props = {
-    setRound: React.Dispatch<React.SetStateAction<number>>,
-    setPlayers: React.Dispatch<React.SetStateAction<PlayerType[]>>,
-    setScreenCurrentMsg: React.Dispatch<React.SetStateAction<ScreenCurrentMsgType>>
-}
-
-const useEndMsg = (props: Props) => {
+const useEndMsg = () => {
 
     const nav = useContext(StableNavigateContext)   
     const room = useAppSelector((state: RootState) => state.room)
     const username = useAppSelector((state: RootState) => state.username)
-    const socket = useContext(SocketContext)
+    const socket = useContext(RoomContext).socket
+    const props = useContext(ScreenMsgsContext)
+    const setScreenCurrentMsg = useContext(ScreenMsgsFunctionsContext).setScreenCurrentMsg
     const [time, setTime] = useState<number>(16)
     const [data, setData] = useState<EndMsgInfoType>(null!)
     const intervalRef = useRef<NodeJS.Timeout>(null!)
@@ -27,16 +23,26 @@ const useEndMsg = (props: Props) => {
         
         const setWinner = (data: EndMsgInfoType) => {
             setData(data)
+            
+            if(username === data.owner){
+                intervalRef.current = setInterval(() => {
+                        setTime(time => time - 1)
+                        socket.emit('end_msg_tick', {room: room}) 
+                }, 1000)
+                    
+                timeoutRef.current = setTimeout(() => {
+                    socket.emit('end_room', {room: room})
+                }, 16 * 1000)
+            }
+        }
 
-            intervalRef.current = setInterval(() => {
-                setTime(time => time - 1)
-            }, 1000)
+        const tick = (): void => {
+            setTime(t => t - 1)
+        }
 
-            timeoutRef.current = setTimeout(() => {
-                if(username === data.owner)
-                    socket.emit('close_room', {room: room})
-                nav('/home')
-            }, 16 * 1000)
+        const join = (data: JoinWhileEndMsg): void => {
+            setData(data.data)
+            setTime(data.time)
         }
 
         const restart = (owner: string): void => {
@@ -51,12 +57,22 @@ const useEndMsg = (props: Props) => {
                 socket.emit('start_new_game', {room: room})
         }
 
+        const backHome = (): void => {
+            nav('/home')
+        }
+
         socket.on('end_game', setWinner)
+        socket.on('end_msg_tick', tick)
+        socket.on('join_while_end_msg', join)
         socket.on('restart', restart)
+        socket.on('end_room', backHome)
     
         return (): void => {
             socket.off('end_game', setWinner)
+            socket.off('end_msg_tick', tick)
+            socket.off('join_while_end_msg', join)
             socket.off('restart', restart)
+            socket.on('end_room', backHome)
             clearInterval(intervalRef.current)
             clearTimeout(timeoutRef.current)
         }
@@ -68,16 +84,16 @@ const useEndMsg = (props: Props) => {
         }
 
         const setScreenMsgs = (): void => {
-            props.setScreenCurrentMsg({show: true, msg:
-                <div className="end-msg">
-                    <p>{data.winnerMsg} won the game!</p>
-                    {data.owner === username
-                        ? <p>Press to restart game <span className="restart-game" onClick={restartGame}>RESTART</span></p>
-                        : <p>{data.owner} is deciding whether reset the game or not</p>
-                    }
-                    <p>The room will be closed in {time} seconds</p>
-                </div>
-            })
+            const endMsg = 
+            <div className="end-msg">
+                <p>{data.winnerMsg} won the game!</p>
+                {data.owner === username
+                    ? <p>Press to restart game <span className="restart-game" onClick={restartGame}>RESTART</span></p>   
+                    : <p>{data.owner} is deciding whether reset the game or not</p>
+                }
+                <p>The room will be closed in {time} seconds</p> 
+            </div>
+            setScreenCurrentMsg(endMsg)
         }
         
         if(data){
